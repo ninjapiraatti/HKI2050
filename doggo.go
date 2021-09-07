@@ -25,7 +25,7 @@ func loadPage(title string) (*Page, error) {
 }
 
 func main() {
-	p1 := &Page{Title: "lorem", Body: []byte("Ipsum")}
+	p1 := &Page{Title: "lorem", Body: []byte("Ipsummmm")}
 	p1.save()
 	p2, _ := loadPage("lorem")
 	fmt.Println(string(p2.Body))
