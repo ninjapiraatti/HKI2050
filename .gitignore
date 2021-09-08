@@ -14,7 +14,7 @@
 .env
 test.db
 /temp
-/public
+# /public
 .vscode
 app/node_modules
 app/package-lock.json
