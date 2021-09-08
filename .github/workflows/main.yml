@@ -28,7 +28,7 @@ jobs:
           toolchain: stable
       - run: cargo build --release --all-features
 
-      # Deploy
+      # Deploy server
       - name: Deploy binary to Server
         uses: easingthemes/ssh-deploy@main
         env:
@@ -39,7 +39,18 @@ jobs:
           REMOTE_USER: ${{ secrets.SSH_USERNAME }}
           #TARGET: ${{ secrets.REMOTE_TARGET }}
           TARGET: "/var/www/hki2050.com/binary/"
-          EXCLUDE: "/dist/, /node_modules/"
+          # EXCLUDE: "/dist/, /node_modules/"
+
+      # Deploy public
+      - name: Deploy public to Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "public/"
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          TARGET: "/var/www/hki2050.com/html/"
 
       # Do ssh commands
       - name: SSH
