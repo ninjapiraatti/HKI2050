@@ -15,20 +15,19 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build_and_test:
-    name: Rust project
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: cargo build --release --all-features
-  deploy:
+  build_test_deploy:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+
+      # Build
+      - name: Build Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+        run: cargo build --release --all-features
+
       
       # Deploy
       - name: Deploy to Server
