@@ -36,7 +36,11 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           ARGS: "-rltgoDzvO --delete"
+<<<<<<< HEAD
           SOURCE: "target/release/poc-golang-vue2"
+=======
+          SOURCE: "testdeploy/"
+>>>>>>> 4ff34707b868c21cb2b64d927054116461ba1f5c
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_USER: ${{ secrets.SSH_USERNAME }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
