@@ -26,8 +26,8 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-        run: cargo build --release --all-features
-        
+      - run: cargo build --release --all-features
+
       # Deploy
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@main
