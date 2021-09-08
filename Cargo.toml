@@ -1,0 +1,12 @@
+[package]
+name = "poc-golang-vue2"
+version = "2.0.0"
+authors = ["Ninjapiraatti"]
+edition = "2018"
+
+[dependencies]
+actix-web = "3.3"
+env_logger = "0.8"
+
+[dev-dependencies]
+actix-rt = "1.1"

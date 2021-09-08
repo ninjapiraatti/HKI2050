@@ -15,23 +15,43 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  build_and_test:
+    name: Rust project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo build --release --all-features
   deploy:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      
+      # Deploy
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "target/release/poc-golang-vue2"
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          EXCLUDE: "/dist/, /node_modules/"
 
-      # Deploys the repo
-      - name: Deploy
+      # Do ssh commands
+      - name: SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           username: ${{ secrets.SSH_USERNAME }}
           
           script: |
-            mkdir henlo
+            echo 'henlo'
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
