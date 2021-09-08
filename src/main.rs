@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
             // enable logger
             .wrap(middleware::Logger::default())
             .service(web::resource("../html/index.html").to(|| async { "Hello world!" }))
-            .service(web::resource("../html").to(index))
+            .service(web::resource("/").to(index))
     })
     .bind("127.0.0.1:8086")?
     .run()
