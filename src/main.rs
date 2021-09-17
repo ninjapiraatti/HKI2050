@@ -17,7 +17,7 @@ async fn home(session: Session) -> Result<HttpResponse> {
 
 	Ok(HttpResponse::build(StatusCode::OK)
 		.content_type("text/html; charset=utf-8")
-		.body(include_str!("../public/index.html")))
+		.body(include_str!("../html/index.html")))
 }
 
 #[get("/app/*")]
@@ -31,7 +31,7 @@ async fn allviews(session: Session, req: HttpRequest) -> Result<HttpResponse> {
 
 	Ok(HttpResponse::build(StatusCode::OK)
 		.content_type("text/html; charset=utf-8")
-		.body(include_str!("../public/index.html")))
+		.body(include_str!("../html/index.html")))
 }
 
 #[actix_rt::main]
@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
 							.route(web::get().to(handlers::auth_handler::get_me)),
 					),
 			)*/
-			.service(fs::Files::new("/public", "public").show_files_listing())
+			.service(fs::Files::new("/html", "html").show_files_listing())
 			.service(home)
 			.service(allviews)
 			.service(web::resource("/").route(web::get().to(|req: HttpRequest| {
