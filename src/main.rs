@@ -37,12 +37,14 @@ async fn allviews(session: Session, req: HttpRequest) -> Result<HttpResponse> {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
 	dotenv::dotenv().ok();
+    env_logger::init();
 	let domain: String = std::env::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 	let server_url = std::env::var("SERVER_URL").unwrap_or_else(|_| "localhost:8086".to_string());
 
 	HttpServer::new(move || {
 		App::new()
 			.data(web::JsonConfig::default().limit(4096))
+            .wrap(middleware::Logger::default())
             /*
 			.service(
 				web::scope("/api")
@@ -58,7 +60,7 @@ async fn main() -> std::io::Result<()> {
 							.route(web::get().to(handlers::auth_handler::get_me)),
 					),
 			)*/
-			.service(fs::Files::new("../html", "html").show_files_listing())
+			.service(fs::Files::new("/html", "html").show_files_listing())
 			.service(home)
 			.service(allviews)
 			.service(web::resource("/").route(web::get().to(|req: HttpRequest| {
