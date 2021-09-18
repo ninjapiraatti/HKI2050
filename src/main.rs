@@ -60,7 +60,8 @@ async fn main() -> std::io::Result<()> {
 							.route(web::get().to(handlers::auth_handler::get_me)),
 					),
 			)*/
-			.service(fs::Files::new("/public", "public").show_files_listing())
+			//.service(fs::Files::new("/public", "public").show_files_listing())
+            .service(fs::Files::new("/public", "./public").show_files_listing())
 			.service(home)
 			.service(allviews)
 			.service(web::resource("/").route(web::get().to(|req: HttpRequest| {
