@@ -17728,7 +17728,7 @@
     const _hoisted_1$1 = { class: "container" };
 
     function render$1(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$1, " Henloooo "))
+      return (openBlock(), createElementBlock("div", _hoisted_1$1, " Henlo "))
     }
 
     script$1.render = render$1;
@@ -17736,7 +17736,9 @@
 
     const router = createRouter({
     	routes: [
-    		{ path: '/', component: script$1, name: 'page-home' },
+    		//{ path: '/', name: 'home', redirect: () => ({ name: state.loggeduser && state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
+    		{ path: '/', name: 'home', redirect: () => ('page-home') },
+    		{ path: '/app', component: script$1, name: 'page-home' },
     		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
