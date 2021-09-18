@@ -20,8 +20,8 @@ const needAdminOrSelf = to => state.loggeduser.isadmin || to.params.id == state.
 const router = createRouter({
 	routes: [
 		//{ path: '/', name: 'home', redirect: () => ({ name: state.loggeduser && state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
-		{ path: '/', name: 'home', redirect: () => ('page-home') },
-		{ path: '/app', component: Home, name: 'page-home' },
+		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
+		{ path: '/app/', component: Home, name: 'page-home' },
 		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
 		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
 		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
