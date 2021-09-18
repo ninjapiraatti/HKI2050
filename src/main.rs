@@ -65,7 +65,7 @@ async fn main() -> std::io::Result<()> {
 			.service(home)
 			.service(allviews)
 			.service(web::resource("/").route(web::get().to(|req: HttpRequest| {
-				HttpResponse::Found().header(header::LOCATION, "index.html").finish()
+				HttpResponse::Found().header(header::LOCATION, "/public/index.html").finish()
 			})))
 	})
 	.bind(server_url)?
