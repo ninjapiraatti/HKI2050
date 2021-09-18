@@ -6,6 +6,8 @@ use actix_session::Session;
 use actix_web::http::{header, StatusCode};
 use actix_web::{get, middleware, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 
+mod handlers;
+
 #[get("/")]
 async fn home(session: Session) -> Result<HttpResponse> {
 	let mut counter = 1;
@@ -60,6 +62,13 @@ async fn main() -> std::io::Result<()> {
 							.route(web::get().to(handlers::auth_handler::get_me)),
 					),
 			)*/
+            .service(
+				web::scope("/api")
+                .service(
+                    web::resource("/test")
+                        .route(web::get().to(handlers::test_handler::test)),
+                )
+            )
             .service(fs::Files::new("/public", "public").show_files_listing())
 			.service(home)
 			.service(allviews)
