@@ -1,12 +1,10 @@
-#[macro_use]
-
 use actix_files as fs;
-use actix_identity::{CookieIdentityPolicy, IdentityService};
+//use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_session::Session;
 use actix_web::http::{header, StatusCode};
 use actix_web::{get, middleware, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
+//use diesel::r2d2::{self, ConnectionManager};
 
 mod handlers;
 
@@ -26,6 +24,7 @@ async fn home(session: Session) -> Result<HttpResponse> {
 
 #[get("/app/*")]
 async fn allviews(session: Session, req: HttpRequest) -> Result<HttpResponse> {
+    println!("HTTP REQ:\n{:?}\n", req);
 	let mut counter = 1;
 	if let Some(count) = session.get::<i32>("counter")? {
 		counter = count + 1;
@@ -61,26 +60,12 @@ async fn main() -> std::io::Result<()> {
 	initialize_db(&database_url);
 	let domain: String = std::env::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 	let server_url = std::env::var("SERVER_URL").unwrap_or_else(|_| "localhost:8086".to_string());
+    println!("{:?}", domain);
 
 	HttpServer::new(move || {
 		App::new()
 			.data(web::JsonConfig::default().limit(4096))
             .wrap(middleware::Logger::default())
-            /*
-			.service(
-				web::scope("/api")
-					.service(
-						web::resource("/register/{invitation_id}")
-							.route(web::post().to(handlers::register_handler::register_user)),
-					)
-					.service(web::resource("/upload").route(web::post().to(handlers::upload_handler::save_file)))
-					.service(
-						web::resource("/auth")
-							.route(web::post().to(handlers::auth_handler::login))
-							.route(web::delete().to(handlers::auth_handler::logout))
-							.route(web::get().to(handlers::auth_handler::get_me)),
-					),
-			)*/
             .service(
 				web::scope("/api")
                 .service(
@@ -92,6 +77,7 @@ async fn main() -> std::io::Result<()> {
 			.service(home)
 			.service(allviews)
 			.service(web::resource("/").route(web::get().to(|req: HttpRequest| {
+                println!("HTTP REQ:\n{:?}\n", req);
 				HttpResponse::Found().header(header::LOCATION, "index.html").finish()
 			})))
 	})
