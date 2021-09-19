@@ -5,6 +5,8 @@ use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_session::Session;
 use actix_web::http::{header, StatusCode};
 use actix_web::{get, middleware, web, App, HttpRequest, HttpResponse, HttpServer, Result};
+use diesel::prelude::*;
+use diesel::r2d2::{self, ConnectionManager};
 
 mod handlers;
 
@@ -36,10 +38,27 @@ async fn allviews(session: Session, req: HttpRequest) -> Result<HttpResponse> {
 		.body(include_str!("../public/index.html")))
 }
 
+fn initialize_db(name: &str) {
+	let connection = PgConnection::establish(&name).expect(&format!("Error connecting to {}", name));
+
+	let result = diesel_migrations::run_pending_migrations(&connection);
+
+	match result {
+		Ok(_res) => {
+			println!("Migrations done!");
+		}
+		Err(error) => {
+			println!("Database migration error: \n {:#?}", error);
+		}
+	}
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
 	dotenv::dotenv().ok();
     env_logger::init();
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+	initialize_db(&database_url);
 	let domain: String = std::env::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 	let server_url = std::env::var("SERVER_URL").unwrap_or_else(|_| "localhost:8086".to_string());
 
