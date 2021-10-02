@@ -47,7 +47,8 @@
 // Extend Bootstrap
 
 :root {
-	--#{$variable-prefix}component-active-bg: #{$component-active-bg} !important;
+	--color-scheme: #{$color-scheme};
+	--#{$variable-prefix}component-active-bg: #{$component-active-bg};
 }
 
 .nav-tabs {
@@ -109,12 +110,12 @@
 }
 
 body {
-	background-image: url('assets/bg4.jpg');
+	background-image: url('./assets/andrew-haimerl-andrewnef-5Bxmy3xriMQ-unsplash.jpg');
 	background-size: cover;
 	background-attachment: fixed;
 }
 
-#hula {
+#hki2050 {
 	height: 100vh;
 	display: flex;
 	flex-direction: column;

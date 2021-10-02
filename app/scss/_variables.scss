@@ -1,15 +1,16 @@
 $enable-negative-margins: true;
+$color-scheme: 'dark';
 
 $white: #fff !default;
 $gray-100: hsl(199, 10%, 97%) !default;
 $gray-200: hsl(199, 12%, 89%) !default;
 $gray-300: hsl(199, 15%, 82%) !default;
 $gray-400: hsl(199, 18%, 74%) !default;
-$gray-500: hsl(199, 22%, 60%) !default;
+$gray-500: hsl(56, 22%, 60%) !default;
 $gray-600: hsl(287, 27%, 37%) !default;
-$gray-700: hsl(287, 33%, 24%) !default;
-$gray-800: hsl(287, 40%, 16%) !default;
-$gray-900: hsl(287, 46%, 10%) !default;
+$gray-700: hsl(227, 33%, 24%) !default;
+$gray-800: hsl(238, 41%, 16%) !default;
+$gray-900: hsl(203, 45%, 10%) !default;
 $black: #000 !default;
 
 $blue: #0d6efd !default;
@@ -22,8 +23,9 @@ $yellow: #ffc107 !default;
 $green: #00c8a3 !default;
 $teal: #97ffcb !default;
 $cyan: #0dcaf0 !default;
+$darkblue: #071218 !default;
 
-$separator-color: #800da6 !default; // Hula
+$separator-color: #173244 !default;
 
 $primary: mix($green, $teal) !default;
 $secondary: $gray-600 !default;
@@ -38,8 +40,12 @@ $min-contrast-ratio: 4.5 !default;
 $color-contrast-dark: $dark !default;
 $color-contrast-light: $light !default;
 
-$body-bg: $white !default;
-$body-color: $gray-800 !default;
+// Make it dark
+
+$body-bg: $gray-900 !default;
+$body-color: $gray-100 !default;
+$modal-content-bg: $gray-900 !default;
+$dropdown-bg: $gray-900 !default;
 
 $border-width: 1px !default;
 $border-color: $separator-color !default;
@@ -72,18 +78,17 @@ $table-border-width: 0 !default;
 $component-active-bg: $pink;
 $input-btn-focus-color-opacity: 0.5 !default;
 
-$input-bg: hsl(hue($dark), saturation($light), lightness($light)) !default;
+$input-bg: hsl(hue($light), saturation($dark), lightness($dark)) !default;
 $input-border-color: $input-bg !default;
 
-$input-focus-bg: $white !default;
+$input-focus-bg: $gray-800 !default;
 
 $input-disabled-bg: rgba($input-bg, 0.70) !default;
 $input-disabled-border-color: null !default;
 
 $input-placeholder-color: rgba($body-color, 0.5) !default;
 
-$input-invalid-bg: mix($danger, $input-bg, 25%) !default; // Hula
-
+$input-invalid-bg: mix($danger, $input-bg, 25%) !default;
 $form-check-input-bg: mix($input-bg, $white) !default;
 $form-check-input-border: none !default;
 
@@ -109,8 +114,6 @@ $form-select-disabled-border-color: $input-disabled-border-color !default;
 $font-heading: 'salomeitalic', sans-serif !default;
 $font-family-sans-serif: 'Overpass', sans-serif !default;
 $font-family-monospace: 'Overpass mono', monospace !default;
-
-// Hula variables
 
 $tier-size: 3rem;
 $tier-bg-color: $separator-color;

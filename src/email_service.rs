@@ -13,7 +13,7 @@ pub fn send_invitation(invitation: &Invitation) -> Result<(), ServiceError> {
 	let sending_email = std::env::var("SENDING_EMAIL_ADDRESS").expect("SENDING_EMAIL_ADDRESS must be set");
 	let public_url = std::env::var("PUBLIC_URL").unwrap_or_else(|_| "localhost:8086".to_string());
 
-	let mut email = Message::new(EmailAddress::new(sending_email, "Hula"));
+	let mut email = Message::new(EmailAddress::new(sending_email, "HKI2050"));
 
 	let options = Options {
 		open_tracking: false,
@@ -52,9 +52,8 @@ pub fn send_invitation(invitation: &Invitation) -> Result<(), ServiceError> {
 
 	let email_body = format!(
 		"Please click on the link below to complete registration. <br/>
-			<a href=\"{}\">
-			Click here</a> <br>
-			your Invitation expires on <strong>{}</strong>",
+			<a href=\"{}\">Click here</a> <br>
+			Your Invitation expires on <strong>{}</strong>",
 		url.as_str(),
 		invitation.expires_at.format("%I:%M %p %A, %-d %B, %C%y").to_string()
 	);
@@ -63,7 +62,7 @@ pub fn send_invitation(invitation: &Invitation) -> Result<(), ServiceError> {
 	email
 		.add_recipient(recipient)
 		.options(options)
-		.subject("You have been invited to join Hula ERP.")
+		.subject("You have been invited to join HKI2050.")
 		.html(email_body);
 
 	let result = tm.send(&email);
@@ -121,8 +120,7 @@ pub fn send_reset_request(reset_request: &ResetPasswordRequest) -> Result<(), Se
 
 	let email_body = format!(
 		"You have requested a password reset. Please follow the following link to complete the process: <br/>
-			<a href=\"{}\">
-			Click here</a> <br>
+			<a href=\"{}\">Click here</a> <br>
 			Your reset request expires on <strong>{}</strong>",
 		url.as_str(),
 		reset_request.expires_at.format("%I:%M %p %A, %-d %B, %C%y").to_string()
@@ -132,7 +130,7 @@ pub fn send_reset_request(reset_request: &ResetPasswordRequest) -> Result<(), Se
 	email
 		.add_recipient(recipient)
 		.options(options)
-		.subject("You have requested a password reset at Hula.")
+		.subject("You have requested a password reset at HKI2050.")
 		.html(email_body);
 
 	let result = tm.send(&email);

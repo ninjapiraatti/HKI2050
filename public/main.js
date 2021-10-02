@@ -8097,7 +8097,7 @@
         initDev();
     }
 
-    let store, router$1, flashMessage;
+    let store$1, router$1, flashMessage;
 
     const errorMessages = {
     	UniqueViolation: 'Item already exists',
@@ -8150,7 +8150,7 @@
 
     	switch (response.status) {
     		case 401:
-    			store.dispatch('setUser', null);
+    			store$1.dispatch('setUser', null);
     			if (router$1.currentRoute.value.name !== 'login') {
     				router$1.push({ name: 'login', query: {
     					redirect: router$1.currentRoute.value.fullPath,
@@ -8307,12 +8307,71 @@
 
     var api$1 = {
     	install: (app, options) => {
-    		store = app.config.globalProperties.$store;
+    		store$1 = app.config.globalProperties.$store;
     		router$1 = app.config.globalProperties.$router;
     		flashMessage = app.config.globalProperties.$flashMessage;
 
     		app.config.globalProperties.$api = api;
     	},
+    };
+
+    //import router from '@root/router.js'
+
+    const state = reactive({
+      counter: 666,
+      loggeduser: JSON.parse(localStorage.getItem('user')),
+      colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
+    });
+
+    const methods = {
+      increase() {
+        state.counter++;
+      },
+
+      decrease() {
+        state.counter--;
+      },
+
+      logout() {
+        console.log("Logging out");
+        return true
+      },
+
+      async login(data) {
+    		try {
+    			const userId = await api.users.log.in(data);
+    			if (userId) await this.setUser(userId);
+    		} catch (error) {
+    			console.warn(`Login failed: ${error.message}`);
+    			return false
+    		}
+    		return true
+    	},
+
+      async setUser(data) {
+    		if (typeof data == 'string') {
+    			try {
+    				const [ user ] = await Promise.all([
+    					api.users.get({ id: data }),
+    				]);
+
+    				data = user;
+    			} catch (error) {
+    				data = null;
+    			}
+    		}
+        state.loggeduser = data;
+    		if (data) {
+    			localStorage.setItem('user', JSON.stringify(data));
+    		} else {
+    			localStorage.removeItem('user');
+    		}
+    	},
+    };
+
+    var store = {
+      state,
+      methods
     };
 
     function getDevtoolsGlobalHook() {
@@ -11548,33 +11607,6 @@
         }
         return [leavingRecords, updatingRecords, enteringRecords];
     }
-
-    const state = reactive({
-      counter: 666,
-      loggeduser: JSON.parse(localStorage.getItem('user')),
-    });
-
-    const methods = {
-      increase() {
-        state.counter++;
-      },
-      decrease() {
-        state.counter--;
-      },
-      logout() {
-        console.log("Logging out");
-        return true
-      },
-      login(formData) {
-        console.log("Logging in:" + formData);
-        return true
-      }
-    };
-
-    var state$1 = {
-      state,
-      methods
-    };
 
     var top = 'top';
     var bottom = 'bottom';
@@ -18534,7 +18566,7 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$d = {
+    var script$e = {
     	name: 'FormLogin',
     	setup() {
     	const store = inject('store');
@@ -18570,15 +18602,15 @@
     	},
     };
 
-    const _hoisted_1$b = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$c = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$9 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label me-3"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_3$7 = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
+    const _hoisted_3$8 = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
     const _hoisted_4$7 = ["disabled"];
     const _hoisted_5$4 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
     const _hoisted_6$3 = /*#__PURE__*/createTextVNode("Forgot password?");
@@ -18586,7 +18618,7 @@
     const _hoisted_8$2 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$1 = /*#__PURE__*/createTextVNode("Sign up");
 
-    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -18599,7 +18631,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$b,
+              _hoisted_1$c,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -18617,7 +18649,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_2$8,
+              _hoisted_2$9,
               createVNode(_component_VField, {
                 modelValue: $data.form.password,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.password = $event)),
@@ -18634,7 +18666,7 @@
                 class: "invalid-feedback shake"
               })
             ]),
-            createBaseVNode("div", _hoisted_3$7, [
+            createBaseVNode("div", _hoisted_3$8, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $data.sending,
@@ -18667,17 +18699,17 @@
       ]))
     }
 
-    script$d.render = render$d;
-    script$d.__file = "src/forms/FormLogin.vue";
+    script$e.render = render$e;
+    script$e.__file = "src/forms/FormLogin.vue";
 
-    var script$c = {
+    var script$d = {
     		name: 'Login',
 
     		async mounted() {
     			// Forgot password will return untrue
     			const success = await this.$modal({
     				title: 'Log in',
-    				component: script$d,
+    				component: script$e,
     				backdrop: 'static',
     			});
 
@@ -18685,12 +18717,35 @@
     		},
     	};
 
-    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
       return null
     }
 
+    script$d.render = render$d;
+    script$d.__file = "src/views/Login.vue";
+
+    var script$c = {
+    	name: 'HomeUser',
+    };
+
+    const _hoisted_1$b = { class: "container" };
+    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+      /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
+    ], -1 /* HOISTED */);
+    const _hoisted_3$7 = [
+      _hoisted_2$8
+    ];
+
+    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$b, [
+        createBaseVNode("div", {
+          class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+        }, _hoisted_3$7, 2 /* CLASS */)
+      ]))
+    }
+
     script$c.render = render$c;
-    script$c.__file = "src/views/Login.vue";
+    script$c.__file = "src/views/UserHome.vue";
 
     var script$b = {
     		name: 'FormForgotPassword',
@@ -19332,15 +19387,18 @@
     script$5.render = render$5;
     script$5.__file = "src/views/Home.vue";
 
+    const needLogin = to => store.loggeduser ? true : { name: 'login', query: { redirect: to.fullPath } };
+
     const router = createRouter({
     	routes: [
-    		{ path: '/', name: 'home', redirect: () => ({ name: state$1.loggeduser && state$1.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
+    		{ path: '/', name: 'home', redirect: () => ({ name: store.loggeduser && store.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
     		{ path: '/app/confirm', component: script$6, name: 'confirm' },
     		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
     		{ path: '/app/register', component: script$8, name: 'register' },
+    		{ path: '/app/user', component: script$c, name: 'user-home', beforeEnter: [needLogin] },
     		//{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
     		{ path: '/app/', component: script$5, name: 'page-home' },
-    		{ path: '/app/login', component: script$c, name: 'login' },
+    		{ path: '/app/login', component: script$d, name: 'login' },
     		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
@@ -19642,6 +19700,45 @@
     	},
     };
 
+    const classes = {
+    	navbar: {
+    		light: ['navbar-light', 'bg-light'],
+    		dark: ['navbar-dark', 'bg-dark'],
+    	},
+
+    	table: {
+    		dark: ['table-dark'],
+    	},
+
+    	card: {
+    		dark: ['bg-dark', 'text-light'],
+    	},
+
+    	modal: {
+    		dark: ['bg-dark', 'text-light'],
+    	},
+
+    	modalClose: {
+    		dark: ['btn-close-white'],
+    	}
+    };
+
+    var colorScheme = {
+    	install: (app, { scheme }) => {
+    		const colorScheme = reactive(Object.entries(classes).reduce((classes, [key, value]) => {
+    			classes[key] = computed(() => value[unref(scheme)]);
+    			return classes
+    		}, {}));
+
+    		watch(scheme, (value, previous) => {
+    			document.body.classList.add(value);
+    			document.body.classList.remove(previous);
+    		}, { immediate: true });
+
+    		app.config.globalProperties.$colorScheme = colorScheme;
+    	},
+    };
+
     /*!
       * @smartweb/vue-flash-message v1.0.0-alpha.12
       * (c) 2020 Roman Privalov
@@ -19692,9 +19789,9 @@
 
     var script = {
     	setup() {
-    		provide('store', state$1);
+    		provide('store', store);
     		return {
-    			store: state$1
+    			store
     		}
     	},
     	name: 'App',
@@ -22548,7 +22645,7 @@
     });
 
     defineRule('requiredNonAdmin', value => {
-    	return !!((state$1.loggeduser && state$1.loggeduser.isadmin) || value)
+    	return !!((store.loggeduser && store.loggeduser.isadmin) || value)
     });
 
     const app = createApp(script)
@@ -22557,6 +22654,7 @@
     	.use(api$1)
     	.use(c)
     	.use(modal)
+    	.use(colorScheme, { scheme: toRef(store.state, 'colorScheme') })
     	.component('VForm', Form)
     	.component('VField', Field)
     	.component('ErrorMessage', ErrorMessage);

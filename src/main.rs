@@ -3,7 +3,7 @@ extern crate diesel;
 
 use actix_files as fs;
 use aninmals;
-//use actix_identity::{CookieIdentityPolicy, IdentityService};
+use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_session::Session;
 use actix_web::http::{header, StatusCode};
 use actix_web::{get, middleware, web, App, HttpRequest, HttpResponse, HttpServer, Result};
@@ -24,6 +24,7 @@ mod email_service;
 async fn home(session: Session) -> Result<HttpResponse> {
 	let mut counter = 1;
 	if let Some(count) = session.get::<i32>("counter")? {
+		trace!("SESSION value: {}", count);
 		counter = count + 1;
 	}
 
@@ -36,9 +37,10 @@ async fn home(session: Session) -> Result<HttpResponse> {
 
 #[get("/app/*")]
 async fn allviews(session: Session, req: HttpRequest) -> Result<HttpResponse> {
-	println!("HTTP REQ:\n{:?}\n", req);
+	trace!("allviews: {:?}", req);
 	let mut counter = 1;
 	if let Some(count) = session.get::<i32>("counter")? {
+		trace!("SESSION value: {}", count);
 		counter = count + 1;
 	}
 
@@ -85,6 +87,14 @@ async fn main() -> std::io::Result<()> {
 			.data(pool.clone())
 			//.data(web::JsonConfig::default().limit(4096))
 			.wrap(middleware::Logger::default())
+			.wrap(IdentityService::new(
+				CookieIdentityPolicy::new(utils::SECRET_KEY.as_bytes())
+					.name("auth")
+					.path("/")
+					.domain(domain.as_str())
+					.max_age(86400)
+					.secure(false),
+			))
 			.service(
 				web::scope("/api")
 					.service(
@@ -99,6 +109,12 @@ async fn main() -> std::io::Result<()> {
 						web::resource("/register/{invitation_id}")
 							.route(web::post().to(handlers::register_handler::register_user)),
 					)
+					.service(
+						web::resource("/auth")
+							.route(web::post().to(handlers::auth_handler::login))
+							.route(web::delete().to(handlers::auth_handler::logout))
+							.route(web::get().to(handlers::auth_handler::get_me)),
+					),
 			)
 			.service(fs::Files::new("/public", "public").show_files_listing())
 			.service(home)

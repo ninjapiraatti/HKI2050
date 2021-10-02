@@ -1,10 +1,11 @@
 import '../scss/main.scss'
 
-import { createApp } from 'vue'
+import { createApp, toRef } from 'vue'
 import api from '@root/api.js'
-//import store from '@store'
+import store from '@store'
 import router from '@root/router.js'
 import modal from '@root/plugins/vue-modal'
+import colorScheme from '@root/plugins/vue-color-scheme'
 import FlashMessage from '@smartweb/vue-flash-message'
 import App from '@root/App.vue'
 import 'bootstrap'
@@ -17,6 +18,7 @@ const app = createApp(App)
 	.use(api)
 	.use(FlashMessage)
 	.use(modal)
+	.use(colorScheme, { scheme: toRef(store.state, 'colorScheme') })
 	.component('VForm', Form)
 	.component('VField', Field)
 	.component('ErrorMessage', ErrorMessage)
