@@ -1,6 +1,8 @@
+import path from 'path'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import vue from 'rollup-plugin-vue'
 import postcss from 'rollup-plugin-postcss'
+import alias from '@rollup/plugin-alias'
 import autoprefixer from 'autoprefixer'
 import replace from '@rollup/plugin-replace'
 import copy from 'rollup-plugin-copy-assets'
@@ -16,6 +18,13 @@ export default {
 	},
 
 	plugins: [
+		alias({
+			entries: [
+				{ find: /^@root/, replacement: `${path.resolve(__dirname)}/src` },
+				{ find: /^@(components|views|forms|store|transitions)/, replacement: `${path.resolve(__dirname)}/src/$1` },
+				{ find: /^~/, replacement: `${path.resolve(__dirname)}/node_modules/` },
+			],
+		}),
 
 		nodeResolve({ browser: true }),
 		

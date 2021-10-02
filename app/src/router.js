@@ -1,5 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import state from '@store/index.js'
 import { Modal } from 'bootstrap'
+import Login from '@views/Login.vue'
+import ForgotPassword from '@views/ForgotPassword.vue'
+import Register from '@views/Register.vue'
+import Confirm from '@views/Confirm.vue'
 
 import Home from './views/Home.vue'
 
@@ -19,9 +24,13 @@ const needAdminOrSelf = to => state.loggeduser.isadmin || to.params.id == state.
 
 const router = createRouter({
 	routes: [
-		//{ path: '/', name: 'home', redirect: () => ({ name: state.loggeduser && state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
-		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
+		{ path: '/', name: 'home', redirect: () => ({ name: state.loggeduser && state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
+		{ path: '/app/confirm', component: Confirm, name: 'confirm' },
+		{ path: '/app/forgotpassword', component: ForgotPassword, name: 'forgot-password' },
+		{ path: '/app/register', component: Register, name: 'register' },
+		//{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
 		{ path: '/app/', component: Home, name: 'page-home' },
+		{ path: '/app/login', component: Login, name: 'login' },
 		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
 		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
 		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
@@ -31,6 +40,17 @@ const router = createRouter({
 	history: createWebHistory(),
 	linkActiveClass: 'active',
 	linkExactActiveClass: ''
+})
+
+// Close modal before navigating
+router.beforeEach((to, from, next) => {
+	const modal = document.querySelector('.modal.show')
+	if (!modal) {
+		next()
+	} else {
+		modal.addEventListener('hidden.bs.modal', () => next())
+		Modal.getInstance(modal).hide()
+	}
 })
 
 export default router

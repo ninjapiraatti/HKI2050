@@ -21,6 +21,13 @@ chrono = { version = "0.4", features = ["serde"] }
 diesel = { version = "1.4", features = ["postgres","uuidv07", "r2d2", "chrono"] }
 diesel_migrations = "1.4.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
+aninmals = "0.1.0"
+futures = "0.3.17"
+log = "0.4.14"
+derive_more = "0.99.16"
+lazy_static = "1.4"
+sparkpost = "0.5.4"
+url = "2.2.2"
 
 [dev-dependencies]
 actix-rt = "1.1"

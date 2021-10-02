@@ -57,7 +57,7 @@
         else if (isString(value)) {
             return value;
         }
-        else if (isObject(value)) {
+        else if (isObject$1(value)) {
             return value;
         }
     }
@@ -86,7 +86,7 @@
                 }
             }
         }
-        else if (isObject(value)) {
+        else if (isObject$1(value)) {
             for (const name in value) {
                 if (value[name]) {
                     res += name + ' ';
@@ -118,8 +118,45 @@
         'mesh,meshgradient,meshpatch,meshrow,metadata,mpath,path,pattern,' +
         'polygon,polyline,radialGradient,rect,set,solidcolor,stop,switch,symbol,' +
         'text,textPath,title,tspan,unknown,use,view';
-    const isHTMLTag = /*#__PURE__*/ makeMap(HTML_TAGS);
+    const isHTMLTag$1 = /*#__PURE__*/ makeMap(HTML_TAGS);
     const isSVGTag = /*#__PURE__*/ makeMap(SVG_TAGS);
+
+    /**
+     * For converting {{ interpolation }} values to displayed strings.
+     * @private
+     */
+    const toDisplayString = (val) => {
+        return val == null
+            ? ''
+            : isArray(val) ||
+                (isObject$1(val) &&
+                    (val.toString === objectToString || !isFunction(val.toString)))
+                ? JSON.stringify(val, replacer, 2)
+                : String(val);
+    };
+    const replacer = (_key, val) => {
+        // can't use isRef here since @vue/shared has no deps
+        if (val && val.__v_isRef) {
+            return replacer(_key, val.value);
+        }
+        else if (isMap(val)) {
+            return {
+                [`Map(${val.size})`]: [...val.entries()].reduce((entries, [key, val]) => {
+                    entries[`${key} =>`] = val;
+                    return entries;
+                }, {})
+            };
+        }
+        else if (isSet(val)) {
+            return {
+                [`Set(${val.size})`]: [...val.values()]
+            };
+        }
+        else if (isObject$1(val) && !isArray(val) && !isPlainObject(val)) {
+            return String(val);
+        }
+        return val;
+    };
     const EMPTY_OBJ = Object.freeze({})
         ;
     const EMPTY_ARR = Object.freeze([]) ;
@@ -132,7 +169,7 @@
     const isOn = (key) => onRE.test(key);
     const isModelListener = (key) => key.startsWith('onUpdate:');
     const extend = Object.assign;
-    const remove = (arr, el) => {
+    const remove$1 = (arr, el) => {
         const i = arr.indexOf(el);
         if (i > -1) {
             arr.splice(i, 1);
@@ -146,9 +183,9 @@
     const isFunction = (val) => typeof val === 'function';
     const isString = (val) => typeof val === 'string';
     const isSymbol = (val) => typeof val === 'symbol';
-    const isObject = (val) => val !== null && typeof val === 'object';
+    const isObject$1 = (val) => val !== null && typeof val === 'object';
     const isPromise = (val) => {
-        return isObject(val) && isFunction(val.then) && isFunction(val.catch);
+        return isObject$1(val) && isFunction(val.then) && isFunction(val.catch);
     };
     const objectToString = Object.prototype.toString;
     const toTypeString = (value) => objectToString.call(value);
@@ -208,7 +245,7 @@
             value
         });
     };
-    const toNumber = (val) => {
+    const toNumber$1 = (val) => {
         const n = parseFloat(val);
         return isNaN(n) ? val : n;
     };
@@ -227,7 +264,7 @@
                                 : {}));
     };
 
-    function warn$2(msg, ...args) {
+    function warn$3(msg, ...args) {
         console.warn(`[Vue warn] ${msg}`, ...args);
     }
 
@@ -255,7 +292,7 @@
                 }
             }
             else {
-                warn$2(`cannot run an inactive effect scope.`);
+                warn$3(`cannot run an inactive effect scope.`);
             }
         }
         on() {
@@ -624,7 +661,7 @@
                 const shouldUnwrap = !targetIsArray || !isIntegerKey(key);
                 return shouldUnwrap ? res.value : res;
             }
-            if (isObject(res)) {
+            if (isObject$1(res)) {
                 // Convert returned value into a proxy as well. we do the isObject check
                 // here to avoid invalid value warning. Also need to lazy access readonly
                 // and reactive here to avoid circular dependency.
@@ -633,7 +670,7 @@
             return res;
         };
     }
-    const set = /*#__PURE__*/ createSetter();
+    const set$1 = /*#__PURE__*/ createSetter();
     const shallowSet = /*#__PURE__*/ createSetter(true);
     function createSetter(shallow = false) {
         return function set(target, key, value, receiver) {
@@ -684,7 +721,7 @@
     }
     const mutableHandlers = {
         get,
-        set,
+        set: set$1,
         deleteProperty,
         has,
         ownKeys
@@ -715,8 +752,8 @@
         get: shallowReadonlyGet
     });
 
-    const toReactive = (value) => isObject(value) ? reactive(value) : value;
-    const toReadonly = (value) => isObject(value) ? readonly(value) : value;
+    const toReactive = (value) => isObject$1(value) ? reactive(value) : value;
+    const toReadonly = (value) => isObject$1(value) ? readonly(value) : value;
     const toShallow = (value) => value;
     const getProto = (v) => Reflect.getPrototypeOf(v);
     function get$1(target, key, isReadonly = false, isShallow = false) {
@@ -771,7 +808,7 @@
         }
         return this;
     }
-    function set$1(key, value) {
+    function set$1$1(key, value) {
         value = toRaw(value);
         const target = toRaw(this);
         const { has, get } = getProto(target);
@@ -891,7 +928,7 @@
             },
             has: has$1,
             add,
-            set: set$1,
+            set: set$1$1,
             delete: deleteEntry,
             clear,
             forEach: createForEach(false, false)
@@ -905,7 +942,7 @@
             },
             has: has$1,
             add,
-            set: set$1,
+            set: set$1$1,
             delete: deleteEntry,
             clear,
             forEach: createForEach(false, true)
@@ -1059,7 +1096,7 @@
         return createReactiveObject(target, true, shallowReadonlyHandlers, shallowReadonlyCollectionHandlers, shallowReadonlyMap);
     }
     function createReactiveObject(target, isReadonly, baseHandlers, collectionHandlers, proxyMap) {
-        if (!isObject(target)) {
+        if (!isObject$1(target)) {
             {
                 console.warn(`value cannot be made reactive: ${String(target)}`);
             }
@@ -1134,7 +1171,7 @@
             }
         }
     }
-    const convert = (val) => isObject(val) ? reactive(val) : val;
+    const convert = (val) => isObject$1(val) ? reactive(val) : val;
     function isRef(r) {
         return Boolean(r && r.__v_isRef === true);
     }
@@ -1191,6 +1228,33 @@
         return isReactive(objectWithRefs)
             ? objectWithRefs
             : new Proxy(objectWithRefs, shallowUnwrapHandlers);
+    }
+    function toRefs(object) {
+        if (!isProxy(object)) {
+            console.warn(`toRefs() expects a reactive object but received a plain one.`);
+        }
+        const ret = isArray(object) ? new Array(object.length) : {};
+        for (const key in object) {
+            ret[key] = toRef(object, key);
+        }
+        return ret;
+    }
+    class ObjectRefImpl {
+        constructor(_object, _key) {
+            this._object = _object;
+            this._key = _key;
+            this.__v_isRef = true;
+        }
+        get value() {
+            return this._object[this._key];
+        }
+        set value(newVal) {
+            this._object[this._key] = newVal;
+        }
+    }
+    function toRef(object, key) {
+        const val = object[key];
+        return isRef(val) ? val : new ObjectRefImpl(object, key);
     }
 
     class ComputedRefImpl {
@@ -1462,7 +1526,7 @@
                 if (!(event in emitsOptions) &&
                     !(false )) {
                     if (!propsOptions || !(toHandlerKey(event) in propsOptions)) {
-                        warn$1(`Component emitted event "${event}" but it is neither declared in ` +
+                        warn$2(`Component emitted event "${event}" but it is neither declared in ` +
                             `the emits option nor as an "${toHandlerKey(event)}" prop.`);
                     }
                 }
@@ -1471,7 +1535,7 @@
                     if (isFunction(validator)) {
                         const isValid = validator(...rawArgs);
                         if (!isValid) {
-                            warn$1(`Invalid event arguments: event validation failed for event "${event}".`);
+                            warn$2(`Invalid event arguments: event validation failed for event "${event}".`);
                         }
                     }
                 }
@@ -1488,7 +1552,7 @@
                 args = rawArgs.map(a => a.trim());
             }
             else if (number) {
-                args = rawArgs.map(toNumber);
+                args = rawArgs.map(toNumber$1);
             }
         }
         {
@@ -1497,7 +1561,7 @@
         {
             const lowerCaseEvent = event.toLowerCase();
             if (lowerCaseEvent !== event && props[toHandlerKey(lowerCaseEvent)]) {
-                warn$1(`Event "${lowerCaseEvent}" is emitted in component ` +
+                warn$2(`Event "${lowerCaseEvent}" is emitted in component ` +
                     `${formatComponentName(instance, instance.type)} but the handler is registered for "${event}". ` +
                     `Note that HTML attributes are case-insensitive and you cannot use ` +
                     `v-on to listen to camelCase events when using in-DOM templates. ` +
@@ -1739,13 +1803,13 @@
                             }
                         }
                         if (extraAttrs.length) {
-                            warn$1(`Extraneous non-props attributes (` +
+                            warn$2(`Extraneous non-props attributes (` +
                                 `${extraAttrs.join(', ')}) ` +
                                 `were passed to component but could not be automatically inherited ` +
                                 `because component renders fragment or text root nodes.`);
                         }
                         if (eventAttrs.length) {
-                            warn$1(`Extraneous non-emits event listeners (` +
+                            warn$2(`Extraneous non-emits event listeners (` +
                                 `${eventAttrs.join(', ')}) ` +
                                 `were passed to component but could not be automatically inherited ` +
                                 `because component renders fragment or text root nodes. ` +
@@ -1762,7 +1826,7 @@
             // inherit directives
             if (vnode.dirs) {
                 if (("development" !== 'production') && !isElementRoot(root)) {
-                    warn$1(`Runtime directive used on component with non-element root node. ` +
+                    warn$2(`Runtime directive used on component with non-element root node. ` +
                         `The directives will not function as intended.`);
                 }
                 root.dirs = root.dirs ? root.dirs.concat(vnode.dirs) : vnode.dirs;
@@ -1770,7 +1834,7 @@
             // inherit transition data
             if (vnode.transition) {
                 if (("development" !== 'production') && !isElementRoot(root)) {
-                    warn$1(`Component inside <Transition> renders non-element root node ` +
+                    warn$2(`Component inside <Transition> renders non-element root node ` +
                         `that cannot be animated.`);
                 }
                 root.transition = vnode.transition;
@@ -1962,7 +2026,7 @@
     function provide(key, value) {
         if (!currentInstance) {
             {
-                warn$1(`provide() can only be used inside setup().`);
+                warn$2(`provide() can only be used inside setup().`);
             }
         }
         else {
@@ -2001,11 +2065,11 @@
                     : defaultValue;
             }
             else {
-                warn$1(`injection "${String(key)}" not found.`);
+                warn$2(`injection "${String(key)}" not found.`);
             }
         }
         else {
-            warn$1(`inject() can only be used inside setup() or functional components.`);
+            warn$2(`inject() can only be used inside setup() or functional components.`);
         }
     }
 
@@ -2058,7 +2122,7 @@
                 }
                 // warn multiple elements
                 if (children.length > 1) {
-                    warn$1('<transition> can only be used on a single element or component. Use ' +
+                    warn$2('<transition> can only be used on a single element or component. Use ' +
                         '<transition-group> for lists.');
                 }
                 // there's no need to track reactivity for these props so use the raw
@@ -2067,7 +2131,7 @@
                 const { mode } = rawProps;
                 // check mode
                 if (mode && !['in-out', 'out-in', 'default'].includes(mode)) {
-                    warn$1(`invalid <transition> mode: ${mode}`);
+                    warn$2(`invalid <transition> mode: ${mode}`);
                 }
                 // at this point children has a guaranteed length of 1.
                 const child = children[0];
@@ -2372,7 +2436,7 @@
         // the wrapped version.
         const injected = injectHook(type, hook, keepAliveRoot, true /* prepend */);
         onUnmounted(() => {
-            remove(keepAliveRoot[type], injected);
+            remove$1(keepAliveRoot[type], injected);
         }, target);
     }
 
@@ -2409,7 +2473,7 @@
         }
         else {
             const apiName = toHandlerKey(ErrorTypeStrings[type].replace(/ hook$/, ''));
-            warn$1(`${apiName} is called when there is no active component instance to be ` +
+            warn$2(`${apiName} is called when there is no active component instance to be ` +
                 `associated with. ` +
                 `Lifecycle injection APIs can only be used during execution of setup().` +
                 (` If you are using async setup(), make sure to register lifecycle ` +
@@ -2438,7 +2502,7 @@
         const cache = Object.create(null);
         return (type, key) => {
             if (cache[key]) {
-                warn$1(`${type} property "${key}" is already defined in ${cache[key]}.`);
+                warn$2(`${type} property "${key}" is already defined in ${cache[key]}.`);
             }
             else {
                 cache[key] = type;
@@ -2455,7 +2519,7 @@
         // call beforeCreate first before accessing other options since
         // the hook may mutate resolved options (#2791)
         if (options.beforeCreate) {
-            callHook(options.beforeCreate, instance, "bc" /* BEFORE_CREATE */);
+            callHook$1(options.beforeCreate, instance, "bc" /* BEFORE_CREATE */);
         }
         const { 
         // state
@@ -2505,24 +2569,24 @@
                     }
                 }
                 else {
-                    warn$1(`Method "${key}" has type "${typeof methodHandler}" in the component definition. ` +
+                    warn$2(`Method "${key}" has type "${typeof methodHandler}" in the component definition. ` +
                         `Did you reference the function correctly?`);
                 }
             }
         }
         if (dataOptions) {
             if (!isFunction(dataOptions)) {
-                warn$1(`The data option must be a function. ` +
+                warn$2(`The data option must be a function. ` +
                     `Plain object usage is no longer supported.`);
             }
             const data = dataOptions.call(publicThis, publicThis);
             if (isPromise(data)) {
-                warn$1(`data() returned a Promise - note data() cannot be async; If you ` +
+                warn$2(`data() returned a Promise - note data() cannot be async; If you ` +
                     `intend to perform data fetching before component renders, use ` +
                     `async setup() + <Suspense>.`);
             }
-            if (!isObject(data)) {
-                warn$1(`data() should return an object.`);
+            if (!isObject$1(data)) {
+                warn$2(`data() should return an object.`);
             }
             else {
                 instance.data = reactive(data);
@@ -2553,12 +2617,12 @@
                         ? opt.get.bind(publicThis, publicThis)
                         : NOOP;
                 if (get === NOOP) {
-                    warn$1(`Computed property "${key}" has no getter.`);
+                    warn$2(`Computed property "${key}" has no getter.`);
                 }
                 const set = !isFunction(opt) && isFunction(opt.set)
                     ? opt.set.bind(publicThis)
                     : () => {
-                            warn$1(`Write operation failed: computed property "${key}" is readonly.`);
+                            warn$2(`Write operation failed: computed property "${key}" is readonly.`);
                         }
                         ;
                 const c = computed({
@@ -2590,7 +2654,7 @@
             });
         }
         if (created) {
-            callHook(created, instance, "c" /* CREATED */);
+            callHook$1(created, instance, "c" /* CREATED */);
         }
         function registerLifecycleHook(register, hook) {
             if (isArray(hook)) {
@@ -2647,7 +2711,7 @@
         for (const key in injectOptions) {
             const opt = injectOptions[key];
             let injected;
-            if (isObject(opt)) {
+            if (isObject$1(opt)) {
                 if ('default' in opt) {
                     injected = inject(opt.from || key, opt.default, true /* treat default function as factory */);
                 }
@@ -2670,7 +2734,7 @@
                 }
                 else {
                     {
-                        warn$1(`injected property "${key}" is a ref and will be auto-unwrapped ` +
+                        warn$2(`injected property "${key}" is a ref and will be auto-unwrapped ` +
                             `and no longer needs \`.value\` in the next minor release. ` +
                             `To opt-in to the new behavior now, ` +
                             `set \`app.config.unwrapInjectedRef = true\` (this config is ` +
@@ -2687,7 +2751,7 @@
             }
         }
     }
-    function callHook(hook, instance, type) {
+    function callHook$1(hook, instance, type) {
         callWithAsyncErrorHandling(isArray(hook)
             ? hook.map(h => h.bind(instance.proxy))
             : hook.bind(instance.proxy), instance, type);
@@ -2702,13 +2766,13 @@
                 watch(getter, handler);
             }
             else {
-                warn$1(`Invalid watch handler specified by key "${raw}"`, handler);
+                warn$2(`Invalid watch handler specified by key "${raw}"`, handler);
             }
         }
         else if (isFunction(raw)) {
             watch(getter, raw.bind(publicThis));
         }
-        else if (isObject(raw)) {
+        else if (isObject$1(raw)) {
             if (isArray(raw)) {
                 raw.forEach(r => createWatcher(r, ctx, publicThis, key));
             }
@@ -2720,12 +2784,12 @@
                     watch(getter, handler, raw);
                 }
                 else {
-                    warn$1(`Invalid watch handler specified by key "${raw.handler}"`, handler);
+                    warn$2(`Invalid watch handler specified by key "${raw.handler}"`, handler);
                 }
             }
         }
         else {
-            warn$1(`Invalid watch option: "${key}"`, raw);
+            warn$2(`Invalid watch option: "${key}"`, raw);
         }
     }
     /**
@@ -2767,7 +2831,7 @@
         }
         for (const key in from) {
             if (asMixin && key === 'expose') {
-                warn$1(`"expose" option is ignored when declared in mixins or extends. ` +
+                warn$2(`"expose" option is ignored when declared in mixins or extends. ` +
                         `It should only be declared in the base component itself.`);
             }
             else {
@@ -3086,7 +3150,7 @@
         if (isArray(raw)) {
             for (let i = 0; i < raw.length; i++) {
                 if (!isString(raw[i])) {
-                    warn$1(`props must be strings when using array syntax.`, raw[i]);
+                    warn$2(`props must be strings when using array syntax.`, raw[i]);
                 }
                 const normalizedKey = camelize(raw[i]);
                 if (validatePropName(normalizedKey)) {
@@ -3095,8 +3159,8 @@
             }
         }
         else if (raw) {
-            if (!isObject(raw)) {
-                warn$1(`invalid props options`, raw);
+            if (!isObject$1(raw)) {
+                warn$2(`invalid props options`, raw);
             }
             for (const key in raw) {
                 const normalizedKey = camelize(key);
@@ -3127,7 +3191,7 @@
             return true;
         }
         else {
-            warn$1(`Invalid prop name: "${key}" is a reserved property.`);
+            warn$2(`Invalid prop name: "${key}" is a reserved property.`);
         }
         return false;
     }
@@ -3169,7 +3233,7 @@
         const { type, required, validator } = prop;
         // required!
         if (required && isAbsent) {
-            warn$1('Missing required prop: "' + name + '"');
+            warn$2('Missing required prop: "' + name + '"');
             return;
         }
         // missing but optional
@@ -3188,13 +3252,13 @@
                 isValid = valid;
             }
             if (!isValid) {
-                warn$1(getInvalidTypeMessage(name, value, expectedTypes));
+                warn$2(getInvalidTypeMessage(name, value, expectedTypes));
                 return;
             }
         }
         // custom validator
         if (validator && !validator(value)) {
-            warn$1('Invalid prop: custom validator check failed for prop "' + name + '".');
+            warn$2('Invalid prop: custom validator check failed for prop "' + name + '".');
         }
     }
     const isSimpleType = /*#__PURE__*/ makeMap('String,Number,Boolean,Function,Symbol,BigInt');
@@ -3213,7 +3277,7 @@
             }
         }
         else if (expectedType === 'Object') {
-            valid = isObject(value);
+            valid = isObject$1(value);
         }
         else if (expectedType === 'Array') {
             valid = isArray(value);
@@ -3287,7 +3351,7 @@
     const normalizeSlot$1 = (key, rawSlot, ctx) => {
         const normalized = withCtx((...args) => {
             if (currentInstance) {
-                warn$1(`Slot "${key}" invoked outside of the render function: ` +
+                warn$2(`Slot "${key}" invoked outside of the render function: ` +
                     `this will not track dependencies used in the slot. ` +
                     `Invoke the slot function inside the render function instead.`);
             }
@@ -3307,7 +3371,7 @@
             }
             else if (value != null) {
                 {
-                    warn$1(`Non-function value encountered for slot "${key}". ` +
+                    warn$2(`Non-function value encountered for slot "${key}". ` +
                         `Prefer function slots for better performance.`);
                 }
                 const normalized = normalizeSlotValue(value);
@@ -3318,7 +3382,7 @@
     const normalizeVNodeSlots = (instance, children) => {
         if (!isKeepAlive(instance.vnode) &&
             !(false )) {
-            warn$1(`Non-function value encountered for default slot. ` +
+            warn$2(`Non-function value encountered for default slot. ` +
                 `Prefer function slots for better performance.`);
         }
         const normalized = normalizeSlotValue(children);
@@ -3413,7 +3477,7 @@
     const isBuiltInDirective = /*#__PURE__*/ makeMap('bind,cloak,else-if,else,for,html,if,model,on,once,pre,show,slot,text');
     function validateDirectiveName(name) {
         if (isBuiltInDirective(name)) {
-            warn$1('Do not use built-in directive ids as custom directive id: ' + name);
+            warn$2('Do not use built-in directive ids as custom directive id: ' + name);
         }
     }
     function invokeDirectiveHook(vnode, prevVNode, instance, name) {
@@ -3464,8 +3528,8 @@
     let uid = 0;
     function createAppAPI(render, hydrate) {
         return function createApp(rootComponent, rootProps = null) {
-            if (rootProps != null && !isObject(rootProps)) {
-                warn$1(`root props passed to app.mount() must be an object.`);
+            if (rootProps != null && !isObject$1(rootProps)) {
+                warn$2(`root props passed to app.mount() must be an object.`);
                 rootProps = null;
             }
             const context = createAppContext();
@@ -3484,12 +3548,12 @@
                 },
                 set config(v) {
                     {
-                        warn$1(`app.config cannot be replaced. Modify individual options instead.`);
+                        warn$2(`app.config cannot be replaced. Modify individual options instead.`);
                     }
                 },
                 use(plugin, ...options) {
                     if (installedPlugins.has(plugin)) {
-                        warn$1(`Plugin has already been applied to target app.`);
+                        warn$2(`Plugin has already been applied to target app.`);
                     }
                     else if (plugin && isFunction(plugin.install)) {
                         installedPlugins.add(plugin);
@@ -3500,7 +3564,7 @@
                         plugin(app, ...options);
                     }
                     else {
-                        warn$1(`A plugin must either be a function or an object with an "install" ` +
+                        warn$2(`A plugin must either be a function or an object with an "install" ` +
                             `function.`);
                     }
                     return app;
@@ -3511,7 +3575,7 @@
                             context.mixins.push(mixin);
                         }
                         else {
-                            warn$1('Mixin has already been applied to target app' +
+                            warn$2('Mixin has already been applied to target app' +
                                 (mixin.name ? `: ${mixin.name}` : ''));
                         }
                     }
@@ -3525,7 +3589,7 @@
                         return context.components[name];
                     }
                     if (context.components[name]) {
-                        warn$1(`Component "${name}" has already been registered in target app.`);
+                        warn$2(`Component "${name}" has already been registered in target app.`);
                     }
                     context.components[name] = component;
                     return app;
@@ -3538,7 +3602,7 @@
                         return context.directives[name];
                     }
                     if (context.directives[name]) {
-                        warn$1(`Directive "${name}" has already been registered in target app.`);
+                        warn$2(`Directive "${name}" has already been registered in target app.`);
                     }
                     context.directives[name] = directive;
                     return app;
@@ -3571,7 +3635,7 @@
                         return vnode.component.proxy;
                     }
                     else {
-                        warn$1(`App has already been mounted.\n` +
+                        warn$2(`App has already been mounted.\n` +
                             `If you want to remount the same app, move your app creation logic ` +
                             `into a factory function and create fresh app instances for each ` +
                             `mount - e.g. \`const createMyApp = () => createApp(App)\``);
@@ -3587,12 +3651,12 @@
                         delete app._container.__vue_app__;
                     }
                     else {
-                        warn$1(`Cannot unmount an app that is not mounted.`);
+                        warn$2(`Cannot unmount an app that is not mounted.`);
                     }
                 },
                 provide(key, value) {
                     if (key in context.provides) {
-                        warn$1(`App already provides property with key "${String(key)}". ` +
+                        warn$2(`App already provides property with key "${String(key)}". ` +
                             `It will be overwritten with the new value.`);
                     }
                     // TypeScript doesn't allow symbols as index type
@@ -3721,7 +3785,7 @@
                         type.process(n1, n2, container, anchor, parentComponent, parentSuspense, isSVG, slotScopeIds, optimized, internals);
                     }
                     else {
-                        warn$1('Invalid VNode type:', type, `(${typeof type})`);
+                        warn$2('Invalid VNode type:', type, `(${typeof type})`);
                     }
             }
             // set ref
@@ -4542,7 +4606,7 @@
                         : normalizeVNode(c2[i]));
                     if (nextChild.key != null) {
                         if (keyToNewIndexMap.has(nextChild.key)) {
-                            warn$1(`Duplicate keys found during update:`, JSON.stringify(nextChild.key), `Make sure keys are unique.`);
+                            warn$2(`Duplicate keys found during update:`, JSON.stringify(nextChild.key), `Make sure keys are unique.`);
                         }
                         keyToNewIndexMap.set(nextChild.key, i);
                     }
@@ -4894,7 +4958,7 @@
         const value = isUnmount ? null : refValue;
         const { i: owner, r: ref } = rawRef;
         if (!owner) {
-            warn$1(`Missing ref owner context. ref cannot be used on hoisted vnodes. ` +
+            warn$2(`Missing ref owner context. ref cannot be used on hoisted vnodes. ` +
                 `A vnode with ref must be created inside the render function.`);
             return;
         }
@@ -4949,7 +5013,7 @@
             callWithErrorHandling(ref, owner, 12 /* FUNCTION_REF */, [value, refs]);
         }
         else {
-            warn$1('Invalid template ref type:', value, `(${typeof value})`);
+            warn$2('Invalid template ref type:', value, `(${typeof value})`);
         }
     }
     function invokeVNodeHook(hook, instance, vnode, prevVNode = null) {
@@ -5047,6 +5111,18 @@
         return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
     }
     const NULL_DYNAMIC_COMPONENT = Symbol();
+    /**
+     * @private
+     */
+    function resolveDynamicComponent(component) {
+        if (isString(component)) {
+            return resolveAsset(COMPONENTS, component, false) || component;
+        }
+        else {
+            // invalid types will fallthrough to createVNode and raise warning
+            return (component || NULL_DYNAMIC_COMPONENT);
+        }
+    }
     // implementation
     function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
         const instance = currentRenderingInstance || currentInstance;
@@ -5073,12 +5149,12 @@
                 return Component;
             }
             if (warnMissing && !res) {
-                warn$1(`Failed to resolve ${type.slice(0, -1)}: ${name}`);
+                warn$2(`Failed to resolve ${type.slice(0, -1)}: ${name}`);
             }
             return res;
         }
         else {
-            warn$1(`resolve${capitalize(type.slice(0, -1))} ` +
+            warn$2(`resolve${capitalize(type.slice(0, -1))} ` +
                 `can only be used in render() or setup().`);
         }
     }
@@ -5166,6 +5242,16 @@
     function createElementBlock(type, props, children, patchFlag, dynamicProps, shapeFlag) {
         return setupBlock(createBaseVNode(type, props, children, patchFlag, dynamicProps, shapeFlag, true /* isBlock */));
     }
+    /**
+     * Create a block root vnode. Takes the same exact arguments as `createVNode`.
+     * A block root keeps track of dynamic nodes within the block in the
+     * `dynamicChildren` array.
+     *
+     * @private
+     */
+    function createBlock(type, props, children, patchFlag, dynamicProps) {
+        return setupBlock(createVNode(type, props, children, patchFlag, dynamicProps, true /* isBlock: prevent a block from tracking itself */));
+    }
     function isVNode(value) {
         return value ? value.__v_isVNode === true : false;
     }
@@ -5218,7 +5304,7 @@
             appContext: null
         };
         if (needFullChildrenNormalization) {
-            normalizeChildren(vnode, children);
+            normalizeChildren$1(vnode, children);
             // normalize suspense children
             if (shapeFlag & 128 /* SUSPENSE */) {
                 type.normalize(vnode);
@@ -5233,7 +5319,7 @@
         }
         // validate key
         if (vnode.key !== vnode.key) {
-            warn$1(`VNode created with invalid key (NaN). VNode type:`, vnode.type);
+            warn$2(`VNode created with invalid key (NaN). VNode type:`, vnode.type);
         }
         // track vnode for block tree
         if (isBlockTreeEnabled > 0 &&
@@ -5257,7 +5343,7 @@
     function _createVNode(type, props = null, children = null, patchFlag = 0, dynamicProps = null, isBlockNode = false) {
         if (!type || type === NULL_DYNAMIC_COMPONENT) {
             if (!type) {
-                warn$1(`Invalid vnode type when creating vnode: ${type}.`);
+                warn$2(`Invalid vnode type when creating vnode: ${type}.`);
             }
             type = Comment;
         }
@@ -5267,7 +5353,7 @@
             // #2078 make sure to merge refs during the clone instead of overwriting it
             const cloned = cloneVNode(type, props, true /* mergeRef: true */);
             if (children) {
-                normalizeChildren(cloned, children);
+                normalizeChildren$1(cloned, children);
             }
             return cloned;
         }
@@ -5283,7 +5369,7 @@
             if (klass && !isString(klass)) {
                 props.class = normalizeClass(klass);
             }
-            if (isObject(style)) {
+            if (isObject$1(style)) {
                 // reactive state objects need to be cloned since they are likely to be
                 // mutated
                 if (isProxy(style) && !isArray(style)) {
@@ -5299,14 +5385,14 @@
                 ? 128 /* SUSPENSE */
                 : isTeleport(type)
                     ? 64 /* TELEPORT */
-                    : isObject(type)
+                    : isObject$1(type)
                         ? 4 /* STATEFUL_COMPONENT */
                         : isFunction(type)
                             ? 2 /* FUNCTIONAL_COMPONENT */
                             : 0;
         if (shapeFlag & 4 /* STATEFUL_COMPONENT */ && isProxy(type)) {
             type = toRaw(type);
-            warn$1(`Vue received a Component which was made a reactive object. This can ` +
+            warn$2(`Vue received a Component which was made a reactive object. This can ` +
                 `lead to unnecessary performance overhead, and should be avoided by ` +
                 `marking the component with \`markRaw\` or using \`shallowRef\` ` +
                 `instead of \`ref\`.`, `\nComponent that was made reactive: `, type);
@@ -5394,6 +5480,17 @@
     function createTextVNode(text = ' ', flag = 0) {
         return createVNode(Text, null, text, flag);
     }
+    /**
+     * @private
+     */
+    function createCommentVNode(text = '', 
+    // when used as the v-else branch, the comment node must be created as a
+    // block to ensure correct updates.
+    asBlock = false) {
+        return asBlock
+            ? (openBlock(), createBlock(Comment, null, text))
+            : createVNode(Comment, null, text);
+    }
     function normalizeVNode(child) {
         if (child == null || typeof child === 'boolean') {
             // empty placeholder
@@ -5419,7 +5516,7 @@
     function cloneIfMounted(child) {
         return child.el === null || child.memo ? child : cloneVNode(child);
     }
-    function normalizeChildren(vnode, children) {
+    function normalizeChildren$1(vnode, children) {
         let type = 0;
         const { shapeFlag } = vnode;
         if (children == null) {
@@ -5435,7 +5532,7 @@
                 if (slot) {
                     // _c marker is added by withCtx() indicating this is a compiled slot
                     slot._c && (slot._d = false);
-                    normalizeChildren(vnode, slot());
+                    normalizeChildren$1(vnode, slot());
                     slot._c && (slot._d = true);
                 }
                 return;
@@ -5505,6 +5602,103 @@
             }
         }
         return ret;
+    }
+
+    /**
+     * Actual implementation
+     */
+    function renderList(source, renderItem, cache, index) {
+        let ret;
+        const cached = (cache && cache[index]);
+        if (isArray(source) || isString(source)) {
+            ret = new Array(source.length);
+            for (let i = 0, l = source.length; i < l; i++) {
+                ret[i] = renderItem(source[i], i, undefined, cached && cached[i]);
+            }
+        }
+        else if (typeof source === 'number') {
+            if (!Number.isInteger(source)) {
+                warn$2(`The v-for range expect an integer value but got ${source}.`);
+                return [];
+            }
+            ret = new Array(source);
+            for (let i = 0; i < source; i++) {
+                ret[i] = renderItem(i + 1, i, undefined, cached && cached[i]);
+            }
+        }
+        else if (isObject$1(source)) {
+            if (source[Symbol.iterator]) {
+                ret = Array.from(source, (item, i) => renderItem(item, i, undefined, cached && cached[i]));
+            }
+            else {
+                const keys = Object.keys(source);
+                ret = new Array(keys.length);
+                for (let i = 0, l = keys.length; i < l; i++) {
+                    const key = keys[i];
+                    ret[i] = renderItem(source[key], key, i, cached && cached[i]);
+                }
+            }
+        }
+        else {
+            ret = [];
+        }
+        if (cache) {
+            cache[index] = ret;
+        }
+        return ret;
+    }
+
+    /**
+     * Compiler runtime helper for rendering `<slot/>`
+     * @private
+     */
+    function renderSlot(slots, name, props = {}, 
+    // this is not a user-facing function, so the fallback is always generated by
+    // the compiler and guaranteed to be a function returning an array
+    fallback, noSlotted) {
+        if (currentRenderingInstance.isCE) {
+            return createVNode('slot', name === 'default' ? null : { name }, fallback && fallback());
+        }
+        let slot = slots[name];
+        if (slot && slot.length > 1) {
+            warn$2(`SSR-optimized slot function detected in a non-SSR-optimized render ` +
+                `function. You need to mark this component with $dynamic-slots in the ` +
+                `parent template.`);
+            slot = () => [];
+        }
+        // a compiled slot disables block tracking by default to avoid manual
+        // invocation interfering with template-based block tracking, but in
+        // `renderSlot` we can be sure that it's template-based so we can force
+        // enable it.
+        if (slot && slot._c) {
+            slot._d = false;
+        }
+        openBlock();
+        const validSlotContent = slot && ensureValidVNode(slot(props));
+        const rendered = createBlock(Fragment, { key: props.key || `_${name}` }, validSlotContent || (fallback ? fallback() : []), validSlotContent && slots._ === 1 /* STABLE */
+            ? 64 /* STABLE_FRAGMENT */
+            : -2 /* BAIL */);
+        if (!noSlotted && rendered.scopeId) {
+            rendered.slotScopeIds = [rendered.scopeId + '-s'];
+        }
+        if (slot && slot._c) {
+            slot._d = true;
+        }
+        return rendered;
+    }
+    function ensureValidVNode(vnodes) {
+        return vnodes.some(child => {
+            if (!isVNode(child))
+                return true;
+            if (child.type === Comment)
+                return false;
+            if (child.type === Fragment &&
+                !ensureValidVNode(child.children))
+                return false;
+            return true;
+        })
+            ? vnodes
+            : null;
     }
 
     /**
@@ -5634,11 +5828,11 @@
                 if (data !== EMPTY_OBJ &&
                     (key[0] === '$' || key[0] === '_') &&
                     hasOwn(data, key)) {
-                    warn$1(`Property ${JSON.stringify(key)} must be accessed via $data because it starts with a reserved ` +
+                    warn$2(`Property ${JSON.stringify(key)} must be accessed via $data because it starts with a reserved ` +
                         `character ("$" or "_") and is not proxied on the render context.`);
                 }
                 else if (instance === currentRenderingInstance) {
-                    warn$1(`Property ${JSON.stringify(key)} was accessed during render ` +
+                    warn$2(`Property ${JSON.stringify(key)} was accessed during render ` +
                         `but is not defined on instance.`);
                 }
             }
@@ -5652,11 +5846,11 @@
                 data[key] = value;
             }
             else if (hasOwn(instance.props, key)) {
-                warn$1(`Attempting to mutate prop "${key}". Props are readonly.`, instance);
+                warn$2(`Attempting to mutate prop "${key}". Props are readonly.`, instance);
                 return false;
             }
             if (key[0] === '$' && key.slice(1) in instance) {
-                warn$1(`Attempting to mutate public property "${key}". ` +
+                warn$2(`Attempting to mutate public property "${key}". ` +
                         `Properties starting with $ are reserved and readonly.`, instance);
                 return false;
             }
@@ -5687,7 +5881,7 @@
     };
     {
         PublicInstanceProxyHandlers.ownKeys = (target) => {
-            warn$1(`Avoid app logic that relies on enumerating keys on a component instance. ` +
+            warn$2(`Avoid app logic that relies on enumerating keys on a component instance. ` +
                 `The keys will be empty in production mode to avoid performance overhead.`);
             return Reflect.ownKeys(target);
         };
@@ -5736,7 +5930,7 @@
         const { ctx, setupState } = instance;
         Object.keys(toRaw(setupState)).forEach(key => {
             if (!setupState.__isScriptSetup && (key[0] === '$' || key[0] === '_')) {
-                warn$1(`setup() return property ${JSON.stringify(key)} should not start with "$" or "_" ` +
+                warn$2(`setup() return property ${JSON.stringify(key)} should not start with "$" or "_" ` +
                     `which are reserved prefixes for Vue internals.`);
                 return;
             }
@@ -5846,7 +6040,7 @@
     function validateComponentName(name, config) {
         const appIsNativeTag = config.isNativeTag || NO;
         if (isBuiltInTag(name) || appIsNativeTag(name)) {
-            warn$1('Do not use built-in or reserved HTML elements as component id: ' + name);
+            warn$2('Do not use built-in or reserved HTML elements as component id: ' + name);
         }
     }
     function isStatefulComponent(instance) {
@@ -5884,7 +6078,7 @@
                 }
             }
             if (Component.compilerOptions && isRuntimeOnly()) {
-                warn$1(`"compilerOptions" is only supported when using a build of Vue that ` +
+                warn$2(`"compilerOptions" is only supported when using a build of Vue that ` +
                     `includes the runtime compiler. Since you are using a runtime-only ` +
                     `build, the options should be passed via your build tool config instead.`);
             }
@@ -5940,9 +6134,9 @@
                 instance.render = setupResult;
             }
         }
-        else if (isObject(setupResult)) {
+        else if (isObject$1(setupResult)) {
             if (isVNode(setupResult)) {
-                warn$1(`setup() should not return VNodes directly - ` +
+                warn$2(`setup() should not return VNodes directly - ` +
                     `return a render function instead.`);
             }
             // setup returned bindings.
@@ -5956,7 +6150,7 @@
             }
         }
         else if (setupResult !== undefined) {
-            warn$1(`setup() should return an object. Received: ${setupResult === null ? 'null' : typeof setupResult}`);
+            warn$2(`setup() should return an object. Received: ${setupResult === null ? 'null' : typeof setupResult}`);
         }
         finishComponentSetup(instance, isSSR);
     }
@@ -5982,13 +6176,13 @@
         if (!Component.render && instance.render === NOOP && !isSSR) {
             /* istanbul ignore if */
             if (Component.template) {
-                warn$1(`Component provided template option but ` +
+                warn$2(`Component provided template option but ` +
                     `runtime compilation is not supported in this build of Vue.` +
                     (` Configure your bundler to alias "vue" to "vue/dist/vue.esm-bundler.js".`
                         ) /* should not happen */);
             }
             else {
-                warn$1(`Component is missing template or render function.`);
+                warn$2(`Component is missing template or render function.`);
             }
         }
     }
@@ -6000,11 +6194,11 @@
                     return target[key];
                 },
                 set() {
-                    warn$1(`setupContext.attrs is readonly.`);
+                    warn$2(`setupContext.attrs is readonly.`);
                     return false;
                 },
                 deleteProperty() {
-                    warn$1(`setupContext.attrs is readonly.`);
+                    warn$2(`setupContext.attrs is readonly.`);
                     return false;
                 }
             }
@@ -6013,7 +6207,7 @@
     function createSetupContext(instance) {
         const expose = exposed => {
             if (instance.exposed) {
-                warn$1(`expose() should be called only once per setup().`);
+                warn$2(`expose() should be called only once per setup().`);
             }
             instance.exposed = exposed || {};
         };
@@ -6092,7 +6286,7 @@
     function popWarningContext() {
         stack.pop();
     }
-    function warn$1(msg, ...args) {
+    function warn$2(msg, ...args) {
         // avoid props formatting or warn handler tracking deps that might be mutated
         // during patch, leading to infinite recursion.
         pauseTracking();
@@ -6291,7 +6485,7 @@
             if (contextVNode) {
                 pushWarningContext(contextVNode);
             }
-            warn$1(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
+            warn$2(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
             if (contextVNode) {
                 popWarningContext();
             }
@@ -6487,7 +6681,7 @@
             if (count > RECURSION_LIMIT) {
                 const instance = fn.ownerInstance;
                 const componentName = instance && getComponentName(instance.type);
-                warn$1(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. ` +
+                warn$2(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. ` +
                     `This means you have a reactive effect that is mutating its own ` +
                     `dependencies and thus recursively triggering itself. Possible sources ` +
                     `include component template, render function, updated hook or ` +
@@ -6509,7 +6703,7 @@
     // implementation
     function watch(source, cb, options) {
         if (!isFunction(cb)) {
-            warn$1(`\`watch(fn, options?)\` signature has been moved to a separate API. ` +
+            warn$2(`\`watch(fn, options?)\` signature has been moved to a separate API. ` +
                 `Use \`watchEffect(fn, options?)\` instead. \`watch\` now only ` +
                 `supports \`watch(source, cb, options?) signature.`);
         }
@@ -6518,16 +6712,16 @@
     function doWatch(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ) {
         if (!cb) {
             if (immediate !== undefined) {
-                warn$1(`watch() "immediate" option is only respected when using the ` +
+                warn$2(`watch() "immediate" option is only respected when using the ` +
                     `watch(source, callback, options?) signature.`);
             }
             if (deep !== undefined) {
-                warn$1(`watch() "deep" option is only respected when using the ` +
+                warn$2(`watch() "deep" option is only respected when using the ` +
                     `watch(source, callback, options?) signature.`);
             }
         }
         const warnInvalidSource = (s) => {
-            warn$1(`Invalid watch source: `, s, `A watch source can only be a getter/effect function, a ref, ` +
+            warn$2(`Invalid watch source: `, s, `A watch source can only be a getter/effect function, a ref, ` +
                 `a reactive object, or an array of these types.`);
         };
         const instance = currentInstance;
@@ -6670,7 +6864,7 @@
         return () => {
             effect.stop();
             if (instance && instance.scope) {
-                remove(instance.scope.effects, effect);
+                remove$1(instance.scope.effects, effect);
             }
         };
     }
@@ -6712,7 +6906,7 @@
         };
     }
     function traverse(value, seen = new Set()) {
-        if (!isObject(value) || value["__v_skip" /* SKIP */]) {
+        if (!isObject$1(value) || value["__v_skip" /* SKIP */]) {
             return value;
         }
         seen = seen || new Set();
@@ -6746,10 +6940,10 @@
     Object.freeze([]) ;
 
     // Actual implementation
-    function h(type, propsOrChildren, children) {
+    function h$1(type, propsOrChildren, children) {
         const l = arguments.length;
         if (l === 2) {
-            if (isObject(propsOrChildren) && !isArray(propsOrChildren)) {
+            if (isObject$1(propsOrChildren) && !isArray(propsOrChildren)) {
                 // single vnode without props
                 if (isVNode(propsOrChildren)) {
                     return createVNode(type, null, [propsOrChildren]);
@@ -6787,7 +6981,7 @@
         const formatter = {
             header(obj) {
                 // TODO also format ComponentPublicInstance & ctx.slots/attrs in setup
-                if (!isObject(obj)) {
+                if (!isObject$1(obj)) {
                     return null;
                 }
                 if (obj.__isVue) {
@@ -6912,7 +7106,7 @@
             else if (typeof v === 'boolean') {
                 return ['span', keywordStyle, v];
             }
-            else if (isObject(v)) {
+            else if (isObject$1(v)) {
                 return ['object', { object: asRaw ? toRaw(v) : v }];
             }
             else {
@@ -6935,7 +7129,7 @@
         function isKeyOfType(Comp, key, type) {
             const opts = Comp[type];
             if ((isArray(opts) && opts.includes(key)) ||
-                (isObject(opts) && key in opts)) {
+                (isObject$1(opts) && key in opts)) {
                 return true;
             }
             if (Comp.extends && isKeyOfType(Comp.extends, key, type)) {
@@ -7223,7 +7417,7 @@
         }
         catch (e) {
             {
-                warn$1(`Failed setting prop "${key}" on <${el.tagName.toLowerCase()}>: ` +
+                warn$2(`Failed setting prop "${key}" on <${el.tagName.toLowerCase()}>: ` +
                     `value ${value} is invalid.`, e);
             }
         }
@@ -7404,6 +7598,9 @@
         }
         return key in el;
     }
+
+    const TRANSITION = 'transition';
+    const ANIMATION = 'animation';
     const DOMTransitionPropsValidators = {
         name: String,
         type: String,
@@ -7422,7 +7619,378 @@
         leaveActiveClass: String,
         leaveToClass: String
     };
-    (/*#__PURE__*/ extend({}, BaseTransition.props, DOMTransitionPropsValidators));
+    const TransitionPropsValidators = (/*#__PURE__*/ extend({}, BaseTransition.props, DOMTransitionPropsValidators));
+    /**
+     * #3227 Incoming hooks may be merged into arrays when wrapping Transition
+     * with custom HOCs.
+     */
+    const callHook = (hook, args = []) => {
+        if (isArray(hook)) {
+            hook.forEach(h => h(...args));
+        }
+        else if (hook) {
+            hook(...args);
+        }
+    };
+    /**
+     * Check if a hook expects a callback (2nd arg), which means the user
+     * intends to explicitly control the end of the transition.
+     */
+    const hasExplicitCallback = (hook) => {
+        return hook
+            ? isArray(hook)
+                ? hook.some(h => h.length > 1)
+                : hook.length > 1
+            : false;
+    };
+    function resolveTransitionProps(rawProps) {
+        const baseProps = {};
+        for (const key in rawProps) {
+            if (!(key in DOMTransitionPropsValidators)) {
+                baseProps[key] = rawProps[key];
+            }
+        }
+        if (rawProps.css === false) {
+            return baseProps;
+        }
+        const { name = 'v', type, duration, enterFromClass = `${name}-enter-from`, enterActiveClass = `${name}-enter-active`, enterToClass = `${name}-enter-to`, appearFromClass = enterFromClass, appearActiveClass = enterActiveClass, appearToClass = enterToClass, leaveFromClass = `${name}-leave-from`, leaveActiveClass = `${name}-leave-active`, leaveToClass = `${name}-leave-to` } = rawProps;
+        const durations = normalizeDuration(duration);
+        const enterDuration = durations && durations[0];
+        const leaveDuration = durations && durations[1];
+        const { onBeforeEnter, onEnter, onEnterCancelled, onLeave, onLeaveCancelled, onBeforeAppear = onBeforeEnter, onAppear = onEnter, onAppearCancelled = onEnterCancelled } = baseProps;
+        const finishEnter = (el, isAppear, done) => {
+            removeTransitionClass(el, isAppear ? appearToClass : enterToClass);
+            removeTransitionClass(el, isAppear ? appearActiveClass : enterActiveClass);
+            done && done();
+        };
+        const finishLeave = (el, done) => {
+            removeTransitionClass(el, leaveToClass);
+            removeTransitionClass(el, leaveActiveClass);
+            done && done();
+        };
+        const makeEnterHook = (isAppear) => {
+            return (el, done) => {
+                const hook = isAppear ? onAppear : onEnter;
+                const resolve = () => finishEnter(el, isAppear, done);
+                callHook(hook, [el, resolve]);
+                nextFrame(() => {
+                    removeTransitionClass(el, isAppear ? appearFromClass : enterFromClass);
+                    addTransitionClass(el, isAppear ? appearToClass : enterToClass);
+                    if (!hasExplicitCallback(hook)) {
+                        whenTransitionEnds(el, type, enterDuration, resolve);
+                    }
+                });
+            };
+        };
+        return extend(baseProps, {
+            onBeforeEnter(el) {
+                callHook(onBeforeEnter, [el]);
+                addTransitionClass(el, enterFromClass);
+                addTransitionClass(el, enterActiveClass);
+            },
+            onBeforeAppear(el) {
+                callHook(onBeforeAppear, [el]);
+                addTransitionClass(el, appearFromClass);
+                addTransitionClass(el, appearActiveClass);
+            },
+            onEnter: makeEnterHook(false),
+            onAppear: makeEnterHook(true),
+            onLeave(el, done) {
+                const resolve = () => finishLeave(el, done);
+                addTransitionClass(el, leaveFromClass);
+                // force reflow so *-leave-from classes immediately take effect (#2593)
+                forceReflow();
+                addTransitionClass(el, leaveActiveClass);
+                nextFrame(() => {
+                    removeTransitionClass(el, leaveFromClass);
+                    addTransitionClass(el, leaveToClass);
+                    if (!hasExplicitCallback(onLeave)) {
+                        whenTransitionEnds(el, type, leaveDuration, resolve);
+                    }
+                });
+                callHook(onLeave, [el, resolve]);
+            },
+            onEnterCancelled(el) {
+                finishEnter(el, false);
+                callHook(onEnterCancelled, [el]);
+            },
+            onAppearCancelled(el) {
+                finishEnter(el, true);
+                callHook(onAppearCancelled, [el]);
+            },
+            onLeaveCancelled(el) {
+                finishLeave(el);
+                callHook(onLeaveCancelled, [el]);
+            }
+        });
+    }
+    function normalizeDuration(duration) {
+        if (duration == null) {
+            return null;
+        }
+        else if (isObject$1(duration)) {
+            return [NumberOf(duration.enter), NumberOf(duration.leave)];
+        }
+        else {
+            const n = NumberOf(duration);
+            return [n, n];
+        }
+    }
+    function NumberOf(val) {
+        const res = toNumber$1(val);
+        validateDuration(res);
+        return res;
+    }
+    function validateDuration(val) {
+        if (typeof val !== 'number') {
+            warn$2(`<transition> explicit duration is not a valid number - ` +
+                `got ${JSON.stringify(val)}.`);
+        }
+        else if (isNaN(val)) {
+            warn$2(`<transition> explicit duration is NaN - ` +
+                'the duration expression might be incorrect.');
+        }
+    }
+    function addTransitionClass(el, cls) {
+        cls.split(/\s+/).forEach(c => c && el.classList.add(c));
+        (el._vtc ||
+            (el._vtc = new Set())).add(cls);
+    }
+    function removeTransitionClass(el, cls) {
+        cls.split(/\s+/).forEach(c => c && el.classList.remove(c));
+        const { _vtc } = el;
+        if (_vtc) {
+            _vtc.delete(cls);
+            if (!_vtc.size) {
+                el._vtc = undefined;
+            }
+        }
+    }
+    function nextFrame(cb) {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(cb);
+        });
+    }
+    let endId = 0;
+    function whenTransitionEnds(el, expectedType, explicitTimeout, resolve) {
+        const id = (el._endId = ++endId);
+        const resolveIfNotStale = () => {
+            if (id === el._endId) {
+                resolve();
+            }
+        };
+        if (explicitTimeout) {
+            return setTimeout(resolveIfNotStale, explicitTimeout);
+        }
+        const { type, timeout, propCount } = getTransitionInfo(el, expectedType);
+        if (!type) {
+            return resolve();
+        }
+        const endEvent = type + 'end';
+        let ended = 0;
+        const end = () => {
+            el.removeEventListener(endEvent, onEnd);
+            resolveIfNotStale();
+        };
+        const onEnd = (e) => {
+            if (e.target === el && ++ended >= propCount) {
+                end();
+            }
+        };
+        setTimeout(() => {
+            if (ended < propCount) {
+                end();
+            }
+        }, timeout + 1);
+        el.addEventListener(endEvent, onEnd);
+    }
+    function getTransitionInfo(el, expectedType) {
+        const styles = window.getComputedStyle(el);
+        // JSDOM may return undefined for transition properties
+        const getStyleProperties = (key) => (styles[key] || '').split(', ');
+        const transitionDelays = getStyleProperties(TRANSITION + 'Delay');
+        const transitionDurations = getStyleProperties(TRANSITION + 'Duration');
+        const transitionTimeout = getTimeout(transitionDelays, transitionDurations);
+        const animationDelays = getStyleProperties(ANIMATION + 'Delay');
+        const animationDurations = getStyleProperties(ANIMATION + 'Duration');
+        const animationTimeout = getTimeout(animationDelays, animationDurations);
+        let type = null;
+        let timeout = 0;
+        let propCount = 0;
+        /* istanbul ignore if */
+        if (expectedType === TRANSITION) {
+            if (transitionTimeout > 0) {
+                type = TRANSITION;
+                timeout = transitionTimeout;
+                propCount = transitionDurations.length;
+            }
+        }
+        else if (expectedType === ANIMATION) {
+            if (animationTimeout > 0) {
+                type = ANIMATION;
+                timeout = animationTimeout;
+                propCount = animationDurations.length;
+            }
+        }
+        else {
+            timeout = Math.max(transitionTimeout, animationTimeout);
+            type =
+                timeout > 0
+                    ? transitionTimeout > animationTimeout
+                        ? TRANSITION
+                        : ANIMATION
+                    : null;
+            propCount = type
+                ? type === TRANSITION
+                    ? transitionDurations.length
+                    : animationDurations.length
+                : 0;
+        }
+        const hasTransform = type === TRANSITION &&
+            /\b(transform|all)(,|$)/.test(styles[TRANSITION + 'Property']);
+        return {
+            type,
+            timeout,
+            propCount,
+            hasTransform
+        };
+    }
+    function getTimeout(delays, durations) {
+        while (delays.length < durations.length) {
+            delays = delays.concat(delays);
+        }
+        return Math.max(...durations.map((d, i) => toMs(d) + toMs(delays[i])));
+    }
+    // Old versions of Chromium (below 61.0.3163.100) formats floating pointer
+    // numbers in a locale-dependent way, using a comma instead of a dot.
+    // If comma is not replaced with a dot, the input will be rounded down
+    // (i.e. acting as a floor function) causing unexpected behaviors
+    function toMs(s) {
+        return Number(s.slice(0, -1).replace(',', '.')) * 1000;
+    }
+    // synchronously force layout to put elements into a certain state
+    function forceReflow() {
+        return document.body.offsetHeight;
+    }
+
+    const positionMap = new WeakMap();
+    const newPositionMap = new WeakMap();
+    const TransitionGroupImpl = {
+        name: 'TransitionGroup',
+        props: /*#__PURE__*/ extend({}, TransitionPropsValidators, {
+            tag: String,
+            moveClass: String
+        }),
+        setup(props, { slots }) {
+            const instance = getCurrentInstance();
+            const state = useTransitionState();
+            let prevChildren;
+            let children;
+            onUpdated(() => {
+                // children is guaranteed to exist after initial render
+                if (!prevChildren.length) {
+                    return;
+                }
+                const moveClass = props.moveClass || `${props.name || 'v'}-move`;
+                if (!hasCSSTransform(prevChildren[0].el, instance.vnode.el, moveClass)) {
+                    return;
+                }
+                // we divide the work into three loops to avoid mixing DOM reads and writes
+                // in each iteration - which helps prevent layout thrashing.
+                prevChildren.forEach(callPendingCbs);
+                prevChildren.forEach(recordPosition);
+                const movedChildren = prevChildren.filter(applyTranslation);
+                // force reflow to put everything in position
+                forceReflow();
+                movedChildren.forEach(c => {
+                    const el = c.el;
+                    const style = el.style;
+                    addTransitionClass(el, moveClass);
+                    style.transform = style.webkitTransform = style.transitionDuration = '';
+                    const cb = (el._moveCb = (e) => {
+                        if (e && e.target !== el) {
+                            return;
+                        }
+                        if (!e || /transform$/.test(e.propertyName)) {
+                            el.removeEventListener('transitionend', cb);
+                            el._moveCb = null;
+                            removeTransitionClass(el, moveClass);
+                        }
+                    });
+                    el.addEventListener('transitionend', cb);
+                });
+            });
+            return () => {
+                const rawProps = toRaw(props);
+                const cssTransitionProps = resolveTransitionProps(rawProps);
+                let tag = rawProps.tag || Fragment;
+                prevChildren = children;
+                children = slots.default ? getTransitionRawChildren(slots.default()) : [];
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    if (child.key != null) {
+                        setTransitionHooks(child, resolveTransitionHooks(child, cssTransitionProps, state, instance));
+                    }
+                    else {
+                        warn$2(`<TransitionGroup> children must be keyed.`);
+                    }
+                }
+                if (prevChildren) {
+                    for (let i = 0; i < prevChildren.length; i++) {
+                        const child = prevChildren[i];
+                        setTransitionHooks(child, resolveTransitionHooks(child, cssTransitionProps, state, instance));
+                        positionMap.set(child, child.el.getBoundingClientRect());
+                    }
+                }
+                return createVNode(tag, null, children);
+            };
+        }
+    };
+    const TransitionGroup = TransitionGroupImpl;
+    function callPendingCbs(c) {
+        const el = c.el;
+        if (el._moveCb) {
+            el._moveCb();
+        }
+        if (el._enterCb) {
+            el._enterCb();
+        }
+    }
+    function recordPosition(c) {
+        newPositionMap.set(c, c.el.getBoundingClientRect());
+    }
+    function applyTranslation(c) {
+        const oldPos = positionMap.get(c);
+        const newPos = newPositionMap.get(c);
+        const dx = oldPos.left - newPos.left;
+        const dy = oldPos.top - newPos.top;
+        if (dx || dy) {
+            const s = c.el.style;
+            s.transform = s.webkitTransform = `translate(${dx}px,${dy}px)`;
+            s.transitionDuration = '0s';
+            return c;
+        }
+    }
+    function hasCSSTransform(el, root, moveClass) {
+        // Detect whether an element with the move class applied has
+        // CSS transitions. Since the element may be inside an entering
+        // transition at this very moment, we make a clone of it and remove
+        // all other transition classes applied to ensure only the move class
+        // is applied.
+        const clone = el.cloneNode();
+        if (el._vtc) {
+            el._vtc.forEach(cls => {
+                cls.split(/\s+/).forEach(c => c && clone.classList.remove(c));
+            });
+        }
+        moveClass.split(/\s+/).forEach(c => c && clone.classList.add(c));
+        clone.style.display = 'none';
+        const container = (root.nodeType === 1 ? root : root.parentNode);
+        container.appendChild(clone);
+        const { hasTransform } = getTransitionInfo(clone);
+        container.removeChild(clone);
+        return hasTransform;
+    }
 
     const rendererOptions = extend({ patchProp }, nodeOps);
     // lazy create the renderer - this makes core renderer logic tree-shakable
@@ -7466,20 +8034,20 @@
         // Inject `isNativeTag`
         // this is used for component name validation (dev only)
         Object.defineProperty(app.config, 'isNativeTag', {
-            value: (tag) => isHTMLTag(tag) || isSVGTag(tag),
+            value: (tag) => isHTMLTag$1(tag) || isSVGTag(tag),
             writable: false
         });
     }
     // dev only
     function injectCompilerOptionsCheck(app) {
-        if (isRuntimeOnly()) {
+        {
             const isCustomElement = app.config.isCustomElement;
             Object.defineProperty(app.config, 'isCustomElement', {
                 get() {
                     return isCustomElement;
                 },
                 set() {
-                    warn$1(`The \`isCustomElement\` config option is deprecated. Use ` +
+                    warn$2(`The \`isCustomElement\` config option is deprecated. Use ` +
                         `\`compilerOptions.isCustomElement\` instead.`);
                 }
             });
@@ -7493,11 +8061,11 @@
                 `- For vite: pass it via @vitejs/plugin-vue options. See https://github.com/vitejs/vite/tree/main/packages/plugin-vue#example-for-passing-options-to-vuecompiler-dom`;
             Object.defineProperty(app.config, 'compilerOptions', {
                 get() {
-                    warn$1(msg);
+                    warn$2(msg);
                     return compilerOptions;
                 },
                 set() {
-                    warn$1(msg);
+                    warn$2(msg);
                 }
             });
         }
@@ -7506,14 +8074,14 @@
         if (isString(container)) {
             const res = document.querySelector(container);
             if (!res) {
-                warn$1(`Failed to mount app: mount target selector "${container}" returned null.`);
+                warn$2(`Failed to mount app: mount target selector "${container}" returned null.`);
             }
             return res;
         }
         if (window.ShadowRoot &&
             container instanceof window.ShadowRoot &&
             container.mode === 'closed') {
-            warn$1(`mounting on a ShadowRoot with \`{mode: "closed"}\` may lead to unpredictable bugs`);
+            warn$2(`mounting on a ShadowRoot with \`{mode: "closed"}\` may lead to unpredictable bugs`);
         }
         return container;
     }
@@ -7528,6 +8096,224 @@
     {
         initDev();
     }
+
+    let store, router$1, flashMessage;
+
+    const errorMessages = {
+    	UniqueViolation: 'Item already exists',
+    };
+
+    const debounceFlashMessage = {};
+
+    function splitPascalCase(word) {
+    	const pattern = /($[a-z])|[A-Z][^A-Z]+/g;
+    	const words = word.match(pattern).join(" ");
+    	return words[0] + words.slice(1).toLowerCase()
+    }
+
+    function debounce$1(func, timeout = 300) {
+    	let timer;
+    	return (...args) => {
+    		if (!timer) func.apply(this, args);
+    		clearTimeout(timer);
+    		timer = setTimeout(() => {
+    			timer = undefined;
+    		}, timeout);
+    	}
+    }
+
+    async function handleHttpStatus(response) {
+    	if (response.ok) return response
+
+    	let errorMessage = response.statusText;
+
+    	let error = await response.json().catch(() => {});
+    	if (error) {
+    		error = error.error_type;
+    		switch (error) {
+    			default:
+    				errorMessage = errorMessages[error] || splitPascalCase(error);
+    				console.error(error);
+    		}
+    	}
+
+    	if (!(errorMessage in debounceFlashMessage)) {
+    		debounceFlashMessage[errorMessage] = debounce$1(() => flashMessage.show({
+    			type: 'error',
+    			title: `Error ${response.status}`,
+    			text: errorMessage,
+    			time: 5000,
+    		}));
+    	}
+
+    	debounceFlashMessage[errorMessage]();
+
+    	switch (response.status) {
+    		case 401:
+    			store.dispatch('setUser', null);
+    			if (router$1.currentRoute.value.name !== 'login') {
+    				router$1.push({ name: 'login', query: {
+    					redirect: router$1.currentRoute.value.fullPath,
+    				}});
+    			}
+    			break
+    		case 500:
+    			router$1.push({ name: 'error', params: {
+    				title: 'Error 500',
+    				message: errorMessage,
+    			}});
+    			break
+    	}
+
+    	throw Error(response.statusText)
+    }
+
+    const populateUrl = (url, data) => {
+    	const isObject = typeof data === 'object' && data !== null && !Array.isArray(data);
+
+    	return url.replace(/\{[^}]*?\}/g, tag => {
+    		const mandatory = !tag.includes('?');
+    		tag = tag.slice(1, mandatory ? -1 : -2);
+
+    		const value = isObject
+    			? data[tag]
+    			: data;
+
+    		if (mandatory && !value) {
+    			throw Error(`No "${tag}" provided for url "${url}"`)
+    		}
+
+    		return value || ''
+    	})
+    };
+
+    const prepareBody = body => {
+    	for (const key in body) {
+    		// Back end want's YYYY-MM-DD dates
+    		if (body[key] instanceof Date) body[key] = [
+    			body[key].getFullYear(),
+    			body[key].getMonth() + 1,
+    			body[key].getDate(),
+    		].map(nr => String(nr).padStart(2, 0)).join('-');
+    	}
+
+    	return body
+    };
+
+    const request = ({ url, onError, ...options } = {}) => fetch(url.replace(/\/+$/, ''), options)
+    	.then(handleHttpStatus)
+    	.catch(error => {
+    		if (onError !== undefined) return onError
+    		throw error
+    	});
+
+    const sendJson = ({ method = 'POST', ...args } = {}) => request({
+    	...args,
+    	method,
+    	headers: { 'Content-Type': 'application/json' },
+    	body: JSON.stringify(prepareBody(args.body)),
+    });
+
+    const returnBoolean = promise => promise.then(() => true).catch(() => false);
+    const returnObject = promise => promise.then(response => response.json()).catch(() => null);
+    const returnArray = promise => promise.then(response => response.json()).catch(() => []);
+
+    const create = url => body => returnObject(sendJson({ url: populateUrl(url, body), method: 'POST', body }));
+    const update = url => body => returnObject(sendJson({ url: populateUrl(url, body), method: 'PUT', body }));
+
+    const save = urls => {
+    	if (typeof urls == 'string') urls = { create: urls.replace('/{id}', ''), update: urls };
+
+    	// Prioritize update because it could have the same key that is used to create
+    	// create /api/user/{user_id}/thing: { user_id: 'abc123', name: 'Foo' }
+    	// update /api/user/thing/{id}:      { user_id: 'abc123', name: 'Bar', id: '321cba' }
+    	const updateKey = 'update' in urls
+    		? (urls.update.match(/{([^}]*?)}/) || []).pop()
+    		: null;
+
+    	const c = create(urls.create);
+    	const u = update(urls.update);
+
+    	return data => data[updateKey] ? u(data) : c(data)
+    };
+
+    const getArray = url => data => returnArray(request({ url: populateUrl(url, data) }));
+    const getObject = url => data => returnObject(request({ url: populateUrl(url, data) }));
+
+    const remove = url => data => returnBoolean(
+    	typeof data == 'string'
+    		? request({ url: populateUrl(url, data), method: 'DELETE' })
+    		: sendJson({ url: populateUrl(url, data), method: 'DELETE', body: data })
+    );
+
+    const api = {
+    	users: {
+    		get: async (data = {}) => {
+    			if (!data.id) return getArray('/api/users?is_include_skills=true')()
+    			return getObject('/api/users/{id}')(data)
+    		},
+
+    		save: save('/api/users/{id}'),
+    		delete: remove('/api/users/{id}'),
+
+    		skills: {
+    			save: save({
+    				create: '/api/users/{user_id}/skills',
+    				update: '/api/users/skills/{id}',
+    			}),
+    			delete: remove('/api/users/skills/{id}'),
+    		},
+
+    		files: {
+    			get: (data = {}) => {
+    				if ('user_id' in data) return getArray('/api/users/{user_id}/uploads')(data)
+    				return populateUrl('/api/users/uploads/{id}', data)
+    			},
+
+    			save: data => {
+    				const body = new FormData();
+    				body.append('user_id', data.user_id);
+    				if (data.files.length) data.files.forEach(file => body.append('files[]', file));
+    				return returnBoolean(request({
+    					url: populateUrl('/api/users/{user_id}/uploads', data),
+    					method: 'POST',
+    					body,
+    				}))
+    			},
+
+    			delete: remove('/api/users/uploads/{id}'),
+    		},
+
+    		password: {
+    			requestReset: body => returnBoolean(sendJson({ url: '/api/resetpassword', body })),
+    			save: body => returnBoolean(sendJson({ url: '/api/updatepassword', method: 'PUT', body })),
+    		},
+
+    		registration: {
+    			invite: body => sendJson({ url: '/api/invitations', body }),
+    			confirm: body => returnBoolean(sendJson({ url: populateUrl('/api/register/{id}', body), body })),
+    		},
+
+    		log: {
+    			in: async body => {
+    				await sendJson({ url: '/api/auth', body });
+    				return returnObject(request({ url: '/api/auth' }))
+    			},
+
+    			out: () => request({ url: '/api/auth', method: 'DELETE' }),
+    		},
+    	},
+    };
+
+    var api$1 = {
+    	install: (app, options) => {
+    		store = app.config.globalProperties.$store;
+    		router$1 = app.config.globalProperties.$router;
+    		flashMessage = app.config.globalProperties.$flashMessage;
+
+    		app.config.globalProperties.$api = api;
+    	},
+    };
 
     function getDevtoolsGlobalHook() {
         return getTarget().__VUE_DEVTOOLS_GLOBAL_HOOK__;
@@ -7624,7 +8410,7 @@
     }
     const noop$1 = () => { };
 
-    function warn(msg) {
+    function warn$1(msg) {
         // avoid using ...args as it breaks in older Edge builds
         const args = Array.from(arguments).slice(1);
         console.warn.apply(console, ['[Vue Router warn]: ' + msg].concat(args));
@@ -7758,7 +8544,7 @@
         if (to.startsWith('/'))
             return to;
         if (!from.startsWith('/')) {
-            warn(`Cannot resolve a relative location without an absolute path. Trying to resolve "${to}" from "${from}". It should look like "/${from}".`);
+            warn$1(`Cannot resolve a relative location without an absolute path. Trying to resolve "${to}" from "${from}". It should look like "/${from}".`);
             return to;
         }
         if (!to)
@@ -7876,13 +8662,13 @@
                     try {
                         const foundEl = document.querySelector(position.el);
                         if (isIdSelector && foundEl) {
-                            warn(`The selector "${position.el}" should be passed as "el: document.querySelector('${position.el}')" because it starts with "#".`);
+                            warn$1(`The selector "${position.el}" should be passed as "el: document.querySelector('${position.el}')" because it starts with "#".`);
                             // return to avoid other warnings
                             return;
                         }
                     }
                     catch (err) {
-                        warn(`The selector "${position.el}" is invalid. If you are using an id selector, make sure to escape it. You can find more information about escaping characters in selectors at https://mathiasbynens.be/notes/css-escapes or use CSS.escape (https://developer.mozilla.org/en-US/docs/Web/API/CSS/escape).`);
+                        warn$1(`The selector "${position.el}" is invalid. If you are using an id selector, make sure to escape it. You can find more information about escaping characters in selectors at https://mathiasbynens.be/notes/css-escapes or use CSS.escape (https://developer.mozilla.org/en-US/docs/Web/API/CSS/escape).`);
                         // return to avoid other warnings
                         return;
                     }
@@ -7894,7 +8680,7 @@
                     : document.querySelector(positionEl)
                 : positionEl;
             if (!el) {
-                warn(`Couldn't find element using selector "${position.el}" returned by scrollBehavior.`);
+                warn$1(`Couldn't find element using selector "${position.el}" returned by scrollBehavior.`);
                 return;
             }
             scrollToOptions = getElementPosition(el, position);
@@ -8096,7 +8882,7 @@
             }
             catch (err) {
                 {
-                    warn('Error with push/replace State', err);
+                    warn$1('Error with push/replace State', err);
                 }
                 // Force the navigation, this also resets the call count
                 location[replace ? 'replace' : 'assign'](url);
@@ -8121,7 +8907,7 @@
                 scroll: computeScrollPosition(),
             });
             if (!history.state) {
-                warn(`history.state seems to have been manually replaced without preserving the necessary values. Make sure to preserve existing history state if you are manually calling history.replaceState:\n\n` +
+                warn$1(`history.state seems to have been manually replaced without preserving the necessary values. Make sure to preserve existing history state if you are manually calling history.replaceState:\n\n` +
                     `history.replaceState(history.state, '', url)\n\n` +
                     `You can find more information at https://next.router.vuejs.org/guide/migration/#usage-of-history-state.`);
             }
@@ -8656,7 +9442,7 @@
             const existingKeys = new Set();
             for (const key of parser.keys) {
                 if (existingKeys.has(key.name))
-                    warn(`Found duplicated params with name "${key.name}" for path "${record.path}". Only the last one will be available on "$route.params".`);
+                    warn$1(`Found duplicated params with name "${key.name}" for path "${record.path}". Only the last one will be available on "$route.params".`);
                 existingKeys.add(key.name);
             }
         }
@@ -8846,7 +9632,7 @@
                 // this also allows the user to control the encoding
                 path = location.path;
                 if (!path.startsWith('/')) {
-                    warn(`The Matcher cannot resolve relative paths but received "${path}". Unless you directly called \`matcher.resolve("${path}")\`, this is probably a bug in vue-router. Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/vue-router-next.`);
+                    warn$1(`The Matcher cannot resolve relative paths but received "${path}". Unless you directly called \`matcher.resolve("${path}")\`, this is probably a bug in vue-router. Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/vue-router-next.`);
                 }
                 matcher = matchers.find(m => m.re.test(path));
                 // matcher should have a value after the loop
@@ -8987,17 +9773,17 @@
     function checkSameParams(a, b) {
         for (const key of a.keys) {
             if (!key.optional && !b.keys.find(isSameParam.bind(null, key)))
-                return warn(`Alias "${b.record.path}" and the original record: "${a.record.path}" should have the exact same param named "${key.name}"`);
+                return warn$1(`Alias "${b.record.path}" and the original record: "${a.record.path}" should have the exact same param named "${key.name}"`);
         }
         for (const key of b.keys) {
             if (!key.optional && !a.keys.find(isSameParam.bind(null, key)))
-                return warn(`Alias "${b.record.path}" and the original record: "${a.record.path}" should have the exact same param named "${key.name}"`);
+                return warn$1(`Alias "${b.record.path}" and the original record: "${a.record.path}" should have the exact same param named "${key.name}"`);
         }
     }
     function checkMissingParamsInAbsolutePath(record, parent) {
         for (const key of parent.keys) {
             if (!record.keys.find(isSameParam.bind(null, key)))
-                return warn(`Absolute path "${record.record.path}" should have the exact same param named "${key.name}" as its parent "${parent.record.path}".`);
+                return warn$1(`Absolute path "${record.record.path}" should have the exact same param named "${key.name}" as its parent "${parent.record.path}".`);
         }
     }
 
@@ -9132,7 +9918,7 @@
             return decodeURIComponent('' + text);
         }
         catch (err) {
-            warn(`Error decoding "${text}". Using original value`);
+            warn$1(`Error decoding "${text}". Using original value`);
         }
         return '' + text;
     }
@@ -9299,7 +10085,7 @@
                     guardCall = guardCall.then(resolvedValue => {
                         // @ts-expect-error: _called is added at canOnlyBeCalledOnce
                         if (!next._called) {
-                            warn(message);
+                            warn$1(message);
                             return Promise.reject(new Error('Invalid navigation guard'));
                         }
                         return resolvedValue;
@@ -9309,7 +10095,7 @@
                 else if (guardReturn !== undefined) {
                     // @ts-expect-error: _called is added at canOnlyBeCalledOnce
                     if (!next._called) {
-                        warn(message);
+                        warn$1(message);
                         reject(new Error('Invalid navigation guard'));
                         return;
                     }
@@ -9322,7 +10108,7 @@
         let called = 0;
         return function () {
             if (called++ === 1)
-                warn(`The "next" callback was called more than once in one navigation guard when going from "${from.fullPath}" to "${to.fullPath}". It should be called exactly one time in each navigation guard. This will fail in production.`);
+                warn$1(`The "next" callback was called more than once in one navigation guard when going from "${from.fullPath}" to "${to.fullPath}". It should be called exactly one time in each navigation guard. This will fail in production.`);
             // @ts-expect-error: we put it in the original one because it's easier to check
             next._called = true;
             if (called === 1)
@@ -9338,7 +10124,7 @@
                     if (!rawComponent ||
                         (typeof rawComponent !== 'object' &&
                             typeof rawComponent !== 'function')) {
-                        warn(`Component "${name}" in record with path "${record.path}" is not` +
+                        warn$1(`Component "${name}" in record with path "${record.path}" is not` +
                             ` a valid component. Received "${String(rawComponent)}".`);
                         // throw to ensure we stop here but warn to ensure the message isn't
                         // missed by the user
@@ -9347,7 +10133,7 @@
                     else if ('then' in rawComponent) {
                         // warn if user wrote import('/component.vue') instead of () =>
                         // import('./component.vue')
-                        warn(`Component "${name}" in record with path "${record.path}" is a ` +
+                        warn$1(`Component "${name}" in record with path "${record.path}" is a ` +
                             `Promise instead of a function that returns a Promise. Did you ` +
                             `write "import('./MyPage.vue')" instead of ` +
                             `"() => import('./MyPage.vue')" ? This will break in ` +
@@ -9359,7 +10145,7 @@
                         // warn only once per component
                         !rawComponent.__warnedDefineAsync) {
                         rawComponent.__warnedDefineAsync = true;
-                        warn(`Component "${name}" in record with path "${record.path}" is defined ` +
+                        warn$1(`Component "${name}" in record with path "${record.path}" is defined ` +
                             `using "defineAsyncComponent()". ` +
                             `Write "() => import('./MyPage.vue')" instead of ` +
                             `"defineAsyncComponent(() => import('./MyPage.vue'))".`);
@@ -9378,7 +10164,7 @@
                     // start requesting the chunk already
                     let componentPromise = rawComponent();
                     if (!('catch' in componentPromise)) {
-                        warn(`Component "${name}" in record with path "${record.path}" is a function that does not return a Promise. If you were passing a functional component, make sure to add a "displayName" to the component. This will break in production if not fixed.`);
+                        warn$1(`Component "${name}" in record with path "${record.path}" is a function that does not return a Promise. If you were passing a functional component, make sure to add a "displayName" to the component. This will break in production if not fixed.`);
                         componentPromise = Promise.resolve(componentPromise);
                     }
                     guards.push(() => componentPromise.then(resolved => {
@@ -9516,7 +10302,7 @@
                 const children = slots.default && slots.default(link);
                 return props.custom
                     ? children
-                    : h('a', {
+                    : h$1('a', {
                         'aria-current': link.isExactActive
                             ? props.ariaCurrentValue
                             : null,
@@ -9672,7 +10458,7 @@
                         matchedRoute.instances[currentName] = null;
                     }
                 };
-                const component = h(ViewComponent, assign({}, routeProps, attrs, {
+                const component = h$1(ViewComponent, assign({}, routeProps, attrs, {
                     onVnodeUnmounted,
                     ref: viewRef,
                 }));
@@ -9704,7 +10490,7 @@
         if (parentName &&
             (parentName === 'KeepAlive' || parentName.includes('Transition'))) {
             const comp = parentName === 'KeepAlive' ? 'keep-alive' : 'transition';
-            warn(`<router-view> can no longer be used directly inside <transition> or <keep-alive>.\n` +
+            warn$1(`<router-view> can no longer be used directly inside <transition> or <keep-alive>.\n` +
                 `Use slot props instead:\n\n` +
                 `<router-view v-slot="{ Component }">\n` +
                 `  <${comp}>\n` +
@@ -10176,7 +10962,7 @@
                 matcher.removeRoute(recordMatcher);
             }
             else {
-                warn(`Cannot remove non-existent route "${String(name)}"`);
+                warn$1(`Cannot remove non-existent route "${String(name)}"`);
             }
         }
         function getRoutes() {
@@ -10195,9 +10981,9 @@
                 const href = routerHistory.createHref(locationNormalized.fullPath);
                 {
                     if (href.startsWith('//'))
-                        warn(`Location "${rawLocation}" resolved to "${href}". A resolved location cannot start with multiple slashes.`);
+                        warn$1(`Location "${rawLocation}" resolved to "${href}". A resolved location cannot start with multiple slashes.`);
                     else if (!matchedRoute.matched.length) {
-                        warn(`No match found for location with path "${rawLocation}"`);
+                        warn$1(`No match found for location with path "${rawLocation}"`);
                     }
                 }
                 // locationNormalized is always a new object
@@ -10214,7 +11000,7 @@
                 if ('params' in rawLocation &&
                     !('name' in rawLocation) &&
                     Object.keys(rawLocation.params).length) {
-                    warn(`Path "${rawLocation.path}" was passed with params but they will be ignored. Use a named route alongside params instead.`);
+                    warn$1(`Path "${rawLocation.path}" was passed with params but they will be ignored. Use a named route alongside params instead.`);
                 }
                 matcherLocation = assign({}, rawLocation, {
                     path: parseURL(parseQuery$1, rawLocation.path, currentLocation.path).path,
@@ -10239,7 +11025,7 @@
             const matchedRoute = matcher.resolve(matcherLocation, currentLocation);
             const hash = rawLocation.hash || '';
             if (hash && !hash.startsWith('#')) {
-                warn(`A \`hash\` should always start with the character "#". Replace "${hash}" with "#${hash}".`);
+                warn$1(`A \`hash\` should always start with the character "#". Replace "${hash}" with "#${hash}".`);
             }
             // decoding them) the matcher might have merged current location params so
             // we need to run the decoding again
@@ -10251,10 +11037,10 @@
             const href = routerHistory.createHref(fullPath);
             {
                 if (href.startsWith('//')) {
-                    warn(`Location "${rawLocation}" resolved to "${href}". A resolved location cannot start with multiple slashes.`);
+                    warn$1(`Location "${rawLocation}" resolved to "${href}". A resolved location cannot start with multiple slashes.`);
                 }
                 else if (!matchedRoute.matched.length) {
-                    warn(`No match found for location with path "${'path' in rawLocation ? rawLocation.path : rawLocation}"`);
+                    warn$1(`No match found for location with path "${'path' in rawLocation ? rawLocation.path : rawLocation}"`);
                 }
             }
             return assign({
@@ -10312,7 +11098,7 @@
                 }
                 if (!('path' in newTargetLocation) &&
                     !('name' in newTargetLocation)) {
-                    warn(`Invalid redirect found:\n${JSON.stringify(newTargetLocation, null, 2)}\n when navigating to "${to.fullPath}". A redirect must contain a name or path. This will break in production.`);
+                    warn$1(`Invalid redirect found:\n${JSON.stringify(newTargetLocation, null, 2)}\n when navigating to "${to.fullPath}". A redirect must contain a name or path. This will break in production.`);
                     throw new Error('Invalid redirect');
                 }
                 return assign({
@@ -10370,7 +11156,7 @@
                                 ? // @ts-expect-error
                                     redirectedFrom._count + 1
                                 : 1) > 10) {
-                            warn(`Detected an infinite redirection in a navigation guard when going from "${from.fullPath}" to "${toLocation.fullPath}". Aborting to avoid a Stack Overflow. This will break in production if not fixed.`);
+                            warn$1(`Detected an infinite redirection in a navigation guard when going from "${from.fullPath}" to "${toLocation.fullPath}". Aborting to avoid a Stack Overflow. This will break in production if not fixed.`);
                             return Promise.reject(new Error('Infinite redirect in navigation guard'));
                         }
                         return pushWithRedirect(
@@ -10619,7 +11405,7 @@
             }
             else {
                 {
-                    warn('uncaught error during route navigation:');
+                    warn$1('uncaught error during route navigation:');
                 }
                 console.error(error);
             }
@@ -10703,7 +11489,7 @@
                     // see above
                     started = true;
                     push(routerHistory.location).catch(err => {
-                        warn('Unexpected error when starting the router:', err);
+                        warn$1('Unexpected error when starting the router:', err);
                     });
                 }
                 const reactiveRoute = {};
@@ -10762,6 +11548,33 @@
         }
         return [leavingRecords, updatingRecords, enteringRecords];
     }
+
+    const state = reactive({
+      counter: 666,
+      loggeduser: JSON.parse(localStorage.getItem('user')),
+    });
+
+    const methods = {
+      increase() {
+        state.counter++;
+      },
+      decrease() {
+        state.counter--;
+      },
+      logout() {
+        console.log("Logging out");
+        return true
+      },
+      login(formData) {
+        console.log("Logging in:" + formData);
+        return true
+      }
+    };
+
+    var state$1 = {
+      state,
+      methods
+    };
 
     var top = 'top';
     var bottom = 'bottom';
@@ -13134,7 +13947,7 @@
       return null;
     }
 
-    function normalizeParams(originalTypeEvent, handler, delegationFn) {
+    function normalizeParams$1(originalTypeEvent, handler, delegationFn) {
       const delegation = typeof handler === 'string';
       const originalHandler = delegation ? delegationFn : handler;
       let typeEvent = getTypeEvent(originalTypeEvent);
@@ -13175,7 +13988,7 @@
         }
       }
 
-      const [delegation, originalHandler, typeEvent] = normalizeParams(originalTypeEvent, handler, delegationFn);
+      const [delegation, originalHandler, typeEvent] = normalizeParams$1(originalTypeEvent, handler, delegationFn);
       const events = getEvent(element);
       const handlers = events[typeEvent] || (events[typeEvent] = {});
       const previousFn = findHandler(handlers, originalHandler, delegation ? handler : null);
@@ -13236,7 +14049,7 @@
           return;
         }
 
-        const [delegation, originalHandler, typeEvent] = normalizeParams(originalTypeEvent, handler, delegationFn);
+        const [delegation, originalHandler, typeEvent] = normalizeParams$1(originalTypeEvent, handler, delegationFn);
         const inNamespace = typeEvent !== originalTypeEvent;
         const events = getEvent(element);
         const isNamespace = originalTypeEvent.startsWith('.');
@@ -17721,24 +18534,813 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$1 = {
-    		name: 'Home',
-    	};
+    var script$d = {
+    	name: 'FormLogin',
+    	setup() {
+    	const store = inject('store');
+    		return {
+    			store
+    		}
+    	},
+    	data() {
+    		return {
+    			sending: false,
+    			form: {
+    				email: '',
+    				password: '',
+    			},
+    		}
+    	},
 
-    const _hoisted_1$1 = { class: "container" };
+    	computed: {
+    		submitLabel() {
+    			return this.sending ? 'Logging in' : 'Log in'
+    		},
+    	},
 
-    function render$1(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$1, " Henlo "))
+    	methods: {
+    		async onSubmit() {
+    			this.sending = true;
+
+    			const success = await this.store.methods.login(this.form);
+    			if (success) this.$emit('success', success);
+
+    			this.sending = false;
+    		},
+    	},
+    };
+
+    const _hoisted_1$b = /*#__PURE__*/createBaseVNode("label", {
+      for: "email",
+      class: "form-label"
+    }, "Email", -1 /* HOISTED */);
+    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("label", {
+      for: "password",
+      class: "form-label me-3"
+    }, "Password", -1 /* HOISTED */);
+    const _hoisted_3$7 = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
+    const _hoisted_4$7 = ["disabled"];
+    const _hoisted_5$4 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
+    const _hoisted_6$3 = /*#__PURE__*/createTextVNode("Forgot password?");
+    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
+    const _hoisted_8$2 = /*#__PURE__*/createTextVNode("No account? ");
+    const _hoisted_9$1 = /*#__PURE__*/createTextVNode("Sign up");
+
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VField = resolveComponent("VField");
+      const _component_ErrorMessage = resolveComponent("ErrorMessage");
+      const _component_router_link = resolveComponent("router-link");
+      const _component_VForm = resolveComponent("VForm");
+
+      return (openBlock(), createElementBlock("div", null, [
+        createVNode(_component_VForm, {
+          onSubmit: $options.onSubmit,
+          class: "vstack gap-2"
+        }, {
+          default: withCtx(({ errors }) => [
+            createBaseVNode("div", null, [
+              _hoisted_1$b,
+              createVNode(_component_VField, {
+                modelValue: $data.form.email,
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
+                rules: "required|email",
+                type: "email",
+                id: "email",
+                name: "email",
+                label: "Email",
+                "aria-label": "Email",
+                class: normalizeClass(["form-control", { "is-invalid": errors.email }])
+              }, null, 8 /* PROPS */, ["modelValue", "class"]),
+              createVNode(_component_ErrorMessage, {
+                name: "email",
+                class: "invalid-feedback shake"
+              })
+            ]),
+            createBaseVNode("div", null, [
+              _hoisted_2$8,
+              createVNode(_component_VField, {
+                modelValue: $data.form.password,
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.password = $event)),
+                rules: "required",
+                type: "password",
+                id: "password",
+                name: "password",
+                label: "Password",
+                "aria-label": "Password",
+                class: normalizeClass(["form-control", { "is-invalid": errors.required }])
+              }, null, 8 /* PROPS */, ["modelValue", "class"]),
+              createVNode(_component_ErrorMessage, {
+                name: "password",
+                class: "invalid-feedback shake"
+              })
+            ]),
+            createBaseVNode("div", _hoisted_3$7, [
+              createBaseVNode("button", {
+                type: "submit",
+                disabled: $data.sending,
+                class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$7),
+              createBaseVNode("div", _hoisted_5$4, [
+                createBaseVNode("div", null, [
+                  createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
+                    default: withCtx(() => [
+                      _hoisted_6$3
+                    ]),
+                    _: 1 /* STABLE */
+                  })
+                ]),
+                _hoisted_7$2,
+                createBaseVNode("div", null, [
+                  _hoisted_8$2,
+                  createVNode(_component_router_link, { to: { name: "register" } }, {
+                    default: withCtx(() => [
+                      _hoisted_9$1
+                    ]),
+                    _: 1 /* STABLE */
+                  })
+                ])
+              ])
+            ])
+          ]),
+          _: 1 /* STABLE */
+        }, 8 /* PROPS */, ["onSubmit"])
+      ]))
     }
 
-    script$1.render = render$1;
-    script$1.__file = "src/views/Home.vue";
+    script$d.render = render$d;
+    script$d.__file = "src/forms/FormLogin.vue";
+
+    var script$c = {
+    		name: 'Login',
+
+    		async mounted() {
+    			// Forgot password will return untrue
+    			const success = await this.$modal({
+    				title: 'Log in',
+    				component: script$d,
+    				backdrop: 'static',
+    			});
+
+    			if (success) this.$router.replace(this.$route.query.redirect || { name: 'home' });
+    		},
+    	};
+
+    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
+      return null
+    }
+
+    script$c.render = render$c;
+    script$c.__file = "src/views/Login.vue";
+
+    var script$b = {
+    		name: 'FormForgotPassword',
+
+    		data() {
+    			return {
+    				sending: false,
+    				form: {
+    					email: '',
+    				},
+    			}
+    		},
+
+    		computed: {
+    			submitLabel() {
+    				return this.sending ? 'Requesting' : 'Request'
+    			},
+    		},
+
+    		methods: {
+    			async onSubmit() {
+    				this.sending = true;
+
+    				const success = await this.$api.users.password.requestReset(this.form);
+    				if (success) this.$emit('success', success);
+
+    				this.sending = false;
+    			},
+    		}
+    	};
+
+    const _hoisted_1$a = /*#__PURE__*/createBaseVNode("label", {
+      for: "email",
+      class: "form-label"
+    }, "The email you used to register", -1 /* HOISTED */);
+    const _hoisted_2$7 = ["disabled"];
+    const _hoisted_3$6 = { class: "mt-label" };
+    const _hoisted_4$6 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
+    const _hoisted_5$3 = /*#__PURE__*/createTextVNode("Log in");
+
+    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VField = resolveComponent("VField");
+      const _component_ErrorMessage = resolveComponent("ErrorMessage");
+      const _component_VForm = resolveComponent("VForm");
+      const _component_router_link = resolveComponent("router-link");
+
+      return (openBlock(), createElementBlock("div", null, [
+        createVNode(_component_VForm, {
+          onSubmit: $options.onSubmit,
+          class: "vstack gap-2"
+        }, {
+          default: withCtx(({ errors }) => [
+            _hoisted_1$a,
+            createBaseVNode("div", {
+              class: normalizeClass(["input-group", { "has-validation": errors.email }])
+            }, [
+              createVNode(_component_VField, {
+                modelValue: $data.form.email,
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
+                rules: "required|email",
+                type: "email",
+                id: "email",
+                name: "email",
+                label: "Email",
+                "aria-label": "Email",
+                class: normalizeClass(["form-control", { "is-invalid": errors.email }])
+              }, null, 8 /* PROPS */, ["modelValue", "class"]),
+              createBaseVNode("button", {
+                type: "submit",
+                disabled: $data.sending,
+                class: "btn btn-primary gradient"
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_2$7),
+              createVNode(_component_ErrorMessage, {
+                name: "email",
+                class: "invalid-feedback shake"
+              })
+            ], 2 /* CLASS */)
+          ]),
+          _: 1 /* STABLE */
+        }, 8 /* PROPS */, ["onSubmit"]),
+        createBaseVNode("div", _hoisted_3$6, [
+          _hoisted_4$6,
+          createVNode(_component_router_link, { to: { name: "login" } }, {
+            default: withCtx(() => [
+              _hoisted_5$3
+            ]),
+            _: 1 /* STABLE */
+          })
+        ])
+      ]))
+    }
+
+    script$b.render = render$b;
+    script$b.__file = "src/forms/FormForgotPassword.vue";
+
+    var script$a = {
+    		name: 'ForgotPassword',
+
+    		data() {
+    			return {
+    				requested: false,
+    			}
+    		},
+
+    		async mounted() {
+    			this.requested = await this.$modal({
+    				title: 'Request a password reset',
+    				component: script$b,
+    				backdrop: 'static',
+    			});
+    		},
+    	};
+
+    const _hoisted_1$9 = {
+      key: 0,
+      class: "container mt-5"
+    };
+    const _hoisted_2$6 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+      /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Password reset requested")
+    ], -1 /* HOISTED */);
+    const _hoisted_3$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
+      /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Password reset requested successfully, check your email.")
+    ], -1 /* HOISTED */);
+    const _hoisted_4$5 = [
+      _hoisted_2$6,
+      _hoisted_3$5
+    ];
+
+    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
+      return ($data.requested)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
+            createBaseVNode("div", {
+              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+            }, _hoisted_4$5, 2 /* CLASS */)
+          ]))
+        : createCommentVNode("v-if", true)
+    }
+
+    script$a.render = render$a;
+    script$a.__file = "src/views/ForgotPassword.vue";
+
+    var script$9 = {
+    	name: 'FormRegister',
+    	setup() {
+    		const store = inject('store');
+    		return {
+    			store
+    		}
+    	},
+    	data() {
+    		return {
+    			sending: false,
+    			form: {
+    				email: '',
+    				username: '',
+    				password_plain: '',
+    			}
+    		}
+    	},
+
+    	computed: {
+    		isAdmin() {
+    			return this.store.state.loggeduser && this.store.state.loggeduser.isadmin
+    		},
+
+    		submitLabel() {
+    			return this.isAdmin
+    				? this.sending ? 'Inviting' : 'Invite'
+    				: this.sending ? 'Registering' : 'Register'
+    		},
+    	},
+
+    	methods: {
+    		async onSubmit() {
+    			this.sending = true;
+
+    			const success = await this.$api.users.registration.invite(this.form);
+
+    			if (success) {
+    				this.$emit('success', success);
+
+    				this.$flashMessage.show({
+    					type: 'success',
+    					title: 'Invitation sent',
+    					time: 5000,
+    				});
+    			}
+
+    			this.sending = false;
+    		}
+    	}
+    };
+
+    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
+      for: "email",
+      class: "form-label"
+    }, "Email", -1 /* HOISTED */);
+    const _hoisted_2$5 = /*#__PURE__*/createBaseVNode("label", {
+      for: "username",
+      class: "form-label"
+    }, "Username", -1 /* HOISTED */);
+    const _hoisted_3$4 = { key: 0 };
+    const _hoisted_4$4 = /*#__PURE__*/createBaseVNode("label", {
+      for: "password_plain",
+      class: "form-label"
+    }, "Password", -1 /* HOISTED */);
+    const _hoisted_5$2 = { key: 1 };
+    const _hoisted_6$2 = /*#__PURE__*/createBaseVNode("label", {
+      for: "password_confirmation",
+      class: "form-label"
+    }, "Repeat password", -1 /* HOISTED */);
+    const _hoisted_7$1 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
+    const _hoisted_8$1 = ["disabled"];
+    const _hoisted_9 = { key: 0 };
+    const _hoisted_10 = /*#__PURE__*/createTextVNode("Already a user? ");
+    const _hoisted_11 = /*#__PURE__*/createTextVNode("Log in");
+
+    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VField = resolveComponent("VField");
+      const _component_ErrorMessage = resolveComponent("ErrorMessage");
+      const _component_router_link = resolveComponent("router-link");
+      const _component_VForm = resolveComponent("VForm");
+
+      return (openBlock(), createElementBlock("div", null, [
+        createVNode(_component_VForm, {
+          onSubmit: $options.onSubmit,
+          class: "vstack gap-2"
+        }, {
+          default: withCtx(({ errors }) => [
+            createBaseVNode("div", null, [
+              _hoisted_1$8,
+              createVNode(_component_VField, {
+                modelValue: $data.form.email,
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
+                rules: "required|email",
+                type: "email",
+                id: "email",
+                name: "email",
+                label: "Email",
+                "aria-label": "Email",
+                class: normalizeClass(["form-control", { "is-invalid": errors.email }])
+              }, null, 8 /* PROPS */, ["modelValue", "class"]),
+              createVNode(_component_ErrorMessage, {
+                name: "email",
+                class: "invalid-feedback shake"
+              })
+            ]),
+            createBaseVNode("div", null, [
+              _hoisted_2$5,
+              createVNode(_component_VField, {
+                modelValue: $data.form.username,
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.username = $event)),
+                rules: "required",
+                type: "text",
+                id: "username",
+                name: "username",
+                label: "Username",
+                "aria-label": "Username",
+                class: normalizeClass(["form-control", { "is-invalid": errors.username }])
+              }, null, 8 /* PROPS */, ["modelValue", "class"]),
+              createVNode(_component_ErrorMessage, {
+                name: "username",
+                class: "invalid-feedback shake"
+              })
+            ]),
+            (!$options.isAdmin)
+              ? (openBlock(), createElementBlock("div", _hoisted_3$4, [
+                  _hoisted_4$4,
+                  createVNode(_component_VField, {
+                    modelValue: $data.form.password_plain,
+                    "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => ($data.form.password_plain = $event)),
+                    rules: "requiredNonAdmin",
+                    type: "password",
+                    id: "password_plain",
+                    name: "password_plain",
+                    label: "Password",
+                    "aria-label": "Password",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.password_plain }])
+                  }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                  createVNode(_component_ErrorMessage, {
+                    name: "password_plain",
+                    class: "invalid-feedback shake"
+                  })
+                ]))
+              : createCommentVNode("v-if", true),
+            (!$options.isAdmin)
+              ? (openBlock(), createElementBlock("div", _hoisted_5$2, [
+                  _hoisted_6$2,
+                  createVNode(_component_VField, {
+                    rules: "confirmed:@password_plain",
+                    type: "password",
+                    id: "password_confirmation",
+                    name: "password_confirmation",
+                    label: "Password confirmation",
+                    "aria-label": "Password confirmation",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.password_confirmation }])
+                  }, null, 8 /* PROPS */, ["class"]),
+                  createVNode(_component_ErrorMessage, {
+                    name: "password_confirmation",
+                    class: "invalid-feedback shake"
+                  })
+                ]))
+              : createCommentVNode("v-if", true),
+            createBaseVNode("div", _hoisted_7$1, [
+              createBaseVNode("button", {
+                type: "submit",
+                disabled: $data.sending,
+                class: "btn btn-primary gradient align-self-start"
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_8$1),
+              (!$options.isAdmin)
+                ? (openBlock(), createElementBlock("div", _hoisted_9, [
+                    _hoisted_10,
+                    createVNode(_component_router_link, { to: { name: "login" } }, {
+                      default: withCtx(() => [
+                        _hoisted_11
+                      ]),
+                      _: 1 /* STABLE */
+                    })
+                  ]))
+                : createCommentVNode("v-if", true)
+            ])
+          ]),
+          _: 1 /* STABLE */
+        }, 8 /* PROPS */, ["onSubmit"])
+      ]))
+    }
+
+    script$9.render = render$9;
+    script$9.__file = "src/forms/FormRegister.vue";
+
+    var script$8 = {
+    		name: 'Register',
+
+    		data() {
+    			return {
+    				registered: false,
+    			}
+    		},
+
+    		async mounted() {
+    			this.registered = await this.$modal({
+    				title: 'Sign up',
+    				component: script$9,
+    				backdrop: 'static',
+    			});
+    		},
+    	};
+
+    const _hoisted_1$7 = {
+      key: 0,
+      class: "container mt-5"
+    };
+    const _hoisted_2$4 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+      /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Invitation sent")
+    ], -1 /* HOISTED */);
+    const _hoisted_3$3 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
+      /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Please check your email and follow the confirmation link to activate your account.")
+    ], -1 /* HOISTED */);
+    const _hoisted_4$3 = [
+      _hoisted_2$4,
+      _hoisted_3$3
+    ];
+
+    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
+      return ($data.registered)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
+            createBaseVNode("div", {
+              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+            }, _hoisted_4$3, 2 /* CLASS */)
+          ]))
+        : createCommentVNode("v-if", true)
+    }
+
+    script$8.render = render$8;
+    script$8.__file = "src/views/Register.vue";
+
+    var script$7 = {
+    		name: 'FormResetPassword',
+
+    		props: {
+    			id: {
+    				type: String,
+    				required: true,
+    			},
+    			email: {
+    				type: String,
+    				required: true,
+    			},
+    		},
+
+    		data() {
+    			return {
+    				sending: false,
+    				form: {
+    					...this.$props,
+    					password: '',
+    				}
+    			}
+    		},
+
+    		computed: {
+    			submitLabel() {
+    				return this.sending ? 'Changing' : 'Change'
+    			},
+    		},
+
+    		methods: {
+    			async onSubmit() {
+    				this.sending = true;
+
+    				for (const prop in this.form) if (this.form[prop] == '') this.form[prop] = undefined;
+    				const success = await this.$api.users.password.save(this.form);
+    				
+    				const message = success ? {
+    					type: 'success',
+    					title: 'Password changed',
+    				} : {
+    					type: 'error',
+    					title: 'Updating password failed',
+    				};
+
+    				this.$flashMessage.show({
+    					...message,
+    					time: 5000,
+    				});
+    				
+    				if (success) this.$emit('success', success);
+
+    				this.sending = false;
+    			}
+    		}
+    	};
+
+    const _hoisted_1$6 = /*#__PURE__*/createBaseVNode("label", {
+      for: "password",
+      class: "form-label"
+    }, "Password", -1 /* HOISTED */);
+    const _hoisted_2$3 = /*#__PURE__*/createBaseVNode("label", {
+      for: "password_confirmation",
+      class: "form-label"
+    }, "Repeat password", -1 /* HOISTED */);
+    const _hoisted_3$2 = { class: "mt-label" };
+    const _hoisted_4$2 = ["disabled"];
+
+    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VField = resolveComponent("VField");
+      const _component_ErrorMessage = resolveComponent("ErrorMessage");
+      const _component_VForm = resolveComponent("VForm");
+
+      return (openBlock(), createBlock(_component_VForm, {
+        onSubmit: $options.onSubmit,
+        class: "vstack gap-2"
+      }, {
+        default: withCtx(({ errors }) => [
+          createBaseVNode("div", null, [
+            _hoisted_1$6,
+            createVNode(_component_VField, {
+              modelValue: $data.form.password,
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.password = $event)),
+              rules: "required",
+              type: "password",
+              id: "password",
+              name: "password",
+              label: "Password",
+              "aria-label": "Password",
+              class: normalizeClass(["form-control", { "is-invalid": errors.password }])
+            }, null, 8 /* PROPS */, ["modelValue", "class"]),
+            createVNode(_component_ErrorMessage, {
+              name: "password",
+              class: "invalid-feedback shake"
+            })
+          ]),
+          createBaseVNode("div", null, [
+            _hoisted_2$3,
+            createVNode(_component_VField, {
+              rules: "confirmed:@password",
+              type: "password",
+              id: "password_confirmation",
+              name: "password_confirmation",
+              label: "Password confirmation",
+              "aria-label": "Password confirmation",
+              class: normalizeClass(["form-control", { "is-invalid": errors.password_confirmation }])
+            }, null, 8 /* PROPS */, ["class"]),
+            createVNode(_component_ErrorMessage, {
+              name: "password_confirmation",
+              class: "invalid-feedback shake"
+            })
+          ]),
+          createBaseVNode("div", _hoisted_3$2, [
+            createBaseVNode("button", {
+              type: "submit",
+              disabled: $data.sending,
+              class: "btn btn-primary gradient float-end"
+            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$2)
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["onSubmit"]))
+    }
+
+    script$7.render = render$7;
+    script$7.__file = "src/forms/FormResetPassword.vue";
+
+    var script$6 = {
+    		name: 'Confirm',
+
+    		data() {
+    			return {
+    				confirmed: false,
+    			}
+    		},
+
+    		async mounted() {
+    			const data = this.$route.query;
+
+    			if (data.type == 'reset') {
+    				this.resetPassword(data);
+    			} else {
+    				this.confirmAccount(data);
+    			}
+    		},
+
+    		methods: {
+    			async resetPassword(data) {
+    				await this.$modal({
+    					title: 'Enter new password',
+    					component: script$7,
+    					props: data,
+    					backdrop: 'static',
+    				});
+
+    				this.$router.push({ name: 'login' });
+    			},
+
+    			async confirmAccount(data) {
+    				this.confirmed = await this.$api.users.registration.confirm(data);
+
+    				const message = this.confirmed ? {
+    					type: 'success',
+    					title: 'Account confirmed',
+    				} : {
+    					type: 'error',
+    					title: 'Account confirmation failed',
+    				};
+
+    				this.$flashMessage.show({
+    					...message,
+    					time: 5000,
+    				});
+
+    				if (!this.confirmed) this.$router.replace({
+    					name: 'error',
+    					params: {
+    						title: 'Account confirmation failed',
+    						message: 'If your account is already confirmed you can try logging in.',
+    					},
+    				});
+
+    				if (data.reset_request_id) {
+    					this.confirmed = false; // Hide confirmation info in the backround
+    					this.resetPassword({
+    						id: data.reset_request_id,
+    						email: data.email,
+    						type: 'reset',
+    					});
+    				}
+    			},
+    		},
+    	};
+
+    const _hoisted_1$5 = {
+      key: 0,
+      class: "container mt-5"
+    };
+    const _hoisted_2$2 = { class: "card shadow" };
+    const _hoisted_3$1 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+      /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Account confirmed")
+    ], -1 /* HOISTED */);
+    const _hoisted_4$1 = { class: "card-body" };
+    const _hoisted_5$1 = { class: "mb-0" };
+    const _hoisted_6$1 = /*#__PURE__*/createTextVNode("Your account has been confirmed. You can now ");
+    const _hoisted_7 = /*#__PURE__*/createTextVNode("log in");
+    const _hoisted_8 = /*#__PURE__*/createTextVNode(".");
+
+    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_router_link = resolveComponent("router-link");
+
+      return ($data.confirmed)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$5, [
+            createBaseVNode("div", _hoisted_2$2, [
+              _hoisted_3$1,
+              createBaseVNode("div", _hoisted_4$1, [
+                createBaseVNode("p", _hoisted_5$1, [
+                  _hoisted_6$1,
+                  createVNode(_component_router_link, { to: { name: "login" } }, {
+                    default: withCtx(() => [
+                      _hoisted_7
+                    ]),
+                    _: 1 /* STABLE */
+                  }),
+                  _hoisted_8
+                ])
+              ])
+            ])
+          ]))
+        : createCommentVNode("v-if", true)
+    }
+
+    script$6.render = render$6;
+    script$6.__file = "src/views/Confirm.vue";
+
+    var script$5 = {
+    	name: 'Home',
+    	setup() {
+    		const store = inject('store');
+    		return {
+    			store
+    		}
+    	},
+    };
+
+    const _hoisted_1$4 = { class: "container" };
+    const _hoisted_2$1 = { class: "counter" };
+
+    function render$5(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
+        createBaseVNode("div", _hoisted_2$1, [
+          createTextVNode(toDisplayString($setup.store.state.loggeduser) + " " + toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
+          createBaseVNode("button", {
+            onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
+          }, "-"),
+          createBaseVNode("button", {
+            onClick: _cache[1] || (_cache[1] = (...args) => ($setup.store.methods.increase && $setup.store.methods.increase(...args)))
+          }, "+")
+        ])
+      ]))
+    }
+
+    script$5.render = render$5;
+    script$5.__file = "src/views/Home.vue";
 
     const router = createRouter({
     	routes: [
-    		//{ path: '/', name: 'home', redirect: () => ({ name: state.loggeduser && state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
-    		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
-    		{ path: '/app/', component: script$1, name: 'page-home' },
+    		{ path: '/', name: 'home', redirect: () => ({ name: state$1.loggeduser && state$1.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
+    		{ path: '/app/confirm', component: script$6, name: 'confirm' },
+    		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
+    		{ path: '/app/register', component: script$8, name: 'register' },
+    		//{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
+    		{ path: '/app/', component: script$5, name: 'page-home' },
+    		{ path: '/app/login', component: script$c, name: 'login' },
     		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
@@ -17750,25 +19352,3214 @@
     	linkExactActiveClass: ''
     });
 
-    var script = {
-    		name: 'App',
+    // Close modal before navigating
+    router.beforeEach((to, from, next) => {
+    	const modal = document.querySelector('.modal.show');
+    	if (!modal) {
+    		next();
+    	} else {
+    		modal.addEventListener('hidden.bs.modal', () => next());
+    		Modal.getInstance(modal).hide();
+    	}
+    });
+
+    const sizeClasses = {
+    		sm: 'modal-sm',
+    		lg: 'modal-lg',
+    		xl: 'modal-xl',
     	};
+
+    	var script$4 = {
+    		name: 'VModal',
+    		
+    		props: {
+    			title: String,
+    			backdrop: {
+    				type: [Boolean, String],
+    				default: true,
+    				validator: value => typeof value == 'boolean' || value == 'static',
+    			},
+    			size: {
+    				type: String,
+    				validator: value => Object.keys(sizeClasses).includes(value)
+    			},
+    			showAtStart: false,
+    		},
+
+    		computed: {
+    			sizeClass() {
+    				return sizeClasses[this.size] || ''
+    			},
+    		},
+
+    		mounted() {
+    			this.modal = Modal.getOrCreateInstance(this.$refs.modal);
+
+    			this.$refs.modal.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding'); });
+    			this.$refs.modal.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden'); });
+    			this.$refs.modal.addEventListener('show.bs.modal', () => { this.$emit('modal-showing'); });
+    			this.$refs.modal.addEventListener('shown.bs.modal', () => {
+    				this.$emit('modal-shown');
+    				const selectors = [
+    					'input, select',
+    					'button.btn-primary',
+    					'button',
+    				];
+    				for (const selector of selectors) {
+    					const input = this.$refs.body.querySelector(selector);
+    					if (input) {
+    						input.focus();
+    						break
+    					}
+    				}
+    			});
+
+    			if (this.showAtStart) this.modal.show();
+    		},
+
+    		methods: {
+    			show() {
+    				this.modal.show();
+    			},
+
+    			hide() {
+    				this.modal.hide();
+    			}
+    		}
+    	};
+
+    const _hoisted_1$3 = ["data-bs-backdrop", "data-bs-keyboard"];
+    const _hoisted_2 = { class: "modal-content shadow-lg" };
+    const _hoisted_3 = {
+      key: 0,
+      class: "modal-header"
+    };
+    const _hoisted_4 = { class: "modal-title h2" };
+    const _hoisted_5 = {
+      key: 0,
+      type: "button",
+      class: "btn-close",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    };
+    const _hoisted_6 = {
+      ref: "body",
+      class: "modal-body"
+    };
+
+    function render$4(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", {
+        class: "modal fade",
+        ref: "modal",
+        "data-bs-backdrop": $props.backdrop,
+        "data-bs-keyboard": $props.backdrop != "static"
+      }, [
+        createBaseVNode("div", {
+          class: normalizeClass(["modal-dialog", $options.sizeClass])
+        }, [
+          createBaseVNode("div", _hoisted_2, [
+            ($props.title)
+              ? (openBlock(), createElementBlock("div", _hoisted_3, [
+                  createBaseVNode("div", _hoisted_4, toDisplayString($props.title), 1 /* TEXT */),
+                  ($props.backdrop != "static")
+                    ? (openBlock(), createElementBlock("button", _hoisted_5))
+                    : createCommentVNode("v-if", true)
+                ]))
+              : createCommentVNode("v-if", true),
+            createBaseVNode("div", _hoisted_6, [
+              renderSlot(_ctx.$slots, "default")
+            ], 512 /* NEED_PATCH */)
+          ])
+        ], 2 /* CLASS */)
+      ], 8 /* PROPS */, _hoisted_1$3))
+    }
+
+    script$4.render = render$4;
+    script$4.__file = "src/components/VModal.vue";
+
+    var script$3 = {
+    		name: 'TheModal',
+
+    		components: {
+    			VModal: script$4,
+    		},
+
+    		methods: {
+    			id(modal) {
+    				return `modal-${modal.id}`
+    			},
+
+    			removeModal(modal) {
+    				this.modals.splice(this.modals.indexOf(modal), 1);
+    				modal.resolve(null);
+    			},
+
+    			onSuccess(modal, payload) {
+    				modal.resolve(payload);
+    				this.$refs[this.id(modal)].hide();
+    			},
+    		},
+    	};
+
+    const _hoisted_1$2 = { key: 0 };
+
+    function render$3(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VModal = resolveComponent("VModal");
+
+      return (_ctx.modals.length)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$2, [
+            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.modals, (modal) => {
+              return (openBlock(), createBlock(_component_VModal, {
+                ref: $options.id(modal),
+                key: modal.id,
+                showAtStart: true,
+                title: modal.title,
+                backdrop: modal.backdrop,
+                size: modal.size,
+                onModalHidden: $event => ($options.removeModal(modal))
+              }, {
+                default: withCtx(() => [
+                  (openBlock(), createBlock(resolveDynamicComponent(modal.component), mergeProps(modal.props, {
+                    onSuccess: $event => ($options.onSuccess(modal, $event))
+                  }), null, 16 /* FULL_PROPS */, ["onSuccess"]))
+                ]),
+                _: 2 /* DYNAMIC */
+              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["title", "backdrop", "size", "onModalHidden"]))
+            }), 128 /* KEYED_FRAGMENT */))
+          ]))
+        : createCommentVNode("v-if", true)
+    }
+
+    script$3.render = render$3;
+    script$3.__file = "src/components/TheModal.vue";
+
+    var script$2 = {
+    		name: 'FormConfirm',
+
+    		props: {
+    			ok: {
+    				type: String,
+    				default: 'OK',
+    			},
+    			cancel: {
+    				type: String,
+    				default: 'Cancel',
+    			},
+    		},
+
+    		methods: {
+    			confirm(choice) {
+    				this.$emit('success', choice);
+    			},
+    		},
+    	};
+
+    const _hoisted_1$1 = { class: "d-flex justify-content-between" };
+
+    function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$1, [
+        createBaseVNode("button", {
+          type: "submit",
+          class: "btn btn-secondary",
+          onClick: _cache[0] || (_cache[0] = $event => ($options.confirm(false)))
+        }, toDisplayString($props.cancel), 1 /* TEXT */),
+        createBaseVNode("button", {
+          type: "submit",
+          class: "btn btn-primary gradient",
+          onClick: _cache[1] || (_cache[1] = $event => ($options.confirm(true)))
+        }, toDisplayString($props.ok), 1 /* TEXT */)
+      ]))
+    }
+
+    script$2.render = render$2;
+    script$2.__file = "src/forms/FormConfirm.vue";
+
+    var confirm = modal => {
+    	const confirm = ({ title, ok = 'OK', cancel = 'Cancel' } = {}) => modal({
+    		component: script$2,
+    		title,
+    		props: {
+    			ok,
+    			cancel,
+    		},
+    	});
+
+    	confirm.delete = async (type, data) => {
+    		let title, apiCall;
+    	
+    		switch (type) {	
+    			case 'user':
+    				title = 'profile';
+    				apiCall = api.users.delete.bind(null, data.id);
+    				break
+    		}
+    	
+    		const confirmed = await confirm({
+    			title: `Delete ${title}?`,
+    			ok: 'Delete',
+    		});
+    	
+    		return confirmed
+    			? apiCall()
+    			: confirmed
+    	};
+
+    	return confirm
+    };
+
+    var modal = {
+    	install: (app, options) => {
+    		let id = 0;
+    		const modals = ref([]);
+
+    		app.component('TheModal', {
+    			...script$3,
+    			setup() {
+    				return {
+    					modals,
+    				}
+    			}
+    		});
+
+    		const modal = ({ title, component, props = {}, backdrop = true, size } = {}) => {
+    			if ('props' in component) props = Object.keys(component.props).reduce((used, key) => ({ ...used, [key]: props[key] }), {});
+
+    			return new Promise(resolve => {
+    				modals.value.push({
+    					id: ++id,
+    					resolve,
+    					title,
+    					component: shallowRef(component),
+    					props,
+    					backdrop,
+    					size,
+    				});
+    			})
+    		};
+
+    		app.config.globalProperties.$modal = modal;
+    		app.config.globalProperties.$confirm = confirm(modal);
+    	},
+    };
+
+    /*!
+      * @smartweb/vue-flash-message v1.0.0-alpha.12
+      * (c) 2020 Roman Privalov
+      * @license MIT
+      */
+    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed((()=>!!r.value.x&&!!r.value.y)),u=computed((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed((()=>f.messages.value)),d=computed((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
+
+    var script$1 = {
+    	name: 'TheHeader',
+    	setup() {
+    		const store = inject('store');
+    		return {
+    			store
+    		}
+    	},
+    	data() {
+    		return {
+    			loggedUser: this.store.state.loggeduser // Here loggedUser will result to menu rendering vs. not if you use the state directly
+    		}
+    	},
+
+    	methods: {
+    		logOut() {
+    			const success = this.store.methods.logout();
+    			console.log(success);
+    			if (success) {
+    				this.$flashMessage.show({
+    					type: 'success',
+    					title: 'Successfully logged out',
+    					time: 5000,
+    				});
+    				this.$router.push({ name: 'login' });
+    			}
+    		},
+    	},
+    };
+
+    function render$1(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", null, [
+        createBaseVNode("button", {
+          onClick: _cache[0] || (_cache[0] = $event => ($options.logOut()))
+        }, "Log out")
+      ]))
+    }
+
+    script$1.render = render$1;
+    script$1.__file = "src/components/TheHeader.vue";
+
+    var script = {
+    	setup() {
+    		provide('store', state$1);
+    		return {
+    			store: state$1
+    		}
+    	},
+    	name: 'App',
+    	components: {
+    		TheHeader: script$1
+    	},
+
+    	methods: {
+    		logOut() {
+    			this.$router.push({ name: 'login' });
+    		},
+    	},
+    };
 
     const _hoisted_1 = { id: "main" };
 
     function render(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_TheHeader = resolveComponent("TheHeader");
+      const _component_FlashMessage = resolveComponent("FlashMessage");
+      const _component_TheModal = resolveComponent("TheModal");
       const _component_router_view = resolveComponent("router-view");
 
-      return (openBlock(), createElementBlock("main", _hoisted_1, [
-        createVNode(_component_router_view)
+      return (openBlock(), createElementBlock("div", null, [
+        ($setup.store.state.counter)
+          ? (openBlock(), createBlock(_component_TheHeader, {
+              key: 0,
+              onLoggedout: $options.logOut
+            }, null, 8 /* PROPS */, ["onLoggedout"]))
+          : createCommentVNode("v-if", true),
+        createVNode(_component_FlashMessage, { position: "right top" }),
+        createVNode(_component_TheModal),
+        createBaseVNode("main", _hoisted_1, [
+          createVNode(_component_router_view)
+        ])
       ]))
     }
 
     script.render = render;
     script.__file = "src/App.vue";
 
+    /**
+      * vee-validate v4.5.2
+      * (c) 2021 Abdelrahman Awad
+      * @license MIT
+      */
+
+    function isCallable(fn) {
+        return typeof fn === 'function';
+    }
+    function isNullOrUndefined$1(value) {
+        return value === null || value === undefined;
+    }
+    const isObject = (obj) => obj !== null && !!obj && typeof obj === 'object' && !Array.isArray(obj);
+    function isIndex(value) {
+        return Number(value) >= 0;
+    }
+    function toNumber(value) {
+        const n = parseFloat(value);
+        return isNaN(n) ? value : n;
+    }
+
+    const RULES = {};
+    /**
+     * Adds a custom validator to the list of validation rules.
+     */
+    function defineRule(id, validator) {
+        // makes sure new rules are properly formatted.
+        guardExtend(id, validator);
+        RULES[id] = validator;
+    }
+    /**
+     * Gets an already defined rule
+     */
+    function resolveRule(id) {
+        return RULES[id];
+    }
+    /**
+     * Guards from extension violations.
+     */
+    function guardExtend(id, validator) {
+        if (isCallable(validator)) {
+            return;
+        }
+        throw new Error(`Extension Error: The validator '${id}' must be a function.`);
+    }
+
+    const FormContextKey = Symbol('vee-validate-form');
+    const FieldContextKey = Symbol('vee-validate-field-instance');
+    const IS_ABSENT = Symbol('Default empty value');
+
+    function isLocator(value) {
+        return isCallable(value) && !!value.__locatorRef;
+    }
+    /**
+     * Checks if an tag name is a native HTML tag and not a Vue component
+     */
+    function isHTMLTag(tag) {
+        return ['input', 'textarea', 'select'].includes(tag);
+    }
+    /**
+     * Checks if an input is of type file
+     */
+    function isFileInputNode(tag, attrs) {
+        return isHTMLTag(tag) && attrs.type === 'file';
+    }
+    function isYupValidator(value) {
+        return !!value && isCallable(value.validate);
+    }
+    function hasCheckedAttr(type) {
+        return type === 'checkbox' || type === 'radio';
+    }
+    function isContainerValue(value) {
+        return isObject(value) || Array.isArray(value);
+    }
+    /**
+     * True if the value is an empty object or array
+     */
+    function isEmptyContainer(value) {
+        if (Array.isArray(value)) {
+            return value.length === 0;
+        }
+        return isObject(value) && Object.keys(value).length === 0;
+    }
+    /**
+     * Checks if the path opted out of nested fields using `[fieldName]` syntax
+     */
+    function isNotNestedPath(path) {
+        return /^\[.+\]$/i.test(path);
+    }
+    /**
+     * Checks if an element is a native HTML5 multi-select input element
+     */
+    function isNativeMultiSelect(el) {
+        return isNativeSelect(el) && el.multiple;
+    }
+    /**
+     * Checks if an element is a native HTML5 select input element
+     */
+    function isNativeSelect(el) {
+        return el.tagName === 'SELECT';
+    }
+    /**
+     * Checks if a tag name with attrs object will render a native multi-select element
+     */
+    function isNativeMultiSelectNode(tag, attrs) {
+        // The falsy value array is the values that Vue won't add the `multiple` prop if it has one of these values
+        const hasTruthyBindingValue = ![false, null, undefined, 0].includes(attrs.multiple) && !Number.isNaN(attrs.multiple);
+        return tag === 'select' && 'multiple' in attrs && hasTruthyBindingValue;
+    }
+    /**
+     * Checks if a node should have a `:value` binding or not
+     *
+     * These nodes should not have a value binding
+     * For files, because they are not reactive
+     * For multi-selects because the value binding will reset the value
+     */
+    function shouldHaveValueBinding(tag, attrs) {
+        return isNativeMultiSelectNode(tag, attrs) || isFileInputNode(tag, attrs);
+    }
+    function isFormSubmitEvent(evt) {
+        return isEvent(evt) && evt.target && 'submit' in evt.target;
+    }
+    function isEvent(evt) {
+        if (!evt) {
+            return false;
+        }
+        if (typeof Event !== 'undefined' && isCallable(Event) && evt instanceof Event) {
+            return true;
+        }
+        // this is for IE and Cypress #3161
+        /* istanbul ignore next */
+        if (evt && evt.srcElement) {
+            return true;
+        }
+        return false;
+    }
+    function isPropPresent(obj, prop) {
+        return prop in obj && obj[prop] !== IS_ABSENT;
+    }
+
+    function cleanupNonNestedPath(path) {
+        if (isNotNestedPath(path)) {
+            return path.replace(/\[|\]/gi, '');
+        }
+        return path;
+    }
+    function getFromPath(object, path, fallback) {
+        if (!object) {
+            return fallback;
+        }
+        if (isNotNestedPath(path)) {
+            return object[cleanupNonNestedPath(path)];
+        }
+        const resolvedValue = (path || '')
+            .split(/\.|\[(\d+)\]/)
+            .filter(Boolean)
+            .reduce((acc, propKey) => {
+            if (isContainerValue(acc) && propKey in acc) {
+                return acc[propKey];
+            }
+            return fallback;
+        }, object);
+        return resolvedValue;
+    }
+    /**
+     * Sets a nested property value in a path, creates the path properties if it doesn't exist
+     */
+    function setInPath(object, path, value) {
+        if (isNotNestedPath(path)) {
+            object[cleanupNonNestedPath(path)] = value;
+            return;
+        }
+        const keys = path.split(/\.|\[(\d+)\]/).filter(Boolean);
+        let acc = object;
+        for (let i = 0; i < keys.length; i++) {
+            // Last key, set it
+            if (i === keys.length - 1) {
+                acc[keys[i]] = value;
+                return;
+            }
+            // Key does not exist, create a container for it
+            if (!(keys[i] in acc) || isNullOrUndefined$1(acc[keys[i]])) {
+                // container can be either an object or an array depending on the next key if it exists
+                acc[keys[i]] = isIndex(keys[i + 1]) ? [] : {};
+            }
+            acc = acc[keys[i]];
+        }
+    }
+    function unset(object, key) {
+        if (Array.isArray(object) && isIndex(key)) {
+            object.splice(Number(key), 1);
+            return;
+        }
+        if (isObject(object)) {
+            delete object[key];
+        }
+    }
+    /**
+     * Removes a nested property from object
+     */
+    function unsetPath(object, path) {
+        if (isNotNestedPath(path)) {
+            delete object[cleanupNonNestedPath(path)];
+            return;
+        }
+        const keys = path.split(/\.|\[(\d+)\]/).filter(Boolean);
+        let acc = object;
+        for (let i = 0; i < keys.length; i++) {
+            // Last key, unset it
+            if (i === keys.length - 1) {
+                unset(acc, keys[i]);
+                break;
+            }
+            // Key does not exist, exit
+            if (!(keys[i] in acc) || isNullOrUndefined$1(acc[keys[i]])) {
+                break;
+            }
+            acc = acc[keys[i]];
+        }
+        const pathValues = keys.map((_, idx) => {
+            return getFromPath(object, keys.slice(0, idx).join('.'));
+        });
+        for (let i = pathValues.length - 1; i >= 0; i--) {
+            if (!isEmptyContainer(pathValues[i])) {
+                continue;
+            }
+            if (i === 0) {
+                unset(object, keys[0]);
+                continue;
+            }
+            unset(pathValues[i - 1], keys[i - 1]);
+        }
+    }
+    /**
+     * A typed version of Object.keys
+     */
+    function keysOf(record) {
+        return Object.keys(record);
+    }
+    // Uses same component provide as its own injections
+    // Due to changes in https://github.com/vuejs/vue-next/pull/2424
+    function injectWithSelf(symbol, def = undefined) {
+        const vm = getCurrentInstance();
+        return (vm === null || vm === void 0 ? void 0 : vm.provides[symbol]) || inject(symbol, def);
+    }
+    function warn(message) {
+        warn$2(`[vee-validate]: ${message}`);
+    }
+    /**
+     * Ensures we deal with a singular field value
+     */
+    function normalizeField(field) {
+        if (Array.isArray(field)) {
+            return field[0];
+        }
+        return field;
+    }
+    function resolveNextCheckboxValue(currentValue, checkedValue, uncheckedValue) {
+        if (Array.isArray(currentValue)) {
+            const newVal = [...currentValue];
+            const idx = newVal.indexOf(checkedValue);
+            idx >= 0 ? newVal.splice(idx, 1) : newVal.push(checkedValue);
+            return newVal;
+        }
+        return currentValue === checkedValue ? uncheckedValue : checkedValue;
+    }
+    /**
+     * Creates a throttled function that only invokes the provided function (`func`) at most once per within a given number of milliseconds
+     * (`limit`)
+     */
+    function throttle(func, limit) {
+        let inThrottle;
+        let lastResult;
+        return function (...args) {
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
+            const context = this;
+            if (!inThrottle) {
+                inThrottle = true;
+                setTimeout(() => (inThrottle = false), limit);
+                lastResult = func.apply(context, args);
+            }
+            return lastResult;
+        };
+    }
+    function debounceAsync(inner, ms = 0) {
+        let timer = null;
+        let resolves = [];
+        return function (...args) {
+            // Run the function after a certain amount of time
+            if (timer) {
+                window.clearTimeout(timer);
+            }
+            timer = window.setTimeout(() => {
+                // Get the result of the inner function, then apply it to the resolve function of
+                // each promise that has been created since the last time the inner function was run
+                const result = inner(...args);
+                resolves.forEach(r => r(result));
+                resolves = [];
+            }, ms);
+            return new Promise(resolve => resolves.push(resolve));
+        };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const normalizeChildren = (tag, context, slotProps) => {
+        if (!context.slots.default) {
+            return context.slots.default;
+        }
+        if (typeof tag === 'string' || !tag) {
+            return context.slots.default(slotProps());
+        }
+        return {
+            default: () => { var _a, _b; return (_b = (_a = context.slots).default) === null || _b === void 0 ? void 0 : _b.call(_a, slotProps()); },
+        };
+    };
+    /**
+     * Vue adds a `_value` prop at the moment on the input elements to store the REAL value on them, real values are different than the `value` attribute
+     * as they do not get casted to strings unlike `el.value` which preserves user-code behavior
+     */
+    function getBoundValue(el) {
+        if (hasValueBinding(el)) {
+            return el._value;
+        }
+        return undefined;
+    }
+    /**
+     * Vue adds a `_value` prop at the moment on the input elements to store the REAL value on them, real values are different than the `value` attribute
+     * as they do not get casted to strings unlike `el.value` which preserves user-code behavior
+     */
+    function hasValueBinding(el) {
+        return '_value' in el;
+    }
+
+    function normalizeEventValue(value) {
+        if (!isEvent(value)) {
+            return value;
+        }
+        const input = value.target;
+        // Vue sets the current bound value on `_value` prop
+        // for checkboxes it it should fetch the value binding type as is (boolean instead of string)
+        if (hasCheckedAttr(input.type) && hasValueBinding(input)) {
+            return getBoundValue(input);
+        }
+        if (input.type === 'file' && input.files) {
+            return Array.from(input.files);
+        }
+        if (isNativeMultiSelect(input)) {
+            return Array.from(input.options)
+                .filter(opt => opt.selected && !opt.disabled)
+                .map(getBoundValue);
+        }
+        // makes sure we get the actual `option` bound value
+        // #3440
+        if (isNativeSelect(input)) {
+            const selectedOption = Array.from(input.options).find(opt => opt.selected);
+            return selectedOption ? getBoundValue(selectedOption) : input.value;
+        }
+        return input.value;
+    }
+
+    /**
+     * Normalizes the given rules expression.
+     */
+    function normalizeRules(rules) {
+        const acc = {};
+        Object.defineProperty(acc, '_$$isNormalized', {
+            value: true,
+            writable: false,
+            enumerable: false,
+            configurable: false,
+        });
+        if (!rules) {
+            return acc;
+        }
+        // Object is already normalized, skip.
+        if (isObject(rules) && rules._$$isNormalized) {
+            return rules;
+        }
+        if (isObject(rules)) {
+            return Object.keys(rules).reduce((prev, curr) => {
+                const params = normalizeParams(rules[curr]);
+                if (rules[curr] !== false) {
+                    prev[curr] = buildParams(params);
+                }
+                return prev;
+            }, acc);
+        }
+        /* istanbul ignore if */
+        if (typeof rules !== 'string') {
+            return acc;
+        }
+        return rules.split('|').reduce((prev, rule) => {
+            const parsedRule = parseRule(rule);
+            if (!parsedRule.name) {
+                return prev;
+            }
+            prev[parsedRule.name] = buildParams(parsedRule.params);
+            return prev;
+        }, acc);
+    }
+    /**
+     * Normalizes a rule param.
+     */
+    function normalizeParams(params) {
+        if (params === true) {
+            return [];
+        }
+        if (Array.isArray(params)) {
+            return params;
+        }
+        if (isObject(params)) {
+            return params;
+        }
+        return [params];
+    }
+    function buildParams(provided) {
+        const mapValueToLocator = (value) => {
+            // A target param using interpolation
+            if (typeof value === 'string' && value[0] === '@') {
+                return createLocator(value.slice(1));
+            }
+            return value;
+        };
+        if (Array.isArray(provided)) {
+            return provided.map(mapValueToLocator);
+        }
+        // #3073
+        if (provided instanceof RegExp) {
+            return [provided];
+        }
+        return Object.keys(provided).reduce((prev, key) => {
+            prev[key] = mapValueToLocator(provided[key]);
+            return prev;
+        }, {});
+    }
+    /**
+     * Parses a rule string expression.
+     */
+    const parseRule = (rule) => {
+        let params = [];
+        const name = rule.split(':')[0];
+        if (rule.includes(':')) {
+            params = rule.split(':').slice(1).join(':').split(',');
+        }
+        return { name, params };
+    };
+    function createLocator(value) {
+        const locator = (crossTable) => {
+            const val = getFromPath(crossTable, value) || crossTable[value];
+            return val;
+        };
+        locator.__locatorRef = value;
+        return locator;
+    }
+    function extractLocators(params) {
+        if (Array.isArray(params)) {
+            return params.filter(isLocator);
+        }
+        return keysOf(params)
+            .filter(key => isLocator(params[key]))
+            .map(key => params[key]);
+    }
+
+    const DEFAULT_CONFIG = {
+        generateMessage: ({ field }) => `${field} is not valid.`,
+        bails: true,
+        validateOnBlur: true,
+        validateOnChange: true,
+        validateOnInput: false,
+        validateOnModelUpdate: true,
+    };
+    let currentConfig = Object.assign({}, DEFAULT_CONFIG);
+    const getConfig = () => currentConfig;
+    const setConfig = (newConf) => {
+        currentConfig = Object.assign(Object.assign({}, currentConfig), newConf);
+    };
+    const configure = setConfig;
+
+    /**
+     * Validates a value against the rules.
+     */
+    async function validate(value, rules, options = {}) {
+        const shouldBail = options === null || options === void 0 ? void 0 : options.bails;
+        const field = {
+            name: (options === null || options === void 0 ? void 0 : options.name) || '{field}',
+            rules,
+            bails: shouldBail !== null && shouldBail !== void 0 ? shouldBail : true,
+            formData: (options === null || options === void 0 ? void 0 : options.values) || {},
+        };
+        const result = await _validate(field, value);
+        const errors = result.errors;
+        return {
+            errors,
+            valid: !errors.length,
+        };
+    }
+    /**
+     * Starts the validation process.
+     */
+    async function _validate(field, value) {
+        if (isYupValidator(field.rules)) {
+            return validateFieldWithYup(value, field.rules, { bails: field.bails });
+        }
+        // if a generic function, use it as the pipeline.
+        if (isCallable(field.rules)) {
+            const ctx = {
+                field: field.name,
+                form: field.formData,
+                value: value,
+            };
+            const result = await field.rules(value, ctx);
+            const isValid = typeof result !== 'string' && result;
+            const message = typeof result === 'string' ? result : _generateFieldError(ctx);
+            return {
+                errors: !isValid ? [message] : [],
+            };
+        }
+        const normalizedContext = Object.assign(Object.assign({}, field), { rules: normalizeRules(field.rules) });
+        const errors = [];
+        const rulesKeys = Object.keys(normalizedContext.rules);
+        const length = rulesKeys.length;
+        for (let i = 0; i < length; i++) {
+            const rule = rulesKeys[i];
+            const result = await _test(normalizedContext, value, {
+                name: rule,
+                params: normalizedContext.rules[rule],
+            });
+            if (result.error) {
+                errors.push(result.error);
+                if (field.bails) {
+                    return {
+                        errors,
+                    };
+                }
+            }
+        }
+        return {
+            errors,
+        };
+    }
+    /**
+     * Handles yup validation
+     */
+    async function validateFieldWithYup(value, validator, opts) {
+        var _a;
+        const errors = await validator
+            .validate(value, {
+            abortEarly: (_a = opts.bails) !== null && _a !== void 0 ? _a : true,
+        })
+            .then(() => [])
+            .catch((err) => {
+            // Yup errors have a name prop one them.
+            // https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
+            if (err.name === 'ValidationError') {
+                return err.errors;
+            }
+            // re-throw the error so we don't hide it
+            throw err;
+        });
+        return {
+            errors,
+        };
+    }
+    /**
+     * Tests a single input value against a rule.
+     */
+    async function _test(field, value, rule) {
+        const validator = resolveRule(rule.name);
+        if (!validator) {
+            throw new Error(`No such validator '${rule.name}' exists.`);
+        }
+        const params = fillTargetValues(rule.params, field.formData);
+        const ctx = {
+            field: field.name,
+            value,
+            form: field.formData,
+            rule: Object.assign(Object.assign({}, rule), { params }),
+        };
+        const result = await validator(value, params, ctx);
+        if (typeof result === 'string') {
+            return {
+                error: result,
+            };
+        }
+        return {
+            error: result ? undefined : _generateFieldError(ctx),
+        };
+    }
+    /**
+     * Generates error messages.
+     */
+    function _generateFieldError(fieldCtx) {
+        const message = getConfig().generateMessage;
+        if (!message) {
+            return 'Field is invalid';
+        }
+        return message(fieldCtx);
+    }
+    function fillTargetValues(params, crossTable) {
+        const normalize = (value) => {
+            if (isLocator(value)) {
+                return value(crossTable);
+            }
+            return value;
+        };
+        if (Array.isArray(params)) {
+            return params.map(normalize);
+        }
+        return Object.keys(params).reduce((acc, param) => {
+            acc[param] = normalize(params[param]);
+            return acc;
+        }, {});
+    }
+    async function validateYupSchema(schema, values) {
+        const errorObjects = await schema
+            .validate(values, { abortEarly: false })
+            .then(() => [])
+            .catch((err) => {
+            // Yup errors have a name prop one them.
+            // https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
+            if (err.name !== 'ValidationError') {
+                throw err;
+            }
+            // list of aggregated errors
+            return err.inner || [];
+        });
+        const results = {};
+        const errors = {};
+        for (const error of errorObjects) {
+            const messages = error.errors;
+            results[error.path] = { valid: !messages.length, errors: messages };
+            if (messages.length) {
+                errors[error.path] = messages[0];
+            }
+        }
+        return {
+            valid: !errorObjects.length,
+            results,
+            errors,
+        };
+    }
+    async function validateObjectSchema(schema, values, opts) {
+        const paths = keysOf(schema);
+        const validations = paths.map(async (path) => {
+            var _a, _b, _c;
+            const fieldResult = await validate(getFromPath(values, path), schema[path], {
+                name: ((_a = opts === null || opts === void 0 ? void 0 : opts.names) === null || _a === void 0 ? void 0 : _a[path]) || path,
+                values: values,
+                bails: (_c = (_b = opts === null || opts === void 0 ? void 0 : opts.bailsMap) === null || _b === void 0 ? void 0 : _b[path]) !== null && _c !== void 0 ? _c : true,
+            });
+            return Object.assign(Object.assign({}, fieldResult), { path });
+        });
+        let isAllValid = true;
+        const validationResults = await Promise.all(validations);
+        const results = {};
+        const errors = {};
+        for (const result of validationResults) {
+            results[result.path] = {
+                valid: result.valid,
+                errors: result.errors,
+            };
+            if (!result.valid) {
+                isAllValid = false;
+                errors[result.path] = result.errors[0];
+            }
+        }
+        return {
+            valid: isAllValid,
+            results,
+            errors,
+        };
+    }
+
+    function set(obj, key, val) {
+    	if (typeof val.value === 'object') val.value = klona(val.value);
+    	if (!val.enumerable || val.get || val.set || !val.configurable || !val.writable || key === '__proto__') {
+    		Object.defineProperty(obj, key, val);
+    	} else obj[key] = val.value;
+    }
+
+    function klona(x) {
+    	if (typeof x !== 'object') return x;
+
+    	var i=0, k, list, tmp, str=Object.prototype.toString.call(x);
+
+    	if (str === '[object Object]') {
+    		tmp = Object.create(x.__proto__ || null);
+    	} else if (str === '[object Array]') {
+    		tmp = Array(x.length);
+    	} else if (str === '[object Set]') {
+    		tmp = new Set;
+    		x.forEach(function (val) {
+    			tmp.add(klona(val));
+    		});
+    	} else if (str === '[object Map]') {
+    		tmp = new Map;
+    		x.forEach(function (val, key) {
+    			tmp.set(klona(key), klona(val));
+    		});
+    	} else if (str === '[object Date]') {
+    		tmp = new Date(+x);
+    	} else if (str === '[object RegExp]') {
+    		tmp = new RegExp(x.source, x.flags);
+    	} else if (str === '[object DataView]') {
+    		tmp = new x.constructor( klona(x.buffer) );
+    	} else if (str === '[object ArrayBuffer]') {
+    		tmp = x.slice(0);
+    	} else if (str.slice(-6) === 'Array]') {
+    		// ArrayBuffer.isView(x)
+    		// ~> `new` bcuz `Buffer.slice` => ref
+    		tmp = new x.constructor(x);
+    	}
+
+    	if (tmp) {
+    		for (list=Object.getOwnPropertySymbols(x); i < list.length; i++) {
+    			set(tmp, list[i], Object.getOwnPropertyDescriptor(x, list[i]));
+    		}
+
+    		for (i=0, list=Object.getOwnPropertyNames(x); i < list.length; i++) {
+    			if (Object.hasOwnProperty.call(tmp, k=list[i]) && tmp[k] === x[k]) continue;
+    			set(tmp, k, Object.getOwnPropertyDescriptor(x, k));
+    		}
+    	}
+
+    	return tmp || x;
+    }
+
+    var es6 = function equal(a, b) {
+      if (a === b) return true;
+
+      if (a && b && typeof a == 'object' && typeof b == 'object') {
+        if (a.constructor !== b.constructor) return false;
+
+        var length, i, keys;
+        if (Array.isArray(a)) {
+          length = a.length;
+          if (length != b.length) return false;
+          for (i = length; i-- !== 0;)
+            if (!equal(a[i], b[i])) return false;
+          return true;
+        }
+
+
+        if ((a instanceof Map) && (b instanceof Map)) {
+          if (a.size !== b.size) return false;
+          for (i of a.entries())
+            if (!b.has(i[0])) return false;
+          for (i of a.entries())
+            if (!equal(i[1], b.get(i[0]))) return false;
+          return true;
+        }
+
+        if ((a instanceof Set) && (b instanceof Set)) {
+          if (a.size !== b.size) return false;
+          for (i of a.entries())
+            if (!b.has(i[0])) return false;
+          return true;
+        }
+
+        if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
+          length = a.length;
+          if (length != b.length) return false;
+          for (i = length; i-- !== 0;)
+            if (a[i] !== b[i]) return false;
+          return true;
+        }
+
+
+        if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+        if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+        if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+        keys = Object.keys(a);
+        length = keys.length;
+        if (length !== Object.keys(b).length) return false;
+
+        for (i = length; i-- !== 0;)
+          if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+        for (i = length; i-- !== 0;) {
+          var key = keys[i];
+
+          if (!equal(a[key], b[key])) return false;
+        }
+
+        return true;
+      }
+
+      // true if both NaN, false otherwise
+      return a!==a && b!==b;
+    };
+
+    let ID_COUNTER = 0;
+    function useFieldState(path, init) {
+        const { value, initialValue, setInitialValue } = _useFieldValue(path, init.modelValue, !init.standalone);
+        const { errorMessage, errors, setErrors } = _useFieldErrors(path, !init.standalone);
+        const meta = _useFieldMeta(value, initialValue, errors);
+        const id = ID_COUNTER >= Number.MAX_SAFE_INTEGER ? 0 : ++ID_COUNTER;
+        function setState(state) {
+            var _a;
+            if ('value' in state) {
+                value.value = state.value;
+            }
+            if ('errors' in state) {
+                setErrors(state.errors);
+            }
+            if ('touched' in state) {
+                meta.touched = (_a = state.touched) !== null && _a !== void 0 ? _a : meta.touched;
+            }
+            if ('initialValue' in state) {
+                setInitialValue(state.initialValue);
+            }
+        }
+        return {
+            id,
+            path,
+            value,
+            initialValue,
+            meta,
+            errors,
+            errorMessage,
+            setState,
+        };
+    }
+    /**
+     * Creates the field value and resolves the initial value
+     */
+    function _useFieldValue(path, modelValue, shouldInjectForm) {
+        const form = shouldInjectForm ? injectWithSelf(FormContextKey, undefined) : undefined;
+        const modelRef = ref(unref(modelValue));
+        function resolveInitialValue() {
+            if (!form) {
+                return unref(modelRef);
+            }
+            return getFromPath(form.meta.value.initialValues, unref(path), unref(modelRef));
+        }
+        function setInitialValue(value) {
+            if (!form) {
+                modelRef.value = value;
+                return;
+            }
+            form.setFieldInitialValue(unref(path), value);
+        }
+        const initialValue = computed(resolveInitialValue);
+        // if no form is associated, use a regular ref.
+        if (!form) {
+            const value = ref(resolveInitialValue());
+            return {
+                value,
+                initialValue,
+                setInitialValue,
+            };
+        }
+        // to set the initial value, first check if there is a current value, if there is then use it.
+        // otherwise use the configured initial value if it exists.
+        // prioritize model value over form values
+        // #3429
+        const currentValue = modelValue ? unref(modelValue) : getFromPath(form.values, unref(path), unref(initialValue));
+        form.stageInitialValue(unref(path), currentValue);
+        // otherwise use a computed setter that triggers the `setFieldValue`
+        const value = computed({
+            get() {
+                return getFromPath(form.values, unref(path));
+            },
+            set(newVal) {
+                form.setFieldValue(unref(path), newVal);
+            },
+        });
+        return {
+            value,
+            initialValue,
+            setInitialValue,
+        };
+    }
+    /**
+     * Creates meta flags state and some associated effects with them
+     */
+    function _useFieldMeta(currentValue, initialValue, errors) {
+        const meta = reactive({
+            touched: false,
+            pending: false,
+            valid: true,
+            validated: !!unref(errors).length,
+            initialValue: computed(() => unref(initialValue)),
+            dirty: computed(() => {
+                return !es6(unref(currentValue), unref(initialValue));
+            }),
+        });
+        watch(errors, value => {
+            meta.valid = !value.length;
+        }, {
+            immediate: true,
+            flush: 'sync',
+        });
+        return meta;
+    }
+    /**
+     * Creates the error message state for the field state
+     */
+    function _useFieldErrors(path, shouldInjectForm) {
+        const form = shouldInjectForm ? injectWithSelf(FormContextKey, undefined) : undefined;
+        function normalizeErrors(messages) {
+            if (!messages) {
+                return [];
+            }
+            return Array.isArray(messages) ? messages : [messages];
+        }
+        if (!form) {
+            const errors = ref([]);
+            return {
+                errors,
+                errorMessage: computed(() => errors.value[0]),
+                setErrors: (messages) => {
+                    errors.value = normalizeErrors(messages);
+                },
+            };
+        }
+        const errors = computed(() => form.errorBag.value[unref(path)] || []);
+        return {
+            errors,
+            errorMessage: computed(() => errors.value[0]),
+            setErrors: (messages) => {
+                form.setFieldErrorBag(unref(path), normalizeErrors(messages));
+            },
+        };
+    }
+
+    function installDevtoolsPlugin(app) {
+        {
+            setupDevtoolsPlugin({
+                id: 'vee-validate-devtools-plugin',
+                label: 'VeeValidate Plugin',
+                packageName: 'vee-validate',
+                homepage: 'https://vee-validate.logaretm.com/v4',
+                app,
+                logo: 'https://vee-validate.logaretm.com/v4/logo.png',
+            }, setupApiHooks);
+        }
+    }
+    const DEVTOOLS_FORMS = {};
+    const DEVTOOLS_FIELDS = {};
+    let API;
+    const refreshInspector = throttle(() => {
+        setTimeout(async () => {
+            await nextTick();
+            API === null || API === void 0 ? void 0 : API.sendInspectorState(INSPECTOR_ID);
+            API === null || API === void 0 ? void 0 : API.sendInspectorTree(INSPECTOR_ID);
+        }, 100);
+    }, 100);
+    function registerFormWithDevTools(form) {
+        const vm = getCurrentInstance();
+        if (!API) {
+            const app = vm === null || vm === void 0 ? void 0 : vm.appContext.app;
+            if (!app) {
+                return;
+            }
+            installDevtoolsPlugin(app);
+        }
+        DEVTOOLS_FORMS[form.formId] = Object.assign({}, form);
+        DEVTOOLS_FORMS[form.formId]._vm = vm;
+        onUnmounted(() => {
+            delete DEVTOOLS_FORMS[form.formId];
+            refreshInspector();
+        });
+        refreshInspector();
+    }
+    function registerSingleFieldWithDevtools(field) {
+        const vm = getCurrentInstance();
+        if (!API) {
+            const app = vm === null || vm === void 0 ? void 0 : vm.appContext.app;
+            if (!app) {
+                return;
+            }
+            installDevtoolsPlugin(app);
+        }
+        DEVTOOLS_FIELDS[field.id] = Object.assign({}, field);
+        DEVTOOLS_FIELDS[field.id]._vm = vm;
+        onUnmounted(() => {
+            delete DEVTOOLS_FIELDS[field.id];
+            refreshInspector();
+        });
+        refreshInspector();
+    }
+    const INSPECTOR_ID = 'vee-validate-inspector';
+    const COLORS = {
+        error: 0xbd4b4b,
+        success: 0x06d77b,
+        unknown: 0x54436b,
+        white: 0xffffff,
+        black: 0x000000,
+        blue: 0x035397,
+        purple: 0xb980f0,
+        orange: 0xf5a962,
+        gray: 0xbbbfca,
+    };
+    let SELECTED_NODE = null;
+    function setupApiHooks(api) {
+        API = api;
+        api.addInspector({
+            id: INSPECTOR_ID,
+            icon: 'rule',
+            label: 'vee-validate',
+            noSelectionText: 'Select a vee-validate node to inspect',
+            actions: [
+                {
+                    icon: 'done_outline',
+                    tooltip: 'Validate selected item',
+                    action: async () => {
+                        if (!SELECTED_NODE) {
+                            console.error('There is not a valid selected vee-validate node or component');
+                            return;
+                        }
+                        const result = await SELECTED_NODE.validate();
+                        console.log(result);
+                    },
+                },
+                {
+                    icon: 'delete_sweep',
+                    tooltip: 'Clear validation state of the selected item',
+                    action: () => {
+                        if (!SELECTED_NODE) {
+                            console.error('There is not a valid selected vee-validate node or component');
+                            return;
+                        }
+                        if ('id' in SELECTED_NODE) {
+                            SELECTED_NODE.resetField();
+                            return;
+                        }
+                        SELECTED_NODE.resetForm();
+                    },
+                },
+            ],
+        });
+        api.on.getInspectorTree(payload => {
+            if (payload.inspectorId !== INSPECTOR_ID) {
+                return;
+            }
+            const forms = Object.values(DEVTOOLS_FORMS);
+            const fields = Object.values(DEVTOOLS_FIELDS);
+            payload.rootNodes = [
+                ...forms.map(mapFormForDevtoolsInspector),
+                ...fields.map(field => mapFieldForDevtoolsInspector(field)),
+            ];
+        });
+        api.on.getInspectorState((payload, ctx) => {
+            if (payload.inspectorId !== INSPECTOR_ID || ctx.currentTab !== `custom-inspector:${INSPECTOR_ID}`) {
+                return;
+            }
+            const { form, field, type } = decodeNodeId(payload.nodeId);
+            if (form && type === 'form') {
+                payload.state = buildFormState(form);
+                SELECTED_NODE = form;
+                return;
+            }
+            if (field && type === 'field') {
+                payload.state = buildFieldState(field);
+                SELECTED_NODE = field;
+                return;
+            }
+            SELECTED_NODE = null;
+        });
+    }
+    function mapFormForDevtoolsInspector(form) {
+        const { textColor, bgColor } = getTagTheme(form);
+        const formTreeNodes = {};
+        Object.values(form.fieldsByPath.value).forEach(field => {
+            const fieldInstance = Array.isArray(field) ? field[0] : field;
+            if (!fieldInstance) {
+                return;
+            }
+            setInPath(formTreeNodes, unref(fieldInstance.name), mapFieldForDevtoolsInspector(fieldInstance, form));
+        });
+        function buildFormTree(tree, path = []) {
+            const key = [...path].pop();
+            if ('id' in tree) {
+                return Object.assign(Object.assign({}, tree), { label: key || tree.label });
+            }
+            if (isObject(tree)) {
+                return {
+                    id: `${path.join('.')}`,
+                    label: key || '',
+                    children: Object.keys(tree).map(key => buildFormTree(tree[key], [...path, key])),
+                };
+            }
+            if (Array.isArray(tree)) {
+                return {
+                    id: `${path.join('.')}`,
+                    label: `${key}[]`,
+                    children: tree.map((c, idx) => buildFormTree(c, [...path, String(idx)])),
+                };
+            }
+            return { id: '', label: '', children: [] };
+        }
+        const { children } = buildFormTree(formTreeNodes);
+        return {
+            id: encodeNodeId(form),
+            label: 'Form',
+            children,
+            tags: [
+                {
+                    label: 'Form',
+                    textColor,
+                    backgroundColor: bgColor,
+                },
+                {
+                    label: `${Object.keys(form.fieldsByPath.value).length} fields`,
+                    textColor: COLORS.white,
+                    backgroundColor: COLORS.unknown,
+                },
+            ],
+        };
+    }
+    function mapFieldForDevtoolsInspector(field, form) {
+        const fieldInstance = normalizeField(field);
+        const { textColor, bgColor } = getTagTheme(fieldInstance);
+        const isGroup = Array.isArray(field) && field.length > 1;
+        return {
+            id: encodeNodeId(form, fieldInstance, !isGroup),
+            label: unref(fieldInstance.name),
+            children: Array.isArray(field) ? field.map(fieldItem => mapFieldForDevtoolsInspector(fieldItem, form)) : undefined,
+            tags: [
+                isGroup
+                    ? undefined
+                    : {
+                        label: 'Field',
+                        textColor,
+                        backgroundColor: bgColor,
+                    },
+                !form
+                    ? {
+                        label: 'Standalone',
+                        textColor: COLORS.black,
+                        backgroundColor: COLORS.gray,
+                    }
+                    : undefined,
+                !isGroup && fieldInstance.type === 'checkbox'
+                    ? {
+                        label: 'Checkbox',
+                        textColor: COLORS.white,
+                        backgroundColor: COLORS.blue,
+                    }
+                    : undefined,
+                !isGroup && fieldInstance.type === 'radio'
+                    ? {
+                        label: 'Radio',
+                        textColor: COLORS.white,
+                        backgroundColor: COLORS.purple,
+                    }
+                    : undefined,
+                isGroup
+                    ? {
+                        label: 'Group',
+                        textColor: COLORS.black,
+                        backgroundColor: COLORS.orange,
+                    }
+                    : undefined,
+            ].filter(Boolean),
+        };
+    }
+    function encodeNodeId(form, field, encodeIndex = true) {
+        const fieldPath = form ? unref(field === null || field === void 0 ? void 0 : field.name) : field === null || field === void 0 ? void 0 : field.id;
+        const fieldGroup = fieldPath ? form === null || form === void 0 ? void 0 : form.fieldsByPath.value[fieldPath] : undefined;
+        let idx;
+        if (encodeIndex && field && Array.isArray(fieldGroup)) {
+            idx = fieldGroup.indexOf(field);
+        }
+        const idObject = { f: form === null || form === void 0 ? void 0 : form.formId, ff: fieldPath, idx, type: field ? 'field' : 'form' };
+        return btoa(JSON.stringify(idObject));
+    }
+    function decodeNodeId(nodeId) {
+        try {
+            const idObject = JSON.parse(atob(nodeId));
+            const form = DEVTOOLS_FORMS[idObject.f];
+            if (!form && idObject.ff) {
+                const field = DEVTOOLS_FIELDS[idObject.ff];
+                if (!field) {
+                    return {};
+                }
+                return {
+                    type: idObject.type,
+                    field,
+                };
+            }
+            if (!form) {
+                return {};
+            }
+            const fieldGroup = form.fieldsByPath.value[idObject.ff];
+            return {
+                type: idObject.type,
+                form,
+                field: Array.isArray(fieldGroup) ? fieldGroup[idObject.idx || 0] : fieldGroup,
+            };
+        }
+        catch (err) {
+            // console.error(`Devtools: [vee-validate] Failed to parse node id ${nodeId}`);
+        }
+        return {};
+    }
+    function buildFieldState(field) {
+        const { errors, meta, value } = field;
+        return {
+            'Field state': [
+                { key: 'errors', value: errors.value },
+                {
+                    key: 'initialValue',
+                    value: meta.initialValue,
+                },
+                {
+                    key: 'currentValue',
+                    value: value.value,
+                },
+                {
+                    key: 'touched',
+                    value: meta.touched,
+                },
+                {
+                    key: 'dirty',
+                    value: meta.dirty,
+                },
+                {
+                    key: 'valid',
+                    value: meta.valid,
+                },
+            ],
+        };
+    }
+    function buildFormState(form) {
+        const { errorBag, meta, values, isSubmitting, submitCount } = form;
+        return {
+            'Form state': [
+                {
+                    key: 'submitCount',
+                    value: submitCount.value,
+                },
+                {
+                    key: 'isSubmitting',
+                    value: isSubmitting.value,
+                },
+                {
+                    key: 'touched',
+                    value: meta.value.touched,
+                },
+                {
+                    key: 'dirty',
+                    value: meta.value.dirty,
+                },
+                {
+                    key: 'valid',
+                    value: meta.value.valid,
+                },
+                {
+                    key: 'initialValues',
+                    value: meta.value.initialValues,
+                },
+                {
+                    key: 'currentValues',
+                    value: values,
+                },
+                {
+                    key: 'errors',
+                    value: keysOf(errorBag.value).reduce((acc, key) => {
+                        var _a;
+                        const message = (_a = errorBag.value[key]) === null || _a === void 0 ? void 0 : _a[0];
+                        if (message) {
+                            acc[key] = message;
+                        }
+                        return acc;
+                    }, {}),
+                },
+            ],
+        };
+    }
+    /**
+     * Resolves the tag color based on the form state
+     */
+    function getTagTheme(fieldOrForm) {
+        // const fallbackColors = {
+        //   bgColor: COLORS.unknown,
+        //   textColor: COLORS.white,
+        // };
+        const isValid = 'id' in fieldOrForm ? fieldOrForm.meta.valid : fieldOrForm.meta.value.valid;
+        return {
+            bgColor: isValid ? COLORS.success : COLORS.error,
+            textColor: isValid ? COLORS.black : COLORS.white,
+        };
+    }
+
+    /**
+     * Creates a field composite.
+     */
+    function useField(name, rules, opts) {
+        if (hasCheckedAttr(opts === null || opts === void 0 ? void 0 : opts.type)) {
+            return useCheckboxField(name, rules, opts);
+        }
+        return _useField(name, rules, opts);
+    }
+    function _useField(name, rules, opts) {
+        const { initialValue: modelValue, validateOnMount, bails, type, checkedValue, label, validateOnValueUpdate, uncheckedValue, standalone, } = normalizeOptions(unref(name), opts);
+        const form = !standalone ? injectWithSelf(FormContextKey) : undefined;
+        const { id, value, initialValue, meta, setState, errors, errorMessage } = useFieldState(name, {
+            modelValue,
+            standalone,
+        });
+        /**
+         * Handles common onBlur meta update
+         */
+        const handleBlur = () => {
+            meta.touched = true;
+        };
+        const normalizedRules = computed(() => {
+            let rulesValue = unref(rules);
+            const schema = unref(form === null || form === void 0 ? void 0 : form.schema);
+            if (schema && !isYupValidator(schema)) {
+                rulesValue = extractRuleFromSchema(schema, unref(name)) || rulesValue;
+            }
+            if (isYupValidator(rulesValue) || isCallable(rulesValue)) {
+                return rulesValue;
+            }
+            return normalizeRules(rulesValue);
+        });
+        async function validateCurrentValue(mode) {
+            var _a, _b;
+            if (form === null || form === void 0 ? void 0 : form.validateSchema) {
+                return (_a = (await form.validateSchema(mode)).results[unref(name)]) !== null && _a !== void 0 ? _a : { valid: true, errors: [] };
+            }
+            return validate(value.value, normalizedRules.value, {
+                name: unref(label) || unref(name),
+                values: (_b = form === null || form === void 0 ? void 0 : form.values) !== null && _b !== void 0 ? _b : {},
+                bails,
+            });
+        }
+        async function validateWithStateMutation() {
+            meta.pending = true;
+            meta.validated = true;
+            const result = await validateCurrentValue('validated-only');
+            setState({ errors: result.errors });
+            meta.pending = false;
+            return result;
+        }
+        async function validateValidStateOnly() {
+            const result = await validateCurrentValue('silent');
+            meta.valid = result.valid;
+            return result;
+        }
+        function validate$1(opts) {
+            if (!(opts === null || opts === void 0 ? void 0 : opts.mode) || (opts === null || opts === void 0 ? void 0 : opts.mode) === 'force') {
+                return validateWithStateMutation();
+            }
+            if ((opts === null || opts === void 0 ? void 0 : opts.mode) === 'validated-only') {
+                return validateWithStateMutation();
+            }
+            return validateValidStateOnly();
+        }
+        // Common input/change event handler
+        const handleChange = (e, shouldValidate = true) => {
+            const newValue = normalizeEventValue(e);
+            value.value = newValue;
+            if (!validateOnValueUpdate && shouldValidate) {
+                validateWithStateMutation();
+            }
+        };
+        // Runs the initial validation
+        onMounted(() => {
+            if (validateOnMount) {
+                return validateWithStateMutation();
+            }
+            // validate self initially if no form was handling this
+            // forms should have their own initial silent validation run to make things more efficient
+            if (!form || !form.validateSchema) {
+                validateValidStateOnly();
+            }
+        });
+        function setTouched(isTouched) {
+            meta.touched = isTouched;
+        }
+        let unwatchValue;
+        function watchValue() {
+            unwatchValue = watch(value, validateOnValueUpdate ? validateWithStateMutation : validateValidStateOnly, {
+                deep: true,
+            });
+        }
+        watchValue();
+        function resetField(state) {
+            var _a;
+            unwatchValue === null || unwatchValue === void 0 ? void 0 : unwatchValue();
+            const newValue = state && 'value' in state ? state.value : initialValue.value;
+            setState({
+                value: klona(newValue),
+                initialValue: klona(newValue),
+                touched: (_a = state === null || state === void 0 ? void 0 : state.touched) !== null && _a !== void 0 ? _a : false,
+                errors: (state === null || state === void 0 ? void 0 : state.errors) || [],
+            });
+            meta.pending = false;
+            meta.validated = false;
+            validateValidStateOnly();
+            // need to watch at next tick to avoid triggering the value watcher
+            nextTick(() => {
+                watchValue();
+            });
+        }
+        function setValue(newValue) {
+            value.value = newValue;
+        }
+        function setErrors(errors) {
+            setState({ errors: Array.isArray(errors) ? errors : [errors] });
+        }
+        const field = {
+            id,
+            name,
+            label,
+            value,
+            meta,
+            errors,
+            errorMessage,
+            type,
+            checkedValue,
+            uncheckedValue,
+            bails,
+            resetField,
+            handleReset: () => resetField(),
+            validate: validate$1,
+            handleChange,
+            handleBlur,
+            setState,
+            setTouched,
+            setErrors,
+            setValue,
+        };
+        provide(FieldContextKey, field);
+        if (isRef(rules) && typeof unref(rules) !== 'function') {
+            watch(rules, (value, oldValue) => {
+                if (es6(value, oldValue)) {
+                    return;
+                }
+                meta.validated ? validateWithStateMutation() : validateValidStateOnly();
+            }, {
+                deep: true,
+            });
+        }
+        {
+            field._vm = getCurrentInstance();
+            watch(() => (Object.assign(Object.assign({ errors: errors.value }, meta), { value: value.value })), refreshInspector, {
+                deep: true,
+            });
+            if (!form) {
+                registerSingleFieldWithDevtools(field);
+            }
+        }
+        // if no associated form return the field API immediately
+        if (!form) {
+            return field;
+        }
+        // associate the field with the given form
+        form.register(field);
+        onBeforeUnmount(() => {
+            form.unregister(field);
+        });
+        // extract cross-field dependencies in a computed prop
+        const dependencies = computed(() => {
+            const rulesVal = normalizedRules.value;
+            // is falsy, a function schema or a yup schema
+            if (!rulesVal || isCallable(rulesVal) || isYupValidator(rulesVal)) {
+                return {};
+            }
+            return Object.keys(rulesVal).reduce((acc, rule) => {
+                const deps = extractLocators(rulesVal[rule])
+                    .map((dep) => dep.__locatorRef)
+                    .reduce((depAcc, depName) => {
+                    const depValue = getFromPath(form.values, depName) || form.values[depName];
+                    if (depValue !== undefined) {
+                        depAcc[depName] = depValue;
+                    }
+                    return depAcc;
+                }, {});
+                Object.assign(acc, deps);
+                return acc;
+            }, {});
+        });
+        // Adds a watcher that runs the validation whenever field dependencies change
+        watch(dependencies, (deps, oldDeps) => {
+            // Skip if no dependencies or if the field wasn't manipulated
+            if (!Object.keys(deps).length) {
+                return;
+            }
+            const shouldValidate = !es6(deps, oldDeps);
+            if (shouldValidate) {
+                meta.validated ? validateWithStateMutation() : validateValidStateOnly();
+            }
+        });
+        return field;
+    }
+    /**
+     * Normalizes partial field options to include the full options
+     */
+    function normalizeOptions(name, opts) {
+        const defaults = () => ({
+            initialValue: undefined,
+            validateOnMount: false,
+            bails: true,
+            rules: '',
+            label: name,
+            validateOnValueUpdate: true,
+            standalone: false,
+        });
+        if (!opts) {
+            return defaults();
+        }
+        // TODO: Deprecate this in next major release
+        const checkedValue = 'valueProp' in opts ? opts.valueProp : opts.checkedValue;
+        return Object.assign(Object.assign(Object.assign({}, defaults()), (opts || {})), { checkedValue });
+    }
+    /**
+     * Extracts the validation rules from a schema
+     */
+    function extractRuleFromSchema(schema, fieldName) {
+        // no schema at all
+        if (!schema) {
+            return undefined;
+        }
+        // there is a key on the schema object for this field
+        return schema[fieldName];
+    }
+    function useCheckboxField(name, rules, opts) {
+        const form = !(opts === null || opts === void 0 ? void 0 : opts.standalone) ? injectWithSelf(FormContextKey) : undefined;
+        const checkedValue = opts === null || opts === void 0 ? void 0 : opts.checkedValue;
+        const uncheckedValue = opts === null || opts === void 0 ? void 0 : opts.uncheckedValue;
+        function patchCheckboxApi(field) {
+            const handleChange = field.handleChange;
+            const checked = computed(() => {
+                const currentValue = unref(field.value);
+                const checkedVal = unref(checkedValue);
+                return Array.isArray(currentValue) ? currentValue.includes(checkedVal) : checkedVal === currentValue;
+            });
+            function handleCheckboxChange(e, shouldValidate = true) {
+                var _a, _b;
+                if (checked.value === ((_b = (_a = e) === null || _a === void 0 ? void 0 : _a.target) === null || _b === void 0 ? void 0 : _b.checked)) {
+                    return;
+                }
+                let newValue = normalizeEventValue(e);
+                // Single checkbox field without a form to toggle it's value
+                if (!form) {
+                    newValue = resolveNextCheckboxValue(unref(field.value), unref(checkedValue), unref(uncheckedValue));
+                }
+                handleChange(newValue, shouldValidate);
+            }
+            onBeforeUnmount(() => {
+                // toggles the checkbox value if it was checked
+                if (checked.value) {
+                    handleCheckboxChange(unref(checkedValue), false);
+                }
+            });
+            return Object.assign(Object.assign({}, field), { checked,
+                checkedValue,
+                uncheckedValue, handleChange: handleCheckboxChange });
+        }
+        return patchCheckboxApi(_useField(name, rules, opts));
+    }
+
+    const Field = defineComponent({
+        name: 'Field',
+        inheritAttrs: false,
+        props: {
+            as: {
+                type: [String, Object],
+                default: undefined,
+            },
+            name: {
+                type: String,
+                required: true,
+            },
+            rules: {
+                type: [Object, String, Function],
+                default: undefined,
+            },
+            validateOnMount: {
+                type: Boolean,
+                default: false,
+            },
+            validateOnBlur: {
+                type: Boolean,
+                default: undefined,
+            },
+            validateOnChange: {
+                type: Boolean,
+                default: undefined,
+            },
+            validateOnInput: {
+                type: Boolean,
+                default: undefined,
+            },
+            validateOnModelUpdate: {
+                type: Boolean,
+                default: undefined,
+            },
+            bails: {
+                type: Boolean,
+                default: () => getConfig().bails,
+            },
+            label: {
+                type: String,
+                default: undefined,
+            },
+            uncheckedValue: {
+                type: null,
+                default: undefined,
+            },
+            modelValue: {
+                type: null,
+                default: IS_ABSENT,
+            },
+            modelModifiers: {
+                type: null,
+                default: () => ({}),
+            },
+            'onUpdate:modelValue': {
+                type: null,
+                default: undefined,
+            },
+            standalone: {
+                type: Boolean,
+                default: false,
+            },
+        },
+        setup(props, ctx) {
+            const rules = toRef(props, 'rules');
+            const name = toRef(props, 'name');
+            const label = toRef(props, 'label');
+            const uncheckedValue = toRef(props, 'uncheckedValue');
+            const hasModelEvents = isPropPresent(props, 'onUpdate:modelValue');
+            const { errors, value, errorMessage, validate: validateField, handleChange, handleBlur, setTouched, resetField, handleReset, meta, checked, setErrors, } = useField(name, rules, {
+                validateOnMount: props.validateOnMount,
+                bails: props.bails,
+                standalone: props.standalone,
+                type: ctx.attrs.type,
+                initialValue: resolveInitialValue(props, ctx),
+                // Only for checkboxes and radio buttons
+                checkedValue: ctx.attrs.value,
+                uncheckedValue,
+                label,
+                validateOnValueUpdate: false,
+            });
+            // If there is a v-model applied on the component we need to emit the `update:modelValue` whenever the value binding changes
+            const onChangeHandler = hasModelEvents
+                ? function handleChangeWithModel(e, shouldValidate = true) {
+                    handleChange(e, shouldValidate);
+                    ctx.emit('update:modelValue', value.value);
+                }
+                : handleChange;
+            const handleInput = (e) => {
+                if (!hasCheckedAttr(ctx.attrs.type)) {
+                    value.value = normalizeEventValue(e);
+                }
+            };
+            const onInputHandler = hasModelEvents
+                ? function handleInputWithModel(e) {
+                    handleInput(e);
+                    ctx.emit('update:modelValue', value.value);
+                }
+                : handleInput;
+            const fieldProps = computed(() => {
+                const { validateOnInput, validateOnChange, validateOnBlur, validateOnModelUpdate } = resolveValidationTriggers(props);
+                const baseOnBlur = [handleBlur, ctx.attrs.onBlur, validateOnBlur ? validateField : undefined].filter(Boolean);
+                const baseOnInput = [(e) => onChangeHandler(e, validateOnInput), ctx.attrs.onInput].filter(Boolean);
+                const baseOnChange = [(e) => onChangeHandler(e, validateOnChange), ctx.attrs.onChange].filter(Boolean);
+                const attrs = {
+                    name: props.name,
+                    onBlur: baseOnBlur,
+                    onInput: baseOnInput,
+                    onChange: baseOnChange,
+                };
+                if (validateOnModelUpdate) {
+                    attrs['onUpdate:modelValue'] = [onChangeHandler];
+                }
+                if (hasCheckedAttr(ctx.attrs.type) && checked) {
+                    attrs.checked = checked.value;
+                }
+                else {
+                    attrs.value = value.value;
+                }
+                const tag = resolveTag(props, ctx);
+                if (shouldHaveValueBinding(tag, ctx.attrs)) {
+                    delete attrs.value;
+                }
+                return attrs;
+            });
+            const modelValue = toRef(props, 'modelValue');
+            watch(modelValue, newModelValue => {
+                // Don't attempt to sync absent values
+                if (newModelValue === IS_ABSENT && value.value === undefined) {
+                    return;
+                }
+                if (newModelValue !== applyModifiers(value.value, props.modelModifiers)) {
+                    value.value = newModelValue === IS_ABSENT ? undefined : newModelValue;
+                    validateField();
+                }
+            });
+            function slotProps() {
+                return {
+                    field: fieldProps.value,
+                    value: value.value,
+                    meta,
+                    errors: errors.value,
+                    errorMessage: errorMessage.value,
+                    validate: validateField,
+                    resetField,
+                    handleChange: onChangeHandler,
+                    handleInput: onInputHandler,
+                    handleReset,
+                    handleBlur,
+                    setTouched,
+                    setErrors,
+                };
+            }
+            ctx.expose({
+                setErrors,
+                setTouched,
+                reset: resetField,
+                validate: validateField,
+                handleChange,
+            });
+            return () => {
+                const tag = resolveDynamicComponent(resolveTag(props, ctx));
+                const children = normalizeChildren(tag, ctx, slotProps);
+                if (tag) {
+                    return h$1(tag, Object.assign(Object.assign({}, ctx.attrs), fieldProps.value), children);
+                }
+                return children;
+            };
+        },
+    });
+    function resolveTag(props, ctx) {
+        let tag = props.as || '';
+        if (!props.as && !ctx.slots.default) {
+            tag = 'input';
+        }
+        return tag;
+    }
+    function resolveValidationTriggers(props) {
+        var _a, _b, _c, _d;
+        const { validateOnInput, validateOnChange, validateOnBlur, validateOnModelUpdate } = getConfig();
+        return {
+            validateOnInput: (_a = props.validateOnInput) !== null && _a !== void 0 ? _a : validateOnInput,
+            validateOnChange: (_b = props.validateOnChange) !== null && _b !== void 0 ? _b : validateOnChange,
+            validateOnBlur: (_c = props.validateOnBlur) !== null && _c !== void 0 ? _c : validateOnBlur,
+            validateOnModelUpdate: (_d = props.validateOnModelUpdate) !== null && _d !== void 0 ? _d : validateOnModelUpdate,
+        };
+    }
+    function applyModifiers(value, modifiers) {
+        if (modifiers.number) {
+            return toNumber(value);
+        }
+        return value;
+    }
+    function resolveInitialValue(props, ctx) {
+        // Gets the initial value either from `value` prop/attr or `v-model` binding (modelValue)
+        // For checkboxes and radio buttons it will always be the model value not the `value` attribute
+        if (!hasCheckedAttr(ctx.attrs.type)) {
+            return isPropPresent(props, 'modelValue') ? props.modelValue : ctx.attrs.value;
+        }
+        return isPropPresent(props, 'modelValue') ? props.modelValue : undefined;
+    }
+
+    let FORM_COUNTER = 0;
+    function useForm(opts) {
+        const formId = FORM_COUNTER++;
+        // A lookup containing fields or field groups
+        const fieldsByPath = ref({});
+        // If the form is currently submitting
+        const isSubmitting = ref(false);
+        // The number of times the user tried to submit the form
+        const submitCount = ref(0);
+        // dictionary for field arrays to receive various signals like reset
+        const fieldArraysLookup = {};
+        // a private ref for all form values
+        const formValues = reactive(klona(unref(opts === null || opts === void 0 ? void 0 : opts.initialValues) || {}));
+        // the source of errors for the form fields
+        const { errorBag, setErrorBag, setFieldErrorBag } = useErrorBag(opts === null || opts === void 0 ? void 0 : opts.initialErrors);
+        // Gets the first error of each field
+        const errors = computed(() => {
+            return keysOf(errorBag.value).reduce((acc, key) => {
+                const bag = errorBag.value[key];
+                if (bag && bag.length) {
+                    acc[key] = bag[0];
+                }
+                return acc;
+            }, {});
+        });
+        function getFirstFieldAtPath(path) {
+            const fieldOrGroup = fieldsByPath.value[path];
+            return Array.isArray(fieldOrGroup) ? fieldOrGroup[0] : fieldOrGroup;
+        }
+        function fieldExists(path) {
+            return !!fieldsByPath.value[path];
+        }
+        /**
+         * Holds a computed reference to all fields names and labels
+         */
+        const fieldNames = computed(() => {
+            return keysOf(fieldsByPath.value).reduce((names, path) => {
+                const field = getFirstFieldAtPath(path);
+                if (field) {
+                    names[path] = unref(field.label || field.name) || '';
+                }
+                return names;
+            }, {});
+        });
+        const fieldBailsMap = computed(() => {
+            return keysOf(fieldsByPath.value).reduce((map, path) => {
+                var _a;
+                const field = getFirstFieldAtPath(path);
+                if (field) {
+                    map[path] = (_a = field.bails) !== null && _a !== void 0 ? _a : true;
+                }
+                return map;
+            }, {});
+        });
+        // mutable non-reactive reference to initial errors
+        // we need this to process initial errors then unset them
+        const initialErrors = Object.assign({}, ((opts === null || opts === void 0 ? void 0 : opts.initialErrors) || {}));
+        // initial form values
+        const { initialValues, originalInitialValues, setInitialValues } = useFormInitialValues(fieldsByPath, formValues, opts === null || opts === void 0 ? void 0 : opts.initialValues);
+        // form meta aggregations
+        const meta = useFormMeta(fieldsByPath, formValues, initialValues, errors);
+        const schema = opts === null || opts === void 0 ? void 0 : opts.validationSchema;
+        const formCtx = {
+            formId,
+            fieldsByPath,
+            values: formValues,
+            errorBag,
+            errors,
+            schema,
+            submitCount,
+            meta,
+            isSubmitting,
+            fieldArraysLookup,
+            validateSchema: unref(schema) ? validateSchema : undefined,
+            validate,
+            register: registerField,
+            unregister: unregisterField,
+            setFieldErrorBag,
+            validateField,
+            setFieldValue,
+            setValues,
+            setErrors,
+            setFieldError,
+            setFieldTouched,
+            setTouched,
+            resetForm,
+            handleSubmit,
+            stageInitialValue,
+            unsetInitialValue,
+            setFieldInitialValue,
+        };
+        function isFieldGroup(fieldOrGroup) {
+            return Array.isArray(fieldOrGroup);
+        }
+        function applyFieldMutation(fieldOrGroup, mutation) {
+            if (Array.isArray(fieldOrGroup)) {
+                return fieldOrGroup.forEach(mutation);
+            }
+            return mutation(fieldOrGroup);
+        }
+        /**
+         * Manually sets an error message on a specific field
+         */
+        function setFieldError(field, message) {
+            setFieldErrorBag(field, message);
+        }
+        /**
+         * Sets errors for the fields specified in the object
+         */
+        function setErrors(fields) {
+            setErrorBag(fields);
+        }
+        /**
+         * Sets a single field value
+         */
+        function setFieldValue(field, value, { force } = { force: false }) {
+            var _a;
+            const fieldInstance = fieldsByPath.value[field];
+            const clonedValue = klona(value);
+            // field wasn't found, create a virtual field as a placeholder
+            if (!fieldInstance) {
+                setInPath(formValues, field, clonedValue);
+                return;
+            }
+            // Multiple checkboxes, and only one of them got updated
+            if (isFieldGroup(fieldInstance) && ((_a = fieldInstance[0]) === null || _a === void 0 ? void 0 : _a.type) === 'checkbox' && !Array.isArray(value)) {
+                const newValue = klona(resolveNextCheckboxValue(getFromPath(formValues, field) || [], value, undefined));
+                setInPath(formValues, field, newValue);
+                return;
+            }
+            let newValue = value;
+            // Single Checkbox: toggles the field value unless the field is being reset then force it
+            if (!isFieldGroup(fieldInstance) && fieldInstance.type === 'checkbox' && !force) {
+                newValue = klona(resolveNextCheckboxValue(getFromPath(formValues, field), value, unref(fieldInstance.uncheckedValue)));
+            }
+            setInPath(formValues, field, newValue);
+        }
+        /**
+         * Sets multiple fields values
+         */
+        function setValues(fields) {
+            // clean up old values
+            keysOf(formValues).forEach(key => {
+                delete formValues[key];
+            });
+            // set up new values
+            keysOf(fields).forEach(path => {
+                setFieldValue(path, fields[path]);
+            });
+            // regenerate the arrays when the form values change
+            Object.values(fieldArraysLookup).forEach(f => f && f.reset());
+        }
+        /**
+         * Sets the touched meta state on a field
+         */
+        function setFieldTouched(field, isTouched) {
+            const fieldInstance = fieldsByPath.value[field];
+            if (fieldInstance) {
+                applyFieldMutation(fieldInstance, f => f.setTouched(isTouched));
+            }
+        }
+        /**
+         * Sets the touched meta state on multiple fields
+         */
+        function setTouched(fields) {
+            keysOf(fields).forEach(field => {
+                setFieldTouched(field, !!fields[field]);
+            });
+        }
+        /**
+         * Resets all fields
+         */
+        function resetForm(state) {
+            // set initial values if provided
+            if (state === null || state === void 0 ? void 0 : state.values) {
+                setInitialValues(state.values);
+                setValues(state === null || state === void 0 ? void 0 : state.values);
+            }
+            else {
+                // clean up the initial values back to the original
+                setInitialValues(originalInitialValues.value);
+                // otherwise clean the current values
+                setValues(originalInitialValues.value);
+            }
+            Object.values(fieldsByPath.value).forEach(field => {
+                if (!field) {
+                    return;
+                }
+                applyFieldMutation(field, f => f.resetField());
+            });
+            if (state === null || state === void 0 ? void 0 : state.touched) {
+                setTouched(state.touched);
+            }
+            setErrors((state === null || state === void 0 ? void 0 : state.errors) || {});
+            submitCount.value = (state === null || state === void 0 ? void 0 : state.submitCount) || 0;
+        }
+        function insertFieldAtPath(field, path) {
+            const rawField = markRaw(field);
+            const fieldPath = path;
+            // first field at that path
+            if (!fieldsByPath.value[fieldPath]) {
+                fieldsByPath.value[fieldPath] = rawField;
+                return;
+            }
+            const fieldAtPath = fieldsByPath.value[fieldPath];
+            if (fieldAtPath && !Array.isArray(fieldAtPath)) {
+                fieldsByPath.value[fieldPath] = [fieldAtPath];
+            }
+            // add the new array to that path
+            fieldsByPath.value[fieldPath] = [...fieldsByPath.value[fieldPath], rawField];
+        }
+        function removeFieldFromPath(field, path) {
+            const fieldPath = path;
+            const fieldAtPath = fieldsByPath.value[fieldPath];
+            if (!fieldAtPath) {
+                return;
+            }
+            // same field at path
+            if (!isFieldGroup(fieldAtPath) && field.id === fieldAtPath.id) {
+                delete fieldsByPath.value[fieldPath];
+                return;
+            }
+            if (isFieldGroup(fieldAtPath)) {
+                const idx = fieldAtPath.findIndex(f => f.id === field.id);
+                if (idx === -1) {
+                    return;
+                }
+                fieldAtPath.splice(idx, 1);
+                if (fieldAtPath.length === 1) {
+                    fieldsByPath.value[fieldPath] = fieldAtPath[0];
+                    return;
+                }
+                if (!fieldAtPath.length) {
+                    delete fieldsByPath.value[fieldPath];
+                }
+            }
+        }
+        function registerField(field) {
+            const fieldPath = unref(field.name);
+            insertFieldAtPath(field, fieldPath);
+            if (isRef(field.name)) {
+                // ensures when a field's name was already taken that it preserves its same value
+                // necessary for fields generated by loops
+                watch(field.name, async (newPath, oldPath) => {
+                    // cache the value
+                    await nextTick();
+                    removeFieldFromPath(field, oldPath);
+                    insertFieldAtPath(field, newPath);
+                    // re-validate if either path had errors before
+                    if (errors.value[oldPath] || errors.value[newPath]) {
+                        validateField(newPath);
+                    }
+                    // clean up the old path if no other field is sharing that name
+                    // #3325
+                    await nextTick();
+                    if (!fieldExists(oldPath)) {
+                        unsetPath(formValues, oldPath);
+                    }
+                });
+            }
+            // if field already had errors (initial errors) that's not user-set, validate it again to ensure state is correct
+            // the difference being that `initialErrors` will contain the error message while other errors (pre-validated schema) won't have them as initial errors
+            // #3342
+            const initialErrorMessage = unref(field.errorMessage);
+            if (initialErrorMessage && (initialErrors === null || initialErrors === void 0 ? void 0 : initialErrors[fieldPath]) !== initialErrorMessage) {
+                validateField(fieldPath);
+            }
+            // marks the initial error as "consumed" so it won't be matched later with same non-initial error
+            delete initialErrors[fieldPath];
+        }
+        function unregisterField(field) {
+            const fieldName = unref(field.name);
+            removeFieldFromPath(field, fieldName);
+            nextTick(() => {
+                // clears a field error on unmounted
+                // we wait till next tick to make sure if the field is completely removed and doesn't have any siblings like checkboxes
+                // #3384
+                if (!fieldExists(fieldName)) {
+                    setFieldError(fieldName, undefined);
+                    unsetPath(formValues, fieldName);
+                }
+            });
+        }
+        async function validate(opts) {
+            if (formCtx.validateSchema) {
+                return formCtx.validateSchema((opts === null || opts === void 0 ? void 0 : opts.mode) || 'force');
+            }
+            // No schema, each field is responsible to validate itself
+            const validations = await Promise.all(Object.values(fieldsByPath.value).map(field => {
+                const fieldInstance = Array.isArray(field) ? field[0] : field;
+                if (!fieldInstance) {
+                    return Promise.resolve({ key: '', valid: true, errors: [] });
+                }
+                return fieldInstance.validate(opts).then((result) => {
+                    return {
+                        key: unref(fieldInstance.name),
+                        valid: result.valid,
+                        errors: result.errors,
+                    };
+                });
+            }));
+            const results = {};
+            const errors = {};
+            for (const validation of validations) {
+                results[validation.key] = {
+                    valid: validation.valid,
+                    errors: validation.errors,
+                };
+                if (validation.errors.length) {
+                    errors[validation.key] = validation.errors[0];
+                }
+            }
+            return {
+                valid: validations.every(r => r.valid),
+                results,
+                errors,
+            };
+        }
+        async function validateField(field) {
+            const fieldInstance = fieldsByPath.value[field];
+            if (!fieldInstance) {
+                warn$2(`field with name ${field} was not found`);
+                return Promise.resolve({ errors: [], valid: true });
+            }
+            if (Array.isArray(fieldInstance)) {
+                return fieldInstance.map(f => f.validate())[0];
+            }
+            return fieldInstance.validate();
+        }
+        function handleSubmit(fn, onValidationError) {
+            return function submissionHandler(e) {
+                if (e instanceof Event) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                // Touch all fields
+                setTouched(keysOf(fieldsByPath.value).reduce((acc, field) => {
+                    acc[field] = true;
+                    return acc;
+                }, {}));
+                isSubmitting.value = true;
+                submitCount.value++;
+                return validate()
+                    .then(result => {
+                    if (result.valid && typeof fn === 'function') {
+                        return fn(klona(formValues), {
+                            evt: e,
+                            setErrors,
+                            setFieldError,
+                            setTouched,
+                            setFieldTouched,
+                            setValues,
+                            setFieldValue,
+                            resetForm,
+                        });
+                    }
+                    if (!result.valid && typeof onValidationError === 'function') {
+                        onValidationError({
+                            values: klona(formValues),
+                            evt: e,
+                            errors: result.errors,
+                            results: result.results,
+                        });
+                    }
+                })
+                    .then(returnVal => {
+                    isSubmitting.value = false;
+                    return returnVal;
+                }, err => {
+                    isSubmitting.value = false;
+                    // re-throw the err so it doesn't go silent
+                    throw err;
+                });
+            };
+        }
+        function setFieldInitialValue(path, value) {
+            setInPath(initialValues.value, path, klona(value));
+        }
+        function unsetInitialValue(path) {
+            unsetPath(initialValues.value, path);
+        }
+        /**
+         * Sneaky function to set initial field values
+         */
+        function stageInitialValue(path, value) {
+            setInPath(formValues, path, value);
+            setFieldInitialValue(path, value);
+        }
+        async function _validateSchema() {
+            const schemaValue = unref(schema);
+            if (!schemaValue) {
+                return { valid: true, results: {}, errors: {} };
+            }
+            const formResult = isYupValidator(schemaValue)
+                ? await validateYupSchema(schemaValue, formValues)
+                : await validateObjectSchema(schemaValue, formValues, {
+                    names: fieldNames.value,
+                    bailsMap: fieldBailsMap.value,
+                });
+            return formResult;
+        }
+        /**
+         * Batches validation runs in 5ms batches
+         */
+        const debouncedSchemaValidation = debounceAsync(_validateSchema, 5);
+        async function validateSchema(mode) {
+            const formResult = await debouncedSchemaValidation();
+            // fields by id lookup
+            const fieldsById = formCtx.fieldsByPath.value || {};
+            // errors fields names, we need it to also check if custom errors are updated
+            const currentErrorsPaths = keysOf(formCtx.errorBag.value);
+            // collect all the keys from the schema and all fields
+            // this ensures we have a complete keymap of all the fields
+            const paths = [
+                ...new Set([...keysOf(formResult.results), ...keysOf(fieldsById), ...currentErrorsPaths]),
+            ];
+            // aggregates the paths into a single result object while applying the results on the fields
+            return paths.reduce((validation, path) => {
+                const field = fieldsById[path];
+                const messages = (formResult.results[path] || { errors: [] }).errors;
+                const fieldResult = {
+                    errors: messages,
+                    valid: !messages.length,
+                };
+                validation.results[path] = fieldResult;
+                if (!fieldResult.valid) {
+                    validation.errors[path] = fieldResult.errors[0];
+                }
+                // field not rendered
+                if (!field) {
+                    setFieldError(path, messages);
+                    return validation;
+                }
+                // always update the valid flag regardless of the mode
+                applyFieldMutation(field, f => (f.meta.valid = fieldResult.valid));
+                if (mode === 'silent') {
+                    return validation;
+                }
+                const wasValidated = Array.isArray(field) ? field.some(f => f.meta.validated) : field.meta.validated;
+                if (mode === 'validated-only' && !wasValidated) {
+                    return validation;
+                }
+                applyFieldMutation(field, f => f.setState({ errors: fieldResult.errors }));
+                return validation;
+            }, { valid: formResult.valid, results: {}, errors: {} });
+        }
+        const submitForm = handleSubmit((_, { evt }) => {
+            if (isFormSubmitEvent(evt)) {
+                evt.target.submit();
+            }
+        });
+        // Trigger initial validation
+        onMounted(() => {
+            if (opts === null || opts === void 0 ? void 0 : opts.initialErrors) {
+                setErrors(opts.initialErrors);
+            }
+            if (opts === null || opts === void 0 ? void 0 : opts.initialTouched) {
+                setTouched(opts.initialTouched);
+            }
+            // if validate on mount was enabled
+            if (opts === null || opts === void 0 ? void 0 : opts.validateOnMount) {
+                validate();
+                return;
+            }
+            // otherwise run initial silent validation through schema if available
+            // the useField should skip their own silent validation if a yup schema is present
+            if (formCtx.validateSchema) {
+                formCtx.validateSchema('silent');
+            }
+        });
+        if (isRef(schema)) {
+            watch(schema, () => {
+                var _a;
+                (_a = formCtx.validateSchema) === null || _a === void 0 ? void 0 : _a.call(formCtx, 'validated-only');
+            });
+        }
+        // Provide injections
+        provide(FormContextKey, formCtx);
+        {
+            registerFormWithDevTools(formCtx);
+            watch(() => (Object.assign(Object.assign({ errors: errorBag.value }, meta.value), { values: formValues, isSubmitting: isSubmitting.value, submitCount: submitCount.value })), refreshInspector, {
+                deep: true,
+            });
+        }
+        return {
+            errors,
+            meta,
+            values: formValues,
+            isSubmitting,
+            submitCount,
+            validate,
+            validateField,
+            handleReset: () => resetForm(),
+            resetForm,
+            handleSubmit,
+            submitForm,
+            setFieldError,
+            setErrors,
+            setFieldValue,
+            setValues,
+            setFieldTouched,
+            setTouched,
+        };
+    }
+    /**
+     * Manages form meta aggregation
+     */
+    function useFormMeta(fieldsByPath, currentValues, initialValues, errors) {
+        const MERGE_STRATEGIES = {
+            touched: 'some',
+            pending: 'some',
+            valid: 'every',
+        };
+        const isDirty = computed(() => {
+            return !es6(currentValues, unref(initialValues));
+        });
+        const flags = computed(() => {
+            const fields = Object.values(fieldsByPath.value).flat(1).filter(Boolean);
+            return keysOf(MERGE_STRATEGIES).reduce((acc, flag) => {
+                const mergeMethod = MERGE_STRATEGIES[flag];
+                acc[flag] = fields[mergeMethod](field => field.meta[flag]);
+                return acc;
+            }, {});
+        });
+        return computed(() => {
+            return Object.assign(Object.assign({ initialValues: unref(initialValues) }, flags.value), { valid: flags.value.valid && !keysOf(errors.value).length, dirty: isDirty.value });
+        });
+    }
+    /**
+     * Manages the initial values prop
+     */
+    function useFormInitialValues(fields, formValues, providedValues) {
+        // these are the mutable initial values as the fields are mounted/unmounted
+        const initialValues = ref(klona(unref(providedValues)) || {});
+        // these are the original initial value as provided by the user initially, they don't keep track of conditional fields
+        // this is important because some conditional fields will overwrite the initial values for other fields who had the same name
+        // like array fields, any push/insert operation will overwrite the initial values because they "create new fields"
+        // so these are the values that the reset function should use
+        // these only change when the user explicitly chanegs the initial values or when the user resets them with new values.
+        const originalInitialValues = ref(klona(unref(providedValues)) || {});
+        function setInitialValues(values, updateFields = false) {
+            initialValues.value = klona(values);
+            originalInitialValues.value = klona(values);
+            if (!updateFields) {
+                return;
+            }
+            // update the pristine non-touched fields
+            // those are excluded because it's unlikely you want to change the form values using initial values
+            // we mostly watch them for API population or newly inserted fields
+            // if the user API is taking too much time before user interaction they should consider disabling or hiding their inputs until the values are ready
+            keysOf(fields.value).forEach(fieldPath => {
+                const field = fields.value[fieldPath];
+                const wasTouched = Array.isArray(field) ? field.some(f => f.meta.touched) : field === null || field === void 0 ? void 0 : field.meta.touched;
+                if (!field || wasTouched) {
+                    return;
+                }
+                const newValue = getFromPath(initialValues.value, fieldPath);
+                setInPath(formValues, fieldPath, klona(newValue));
+            });
+        }
+        if (isRef(providedValues)) {
+            watch(providedValues, value => {
+                setInitialValues(value, true);
+            }, {
+                deep: true,
+            });
+        }
+        return {
+            initialValues,
+            originalInitialValues,
+            setInitialValues,
+        };
+    }
+    function useErrorBag(initialErrors) {
+        const errorBag = ref({});
+        function normalizeErrorItem(message) {
+            return Array.isArray(message) ? message : message ? [message] : [];
+        }
+        /**
+         * Manually sets an error message on a specific field
+         */
+        function setFieldErrorBag(field, message) {
+            if (!message) {
+                delete errorBag.value[field];
+                return;
+            }
+            errorBag.value[field] = normalizeErrorItem(message);
+        }
+        /**
+         * Sets errors for the fields specified in the object
+         */
+        function setErrorBag(fields) {
+            errorBag.value = keysOf(fields).reduce((acc, key) => {
+                const message = fields[key];
+                if (message) {
+                    acc[key] = normalizeErrorItem(message);
+                }
+                return acc;
+            }, {});
+        }
+        if (initialErrors) {
+            setErrorBag(initialErrors);
+        }
+        return {
+            errorBag,
+            setErrorBag,
+            setFieldErrorBag,
+        };
+    }
+
+    const Form = defineComponent({
+        name: 'Form',
+        inheritAttrs: false,
+        props: {
+            as: {
+                type: String,
+                default: 'form',
+            },
+            validationSchema: {
+                type: Object,
+                default: undefined,
+            },
+            initialValues: {
+                type: Object,
+                default: undefined,
+            },
+            initialErrors: {
+                type: Object,
+                default: undefined,
+            },
+            initialTouched: {
+                type: Object,
+                default: undefined,
+            },
+            validateOnMount: {
+                type: Boolean,
+                default: false,
+            },
+            onSubmit: {
+                type: Function,
+                default: undefined,
+            },
+            onInvalidSubmit: {
+                type: Function,
+                default: undefined,
+            },
+        },
+        setup(props, ctx) {
+            const initialValues = toRef(props, 'initialValues');
+            const validationSchema = toRef(props, 'validationSchema');
+            const { errors, values, meta, isSubmitting, submitCount, validate, validateField, handleReset, resetForm, handleSubmit, submitForm, setErrors, setFieldError, setFieldValue, setValues, setFieldTouched, setTouched, } = useForm({
+                validationSchema: validationSchema.value ? validationSchema : undefined,
+                initialValues,
+                initialErrors: props.initialErrors,
+                initialTouched: props.initialTouched,
+                validateOnMount: props.validateOnMount,
+            });
+            const onSubmit = props.onSubmit ? handleSubmit(props.onSubmit, props.onInvalidSubmit) : submitForm;
+            function handleFormReset(e) {
+                if (isEvent(e)) {
+                    // Prevent default form reset behavior
+                    e.preventDefault();
+                }
+                handleReset();
+                if (typeof ctx.attrs.onReset === 'function') {
+                    ctx.attrs.onReset();
+                }
+            }
+            function handleScopedSlotSubmit(evt, onSubmit) {
+                const onSuccess = typeof evt === 'function' && !onSubmit ? evt : onSubmit;
+                return handleSubmit(onSuccess, props.onInvalidSubmit)(evt);
+            }
+            function slotProps() {
+                return {
+                    meta: meta.value,
+                    errors: errors.value,
+                    values: values,
+                    isSubmitting: isSubmitting.value,
+                    submitCount: submitCount.value,
+                    validate,
+                    validateField,
+                    handleSubmit: handleScopedSlotSubmit,
+                    handleReset,
+                    submitForm,
+                    setErrors,
+                    setFieldError,
+                    setFieldValue,
+                    setValues,
+                    setFieldTouched,
+                    setTouched,
+                    resetForm,
+                };
+            }
+            // expose these functions and methods as part of public API
+            ctx.expose({
+                setFieldError,
+                setErrors,
+                setFieldValue,
+                setValues,
+                setFieldTouched,
+                setTouched,
+                resetForm,
+                validate,
+                validateField,
+            });
+            return function renderForm() {
+                // avoid resolving the form component as itself
+                const tag = props.as === 'form' ? props.as : resolveDynamicComponent(props.as);
+                const children = normalizeChildren(tag, ctx, slotProps);
+                if (!props.as) {
+                    return children;
+                }
+                // Attributes to add on a native `form` tag
+                const formAttrs = props.as === 'form'
+                    ? {
+                        // Disables native validation as vee-validate will handle it.
+                        novalidate: true,
+                    }
+                    : {};
+                return h$1(tag, Object.assign(Object.assign(Object.assign({}, formAttrs), ctx.attrs), { onSubmit, onReset: handleFormReset }), children);
+            };
+        },
+    });
+
+    let FIELD_ARRAY_COUNTER = 0;
+    function useFieldArray(arrayPath) {
+        const id = FIELD_ARRAY_COUNTER++;
+        const form = injectWithSelf(FormContextKey, undefined);
+        const fields = ref([]);
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        const noOp = () => { };
+        const noOpApi = {
+            fields: readonly(fields),
+            remove: noOp,
+            push: noOp,
+            swap: noOp,
+            insert: noOp,
+            update: noOp,
+            replace: noOp,
+            prepend: noOp,
+        };
+        if (!form) {
+            warn('FieldArray requires being a child of `<Form/>` or `useForm` being called before it. Array fields may not work correctly');
+            return noOpApi;
+        }
+        if (!unref(arrayPath)) {
+            warn('FieldArray requires a field path to be provided, did you forget to pass the `name` prop?');
+            return noOpApi;
+        }
+        let entryCounter = 0;
+        function initFields() {
+            const currentValues = getFromPath(form === null || form === void 0 ? void 0 : form.values, unref(arrayPath), []);
+            fields.value = currentValues.map(createEntry);
+            updateEntryFlags();
+        }
+        initFields();
+        function updateEntryFlags() {
+            const fieldsLength = fields.value.length;
+            for (let i = 0; i < fieldsLength; i++) {
+                const entry = fields.value[i];
+                entry.isFirst = i === 0;
+                entry.isLast = i === fieldsLength - 1;
+            }
+        }
+        function createEntry(value) {
+            const key = entryCounter++;
+            const entry = {
+                key,
+                value: computed(() => {
+                    const currentValues = getFromPath(form === null || form === void 0 ? void 0 : form.values, unref(arrayPath), []);
+                    const idx = fields.value.findIndex(e => e.key === key);
+                    return idx === -1 ? value : currentValues[idx];
+                }),
+                isFirst: false,
+                isLast: false,
+            };
+            return entry;
+        }
+        function remove(idx) {
+            const pathName = unref(arrayPath);
+            const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
+            if (!pathValue || !Array.isArray(pathValue)) {
+                return;
+            }
+            const newValue = [...pathValue];
+            newValue.splice(idx, 1);
+            form === null || form === void 0 ? void 0 : form.unsetInitialValue(pathName + `[${idx}]`);
+            form === null || form === void 0 ? void 0 : form.setFieldValue(pathName, newValue);
+            fields.value.splice(idx, 1);
+            updateEntryFlags();
+        }
+        function push(value) {
+            const pathName = unref(arrayPath);
+            const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
+            const normalizedPathValue = isNullOrUndefined$1(pathValue) ? [] : pathValue;
+            if (!Array.isArray(normalizedPathValue)) {
+                return;
+            }
+            const newValue = [...normalizedPathValue];
+            newValue.push(value);
+            form === null || form === void 0 ? void 0 : form.stageInitialValue(pathName + `[${newValue.length - 1}]`, value);
+            form === null || form === void 0 ? void 0 : form.setFieldValue(pathName, newValue);
+            fields.value.push(createEntry(value));
+            updateEntryFlags();
+        }
+        function swap(indexA, indexB) {
+            const pathName = unref(arrayPath);
+            const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
+            if (!Array.isArray(pathValue) || !pathValue[indexA] || !pathValue[indexB]) {
+                return;
+            }
+            const newValue = [...pathValue];
+            const newFields = [...fields.value];
+            // the old switcheroo
+            const temp = newValue[indexA];
+            newValue[indexA] = newValue[indexB];
+            newValue[indexB] = temp;
+            const tempEntry = newFields[indexA];
+            newFields[indexA] = newFields[indexB];
+            newFields[indexB] = tempEntry;
+            form === null || form === void 0 ? void 0 : form.setFieldValue(pathName, newValue);
+            fields.value = newFields;
+            updateEntryFlags();
+        }
+        function insert(idx, value) {
+            const pathName = unref(arrayPath);
+            const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
+            if (!Array.isArray(pathValue) || pathValue.length < idx) {
+                return;
+            }
+            const newValue = [...pathValue];
+            const newFields = [...fields.value];
+            newValue.splice(idx, 0, value);
+            newFields.splice(idx, 0, createEntry(value));
+            form === null || form === void 0 ? void 0 : form.setFieldValue(pathName, newValue);
+            fields.value = newFields;
+            updateEntryFlags();
+        }
+        function replace(arr) {
+            const pathName = unref(arrayPath);
+            form === null || form === void 0 ? void 0 : form.setFieldValue(pathName, arr);
+            initFields();
+        }
+        function update(idx, value) {
+            const pathName = unref(arrayPath);
+            const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
+            if (!Array.isArray(pathValue) || pathValue.length - 1 < idx) {
+                return;
+            }
+            form === null || form === void 0 ? void 0 : form.setFieldValue(`${pathName}[${idx}]`, value);
+        }
+        function prepend(value) {
+            const pathName = unref(arrayPath);
+            const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
+            const normalizedPathValue = isNullOrUndefined$1(pathValue) ? [] : pathValue;
+            if (!Array.isArray(normalizedPathValue)) {
+                return;
+            }
+            const newValue = [value, ...normalizedPathValue];
+            form === null || form === void 0 ? void 0 : form.stageInitialValue(pathName + `[${newValue.length - 1}]`, value);
+            form === null || form === void 0 ? void 0 : form.setFieldValue(pathName, newValue);
+            fields.value.unshift(createEntry(value));
+            updateEntryFlags();
+        }
+        form.fieldArraysLookup[id] = {
+            reset: initFields,
+        };
+        onBeforeUnmount(() => {
+            delete form.fieldArraysLookup[id];
+        });
+        return {
+            fields: readonly(fields),
+            remove,
+            push,
+            swap,
+            insert,
+            update,
+            replace,
+            prepend,
+        };
+    }
+
+    defineComponent({
+        name: 'FieldArray',
+        inheritAttrs: false,
+        props: {
+            name: {
+                type: String,
+                required: true,
+            },
+        },
+        setup(props, ctx) {
+            const { push, remove, swap, insert, replace, update, prepend, fields } = useFieldArray(toRef(props, 'name'));
+            function slotProps() {
+                return {
+                    fields: fields.value,
+                    push,
+                    remove,
+                    swap,
+                    insert,
+                    update,
+                    replace,
+                    prepend,
+                };
+            }
+            ctx.expose({
+                push,
+                remove,
+                swap,
+                insert,
+                update,
+                replace,
+                prepend,
+            });
+            return () => {
+                const children = normalizeChildren(undefined, ctx, slotProps);
+                return children;
+            };
+        },
+    });
+
+    const ErrorMessage = defineComponent({
+        name: 'ErrorMessage',
+        props: {
+            as: {
+                type: String,
+                default: undefined,
+            },
+            name: {
+                type: String,
+                required: true,
+            },
+        },
+        setup(props, ctx) {
+            const form = inject(FormContextKey, undefined);
+            const message = computed(() => {
+                return form === null || form === void 0 ? void 0 : form.errors.value[props.name];
+            });
+            function slotProps() {
+                return {
+                    message: message.value,
+                };
+            }
+            return () => {
+                // Renders nothing if there are no messages
+                if (!message.value) {
+                    return undefined;
+                }
+                const tag = (props.as ? resolveDynamicComponent(props.as) : props.as);
+                const children = normalizeChildren(tag, ctx, slotProps);
+                const attrs = Object.assign({ role: 'alert' }, ctx.attrs);
+                // If no tag was specified and there are children
+                // render the slot as is without wrapping it
+                if (!tag && (Array.isArray(children) || !children) && (children === null || children === void 0 ? void 0 : children.length)) {
+                    return children;
+                }
+                // If no children in slot
+                // render whatever specified and fallback to a <span> with the message in it's contents
+                if ((Array.isArray(children) || !children) && !(children === null || children === void 0 ? void 0 : children.length)) {
+                    return h$1(tag || 'span', attrs, message.value);
+                }
+                return h$1(tag, attrs, children);
+            };
+        },
+    });
+
+    /**
+      * vee-validate v4.5.2
+      * (c) 2021 Abdelrahman Awad
+      * @license MIT
+      */
+
+    function getSingleParam(params, paramName) {
+        return Array.isArray(params) ? params[0] : params[paramName];
+    }
+    function isEmpty(value) {
+        if (value === null || value === undefined || value === '') {
+            return true;
+        }
+        if (Array.isArray(value) && value.length === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    const confirmedValidator = (value, params) => {
+        const target = getSingleParam(params, 'target');
+        return String(value) === String(target);
+    };
+
+    /* eslint-disable no-useless-escape */
+    const emailValidator = (value) => {
+        if (isEmpty(value)) {
+            return true;
+        }
+        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (Array.isArray(value)) {
+            return value.every(val => re.test(String(val)));
+        }
+        return re.test(String(value));
+    };
+
+    function isNullOrUndefined(value) {
+        return value === null || value === undefined;
+    }
+    function isEmptyArray(arr) {
+        return Array.isArray(arr) && arr.length === 0;
+    }
+
+    const minValueValidator = (value, params) => {
+        if (isEmpty(value)) {
+            return true;
+        }
+        const min = getSingleParam(params, 'min');
+        if (Array.isArray(value)) {
+            return value.length > 0 && value.every(val => minValueValidator(val, { min }));
+        }
+        return Number(value) >= Number(min);
+    };
+
+    const requiredValidator = (value) => {
+        if (isNullOrUndefined(value) || isEmptyArray(value) || value === false) {
+            return false;
+        }
+        return !!String(value).trim().length;
+    };
+
+    configure({
+    	validateOnBlur: false, // Empty required fields make the forms grow -> Forgot password link etc. will dodge the click
+    });
+
+    defineRule('required', requiredValidator);
+    defineRule('email', emailValidator);
+    defineRule('confirmed', confirmedValidator);
+    defineRule('min_value', minValueValidator);
+
+    defineRule('date', value => {
+    	if (!value) return true
+    	const date = new Date(value);
+    	return date.toString() !== 'Invalid Date'
+    });
+
+    defineRule('afterDate', (value, [target], ctx) => {
+    	if (!value) return true
+    	const date = new Date(value);
+    	const min = new Date(ctx.form[target]);
+    	if (date >= min) return true
+    	return `${ctx.field} should be after ${ctx.form[target]}`
+    });
+
+    defineRule('requiredNonAdmin', value => {
+    	return !!((state$1.loggeduser && state$1.loggeduser.isadmin) || value)
+    });
+
     const app = createApp(script)
-    	.use(router);
+    	//.use(store)
+    	.use(router)
+    	.use(api$1)
+    	.use(c)
+    	.use(modal)
+    	.component('VForm', Form)
+    	.component('VField', Field)
+    	.component('ErrorMessage', ErrorMessage);
 
     router.isReady()
     	.then(() => app.mount('#hki2050'));
