@@ -3,6 +3,7 @@ import state from '@store/index.js'
 import { Modal } from 'bootstrap'
 import Login from '@views/Login.vue'
 import UserHome from '@views/UserHome.vue'
+import UserProfile from '@views/UserProfile.vue'
 import ForgotPassword from '@views/ForgotPassword.vue'
 import Register from '@views/Register.vue'
 import Confirm from '@views/Confirm.vue'
@@ -30,10 +31,10 @@ const router = createRouter({
 		{ path: '/app/forgotpassword', component: ForgotPassword, name: 'forgot-password' },
 		{ path: '/app/register', component: Register, name: 'register' },
 		{ path: '/app/user', component: UserHome, name: 'user-home', beforeEnter: [needLogin] },
-		//{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
+		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
 		{ path: '/app/', component: Home, name: 'page-home' },
 		{ path: '/app/login', component: Login, name: 'login' },
-		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
+		{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
 		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
 		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
 		//] },

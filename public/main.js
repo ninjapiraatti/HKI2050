@@ -18566,7 +18566,7 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$e = {
+    var script$f = {
     	name: 'FormLogin',
     	setup() {
     	const store = inject('store');
@@ -18602,23 +18602,23 @@
     	},
     };
 
-    const _hoisted_1$c = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$d = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$9 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label me-3"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_3$8 = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
-    const _hoisted_4$7 = ["disabled"];
-    const _hoisted_5$4 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
-    const _hoisted_6$3 = /*#__PURE__*/createTextVNode("Forgot password?");
-    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
-    const _hoisted_8$2 = /*#__PURE__*/createTextVNode("No account? ");
-    const _hoisted_9$1 = /*#__PURE__*/createTextVNode("Sign up");
+    const _hoisted_3$9 = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
+    const _hoisted_4$8 = ["disabled"];
+    const _hoisted_5$5 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
+    const _hoisted_6$4 = /*#__PURE__*/createTextVNode("Forgot password?");
+    const _hoisted_7$3 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
+    const _hoisted_8$3 = /*#__PURE__*/createTextVNode("No account? ");
+    const _hoisted_9$2 = /*#__PURE__*/createTextVNode("Sign up");
 
-    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -18631,7 +18631,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$c,
+              _hoisted_1$d,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -18649,7 +18649,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_2$9,
+              _hoisted_2$a,
               createVNode(_component_VField, {
                 modelValue: $data.form.password,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.password = $event)),
@@ -18666,27 +18666,27 @@
                 class: "invalid-feedback shake"
               })
             ]),
-            createBaseVNode("div", _hoisted_3$8, [
+            createBaseVNode("div", _hoisted_3$9, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $data.sending,
                 class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$7),
-              createBaseVNode("div", _hoisted_5$4, [
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$8),
+              createBaseVNode("div", _hoisted_5$5, [
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
                     default: withCtx(() => [
-                      _hoisted_6$3
+                      _hoisted_6$4
                     ]),
                     _: 1 /* STABLE */
                   })
                 ]),
-                _hoisted_7$2,
+                _hoisted_7$3,
                 createBaseVNode("div", null, [
-                  _hoisted_8$2,
+                  _hoisted_8$3,
                   createVNode(_component_router_link, { to: { name: "register" } }, {
                     default: withCtx(() => [
-                      _hoisted_9$1
+                      _hoisted_9$2
                     ]),
                     _: 1 /* STABLE */
                   })
@@ -18699,53 +18699,183 @@
       ]))
     }
 
-    script$e.render = render$e;
-    script$e.__file = "src/forms/FormLogin.vue";
+    script$f.render = render$f;
+    script$f.__file = "src/forms/FormLogin.vue";
 
-    var script$d = {
+    var script$e = {
     		name: 'Login',
 
     		async mounted() {
     			// Forgot password will return untrue
     			const success = await this.$modal({
     				title: 'Log in',
-    				component: script$e,
+    				component: script$f,
     				backdrop: 'static',
     			});
 
-    			if (success) this.$router.replace(this.$route.query.redirect || { name: 'home' });
+    			if (success) {
+    				console.log("Logged in");
+    				this.$router.replace(this.$route.query.redirect || { name: 'home' });
+    			}
     		},
     	};
 
-    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       return null
     }
 
-    script$d.render = render$d;
-    script$d.__file = "src/views/Login.vue";
+    script$e.render = render$e;
+    script$e.__file = "src/views/Login.vue";
 
-    var script$c = {
+    var script$d = {
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$b = { class: "container" };
-    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_1$c = { class: "container" };
+    const _hoisted_2$9 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
-    const _hoisted_3$7 = [
-      _hoisted_2$8
+    const _hoisted_3$8 = [
+      _hoisted_2$9
     ];
+
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$c, [
+        createBaseVNode("div", {
+          class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+        }, _hoisted_3$8, 2 /* CLASS */)
+      ]))
+    }
+
+    script$d.render = render$d;
+    script$d.__file = "src/views/UserHome.vue";
+
+    var script$c = {
+    		name: 'UserProfile',
+
+    		data() {
+    			return {
+    				user: {},
+    				characters: [],
+    			}
+    		},
+
+    		async mounted() {
+    			if (this.$store.state.loggeduser.isadmin && !this.$store.state.projects.length) {
+    				console.log("lol");
+    			}
+
+    			await Promise.all([
+    				this.getUser(),
+    				this.getCharacters(),
+    			]);
+    		},
+
+    		methods: {
+    			async getUser() {
+    				const promises = [ this.$api.users.get({ id: this.$route.params.id }) ];
+    				if (!this.$store.state.skillLevels.length) promises.push(this.$store.dispatch('getSkillLevels'));
+
+    				const [ user ] = await Promise.all(promises);
+
+    				this.user = user;
+
+    				this.user.skills.forEach(skill => {
+    					skill.levelLabel = this.$store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label;
+    				});
+    			},
+
+    			async editUser(props = {}) {
+    				const result = await this.$modal({
+    					title: 'Edit user info',
+    					component: FormUserInfo,
+    					props,
+    				});
+
+    				if (result) this.getUser();
+    			},
+
+    			async getCharacters() {
+    				this.characters = await this.$api.users.characters.get({ id: this.$route.params.id });
+    			},
+
+    			async confirmDelete(type, data) {
+    				const success = await this.$confirm.delete(type, data);
+    				
+    				if (success) {
+    					switch (type) {
+    						case 'user':
+    							if (data.id == this.$store.state.loggeduser.id) await this.$api.users.log.out();
+    							this.$router.push({ name: 'admin-users' });
+    							break
+
+    						case 'user.character':
+    							this.getUser();
+    							break
+    					}
+    				}
+    			}
+    		},
+    	};
+
+    const _hoisted_1$b = { class: "container" };
+    const _hoisted_2$8 = { class: "row gx-4" };
+    const _hoisted_3$7 = { class: "col-md-4" };
+    const _hoisted_4$7 = { class: "context" };
+    const _hoisted_5$4 = { class: "card-header d-flex align-items-center" };
+    const _hoisted_6$3 = { class: "h3 mb-0 flex-grow-1" };
+    const _hoisted_7$2 = { class: "card-body" };
+    const _hoisted_8$2 = { class: "context-actions hstack gap-1 justify-content-end" };
+    const _hoisted_9$1 = /*#__PURE__*/createBaseVNode("i", {
+      class: "bi-pencil-fill",
+      title: "Edit profile"
+    }, null, -1 /* HOISTED */);
+    const _hoisted_10$1 = [
+      _hoisted_9$1
+    ];
+    const _hoisted_11$1 = /*#__PURE__*/createBaseVNode("i", {
+      class: "bi-trash-fill",
+      title: "Delete profile"
+    }, null, -1 /* HOISTED */);
+    const _hoisted_12 = [
+      _hoisted_11$1
+    ];
+    const _hoisted_13 = /*#__PURE__*/createBaseVNode("div", { class: "col-md-8" }, " Lol ", -1 /* HOISTED */);
 
     function render$c(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$b, [
-        createBaseVNode("div", {
-          class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-        }, _hoisted_3$7, 2 /* CLASS */)
+        createBaseVNode("div", _hoisted_2$8, [
+          createBaseVNode("div", _hoisted_3$7, [
+            createBaseVNode("div", {
+              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+            }, [
+              createBaseVNode("div", _hoisted_4$7, [
+                createBaseVNode("div", _hoisted_5$4, [
+                  createBaseVNode("h1", _hoisted_6$3, toDisplayString($data.user.username), 1 /* TEXT */)
+                ]),
+                createBaseVNode("div", _hoisted_7$2, [
+                  createBaseVNode("div", null, toDisplayString($data.user.email), 1 /* TEXT */),
+                  createBaseVNode("div", _hoisted_8$2, [
+                    createBaseVNode("button", {
+                      class: "btn btn-unstyled px-1 rounded",
+                      onClick: _cache[0] || (_cache[0] = $event => ($options.editUser($data.user)))
+                    }, _hoisted_10$1),
+                    createBaseVNode("button", {
+                      class: "btn btn-unstyled px-1 rounded",
+                      onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $data.user)))
+                    }, _hoisted_12)
+                  ])
+                ])
+              ])
+            ], 2 /* CLASS */)
+          ]),
+          _hoisted_13
+        ])
       ]))
     }
 
     script$c.render = render$c;
-    script$c.__file = "src/views/UserHome.vue";
+    script$c.__file = "src/views/UserProfile.vue";
 
     var script$b = {
     		name: 'FormForgotPassword',
@@ -19387,7 +19517,17 @@
     script$5.render = render$5;
     script$5.__file = "src/views/Home.vue";
 
+    const error = (to, props = {}) => ({
+    	name: 'error',
+    	params: {
+    		...props,
+    		pathMatch: to.path.split('/').slice(1),
+    	}
+    });
+
     const needLogin = to => store.loggeduser ? true : { name: 'login', query: { redirect: to.fullPath } };
+
+    const needAdminOrSelf = to => store.loggeduser.isadmin || to.params.id == store.loggeduser.id ? true : error(to);
 
     const router = createRouter({
     	routes: [
@@ -19395,11 +19535,11 @@
     		{ path: '/app/confirm', component: script$6, name: 'confirm' },
     		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
     		{ path: '/app/register', component: script$8, name: 'register' },
-    		{ path: '/app/user', component: script$c, name: 'user-home', beforeEnter: [needLogin] },
-    		//{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
+    		{ path: '/app/user', component: script$d, name: 'user-home', beforeEnter: [needLogin] },
+    		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
     		{ path: '/app/', component: script$5, name: 'page-home' },
-    		{ path: '/app/login', component: script$d, name: 'login' },
-    		//{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
+    		{ path: '/app/login', component: script$e, name: 'login' },
+    		{ path: '/app/user/:id', component: script$c, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
     		//] },

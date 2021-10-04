@@ -16,7 +16,10 @@
 				backdrop: 'static',
 			})
 
-			if (success) this.$router.replace(this.$route.query.redirect || { name: 'home' })
+			if (success) {
+				console.log("Logged in")
+				this.$router.replace(this.$route.query.redirect || { name: 'home' })
+			}
 		},
 	}
 </script>
