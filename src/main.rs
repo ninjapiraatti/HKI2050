@@ -78,7 +78,7 @@ async fn main() -> std::io::Result<()> {
 	initialize_db(&database_url);
 	let manager = ConnectionManager::<PgConnection>::new(database_url);
 	let pool: models::users::Pool = r2d2::Pool::builder().build(manager).expect("Failed to create pool.");
-	let domain: String = std::env::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
+	let domain = std::env::var("DOMAIN").unwrap_or_else(|_| "hki2050.com".to_string());
 	let server_url = std::env::var("SERVER_URL").unwrap_or_else(|_| "localhost:8086".to_string());
 	println!("{:?}", domain);
 
