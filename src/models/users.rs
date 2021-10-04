@@ -82,6 +82,7 @@ impl FromRequest for LoggedUser {
 
 	fn from_request(req: &HttpRequest, pl: &mut Payload) -> Self::Future {
 		if let Ok(identity) = Identity::from_request(req, pl).into_inner() {
+			//debug!("{:?}", identity);
 			if let Some(cookie) = identity.identity() {
 				let pool = req.app_data::<Data<models::users::Pool>>().unwrap().clone();
 				let id_res = uuid::Uuid::parse_str(&cookie);
