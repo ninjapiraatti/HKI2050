@@ -8097,7 +8097,7 @@
         initDev();
     }
 
-    let store$1, router$1, flashMessage;
+    let store$1, router$2, flashMessage;
 
     const errorMessages = {
     	UniqueViolation: 'Item already exists',
@@ -8151,14 +8151,14 @@
     	switch (response.status) {
     		case 401:
     			store$1.dispatch('setUser', null);
-    			if (router$1.currentRoute.value.name !== 'login') {
-    				router$1.push({ name: 'login', query: {
-    					redirect: router$1.currentRoute.value.fullPath,
+    			if (router$2.currentRoute.value.name !== 'login') {
+    				router$2.push({ name: 'login', query: {
+    					redirect: router$2.currentRoute.value.fullPath,
     				}});
     			}
     			break
     		case 500:
-    			router$1.push({ name: 'error', params: {
+    			router$2.push({ name: 'error', params: {
     				title: 'Error 500',
     				message: errorMessage,
     			}});
@@ -8308,7 +8308,7 @@
     var api$1 = {
     	install: (app, options) => {
     		store$1 = app.config.globalProperties.$store;
-    		router$1 = app.config.globalProperties.$router;
+    		router$2 = app.config.globalProperties.$router;
     		flashMessage = app.config.globalProperties.$flashMessage;
 
     		app.config.globalProperties.$api = api;
@@ -8332,10 +8332,17 @@
         state.counter--;
       },
 
-      logout() {
-        console.log("Logging out");
-        return true
-      },
+    	async logout() {
+    		try {
+    			await api.users.log.out();
+    			await this.setUser(null);
+    			router.push({ name: 'login' });
+    		} catch (error) {
+    			console.warn(`Logout failed: ${error.message}`);
+    			return false
+    		}
+    		return true
+    	},
 
       async login(data) {
     		try {
@@ -19529,7 +19536,7 @@
 
     const needAdminOrSelf = to => store.loggeduser.isadmin || to.params.id == store.loggeduser.id ? true : error(to);
 
-    const router = createRouter({
+    const router$1 = createRouter({
     	routes: [
     		{ path: '/', name: 'home', redirect: () => ({ name: store.loggeduser && store.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
     		{ path: '/app/confirm', component: script$6, name: 'confirm' },
@@ -19551,7 +19558,7 @@
     });
 
     // Close modal before navigating
-    router.beforeEach((to, from, next) => {
+    router$1.beforeEach((to, from, next) => {
     	const modal = document.querySelector('.modal.show');
     	if (!modal) {
     		next();
@@ -22790,7 +22797,7 @@
 
     const app = createApp(script)
     	//.use(store)
-    	.use(router)
+    	.use(router$1)
     	.use(api$1)
     	.use(c)
     	.use(modal)
@@ -22799,7 +22806,7 @@
     	.component('VField', Field)
     	.component('ErrorMessage', ErrorMessage);
 
-    router.isReady()
+    router$1.isReady()
     	.then(() => app.mount('#hki2050'));
 
 }());

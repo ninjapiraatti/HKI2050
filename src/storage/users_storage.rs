@@ -3,6 +3,7 @@ use crate::utils::hash_password;
 use actix_web::web;
 use diesel::result::Error;
 use diesel::{prelude::*, PgConnection};
+use log::{info};
 use Error::NotFound;
 
 pub fn query_all(pool: &web::Data<Pool>) -> Result<Vec<User>, Error> {
@@ -19,7 +20,7 @@ pub fn get_by_email(q_email: String, pool: &web::Data<Pool>) -> Result<User, Err
 	let conn: &PgConnection = &pool.get().unwrap();
 
 	let user = users.filter(email.eq(&q_email)).get_result::<User>(conn)?;
-
+	info!("USER from email: {}", user.email);
 	Ok(user)
 }
 

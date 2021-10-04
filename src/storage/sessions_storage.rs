@@ -1,6 +1,7 @@
 use actix_web::web;
 use diesel::prelude::*;
 use diesel::PgConnection;
+use log::{info};
 
 use crate::models::users::{Pool, Session};
 use diesel::result::Error;
@@ -29,7 +30,7 @@ pub fn create_session(q_user_id: uuid::Uuid, q_user_email: String, pool: &web::D
 	let session = diesel::insert_into(sessions)
 		.values(&new_session)
 		.get_result::<Session>(conn)?;
-
+	info!("SESSION value: {}", session.id);
 	Ok(session)
 }
 

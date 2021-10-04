@@ -17,10 +17,17 @@ const methods = {
     state.counter--
   },
 
-  logout() {
-    console.log("Logging out")
-    return true
-  },
+	async logout() {
+		try {
+			await api.users.log.out()
+			await this.setUser(null)
+			router.push({ name: 'login' })
+		} catch (error) {
+			console.warn(`Logout failed: ${error.message}`)
+			return false
+		}
+		return true
+	},
 
   async login(data) {
 		try {
