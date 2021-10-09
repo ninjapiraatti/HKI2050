@@ -4,7 +4,8 @@ import { api } from '@root/api.js'
 
 const state = reactive({
   counter: 666,
-  loggeduser: JSON.parse(localStorage.getItem('user')),
+	loggeduser: JSON.parse(localStorage.getItem('user')),
+	//loggeduser: true,
   colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
 })
 
@@ -54,6 +55,7 @@ const methods = {
 		}
     state.loggeduser = data
 		if (data) {
+			console.log(data)
 			localStorage.setItem('user', JSON.stringify(data))
 		} else {
 			localStorage.removeItem('user')
@@ -62,6 +64,6 @@ const methods = {
 }
 
 export default {
-  state,
+	state,
   methods
 }

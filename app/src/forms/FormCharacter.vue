@@ -17,44 +17,20 @@
 			<ErrorMessage name='label' class='invalid-feedback shake' />
 		</div>
 
-		<div v-if='form.id'>
-			<label for='skillcategory_id' class='form-label'>Category</label>
+		<div>
+			<label for='description' class='form-label'>Description</label>
 			<VField
-				v-model='form.skillcategory_id'
+				v-model='form.description'
 				rules='required'
-				as='select'
-				name='skillcategory_id'
-				id='skillcategory_id'
-				label='Category'
-				aria-label='Category'
-				class='form-select'
-				:class='{ "is-invalid": errors.skillcategory_id }'
-			>
-				<option v-for="category in categories" :key="category.id" :value="category.id">
-					{{ category.label }}
-				</option>
-			</VField>
-			<ErrorMessage name='skillcategory_id' class='invalid-feedback shake' />
-		</div>
-
-		<div v-if='!form.id'>
-			<label for='skillscope_id' class='form-label'>Scope</label>
-			<VField
-				v-model='form.skillscope_id'
-				rules='required'
-				as='select'
-				name='skillscope_id'
-				id='skillscope_id'
-				label='Scope'
-				aria-label='Scope'
-				class='form-select'
-				:class='{ "is-invalid": errors.skillscope_id }'
-			>
-				<option v-for="scope in scopes" :key="scope.id" :value="scope.id">
-					{{ scope.label }}
-				</option>
-			</VField>
-			<ErrorMessage name='skillscope_id' class='invalid-feedback shake' />
+				type='text'
+				id='description'
+				name='description'
+				label='Description'
+				aria-label='Description'
+				class='form-control'
+				:class='{ "is-invalid": errors.description }'
+			/>
+			<ErrorMessage name='description' class='invalid-feedback shake' />
 		</div>
 
 		<div class='mt-label'>
@@ -65,19 +41,13 @@
 
 <script>
 	export default {
-		name: 'FormSkill',
+		name: 'FormCharacter',
 
 		props: {
 			id: {
 				type: String,
 				default: undefined,
 			},
-			skillcategory_id: {
-				type: String,
-				required: true,
-			},
-			skillscope_id: String,
-			label: String
 		},
 
 		computed: {

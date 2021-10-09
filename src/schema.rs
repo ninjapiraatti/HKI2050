@@ -1,4 +1,14 @@
 table! {
+    characters (id) {
+        id -> Uuid,
+        user_id -> Uuid,
+        name -> Varchar,
+        description -> Varchar,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
 	invitations (id) {
 		id -> Uuid,
 		email -> Varchar,
@@ -50,10 +60,12 @@ table! {
 
 joinable!(invitations -> reset_requests (reset_request_id));
 joinable!(sessions -> users (user_id));
+joinable!(characters -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     invitations,
     reset_requests,
     sessions,
     users,
+    characters,
 );

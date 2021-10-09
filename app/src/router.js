@@ -18,15 +18,15 @@ const error = (to, props = {}) => ({
 	}
 })
 
-const needLogin = to => state.loggeduser ? true : { name: 'login', query: { redirect: to.fullPath } }
+const needLogin = to => state.state.loggeduser ? true : { name: 'login', query: { redirect: to.fullPath } }
 
-const needAdmin = to => state.loggeduser.isadmin ? true : error(to)
+const needAdmin = to => state.state.loggeduser.isadmin ? true : error(to)
 
-const needAdminOrSelf = to => state.loggeduser.isadmin || to.params.id == state.loggeduser.id ? true : error(to)
+const needAdminOrSelf = to => state.state.loggeduser.isadmin || to.params.id == state.state.loggeduser.id ? true : error(to)
 
 const router = createRouter({
 	routes: [
-		{ path: '/', name: 'home', redirect: () => ({ name: state.loggeduser && state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
+		{ path: '/', name: 'home', redirect: () => ({ name: state.state.loggeduser && state.state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
 		{ path: '/app/confirm', component: Confirm, name: 'confirm' },
 		{ path: '/app/forgotpassword', component: ForgotPassword, name: 'forgot-password' },
 		{ path: '/app/register', component: Register, name: 'register' },
@@ -49,8 +49,10 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
 	const modal = document.querySelector('.modal.show')
 	if (!modal) {
+		console.log(state.state.loggeduser)
 		next()
 	} else {
+		console.log(state.state.loggeduser)
 		modal.addEventListener('hidden.bs.modal', () => next())
 		Modal.getInstance(modal).hide()
 	}

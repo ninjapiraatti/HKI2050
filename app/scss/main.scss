@@ -127,19 +127,17 @@ body {
 	flex-direction: column;
 }
 
-.hula-logo {
+.hki-logo {
 	fill: currentColor;
-
-	#hoop {
-		transition: 0.7s ease-in-out;
-		transform-origin: 400px 431px;
-		transform: rotate(0);
+	img {
+		height: 60px;
 	}
+}
 
-	&:hover {
-		#hoop {
-			transform: rotate(720deg);
-		}
+.bigasslogo {
+	text-align: center;
+	img {
+		margin: 0 auto;
 	}
 }
 

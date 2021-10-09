@@ -16631,16 +16631,18 @@ body {
   flex-direction: column;
 }
 
-.hula-logo {
+.hki-logo {
   fill: currentColor;
 }
-.hula-logo #hoop {
-  transition: 0.7s ease-in-out;
-  transform-origin: 400px 431px;
-  transform: rotate(0);
+.hki-logo img {
+  height: 60px;
 }
-.hula-logo:hover #hoop {
-  transform: rotate(720deg);
+
+.bigasslogo {
+  text-align: center;
+}
+.bigasslogo img {
+  margin: 0 auto;
 }
 
 .tier {

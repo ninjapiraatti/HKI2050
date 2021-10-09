@@ -8319,7 +8319,8 @@
 
     const state = reactive({
       counter: 666,
-      loggeduser: JSON.parse(localStorage.getItem('user')),
+    	loggeduser: JSON.parse(localStorage.getItem('user')),
+    	//loggeduser: true,
       colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
     });
 
@@ -8369,6 +8370,7 @@
     		}
         state.loggeduser = data;
     		if (data) {
+    			console.log(data);
     			localStorage.setItem('user', JSON.stringify(data));
     		} else {
     			localStorage.removeItem('user');
@@ -8377,7 +8379,7 @@
     };
 
     var store = {
-      state,
+    	state,
       methods
     };
 
@@ -18609,20 +18611,20 @@
     	},
     };
 
-    const _hoisted_1$d = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$e = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$b = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label me-3"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_3$9 = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
-    const _hoisted_4$8 = ["disabled"];
-    const _hoisted_5$5 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
-    const _hoisted_6$4 = /*#__PURE__*/createTextVNode("Forgot password?");
-    const _hoisted_7$3 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
-    const _hoisted_8$3 = /*#__PURE__*/createTextVNode("No account? ");
+    const _hoisted_3$b = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
+    const _hoisted_4$9 = ["disabled"];
+    const _hoisted_5$6 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
+    const _hoisted_6$5 = /*#__PURE__*/createTextVNode("Forgot password?");
+    const _hoisted_7$4 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
+    const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$2 = /*#__PURE__*/createTextVNode("Sign up");
 
     function render$f(_ctx, _cache, $props, $setup, $data, $options) {
@@ -18638,7 +18640,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$d,
+              _hoisted_1$e,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -18656,7 +18658,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_2$a,
+              _hoisted_2$b,
               createVNode(_component_VField, {
                 modelValue: $data.form.password,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.password = $event)),
@@ -18673,24 +18675,24 @@
                 class: "invalid-feedback shake"
               })
             ]),
-            createBaseVNode("div", _hoisted_3$9, [
+            createBaseVNode("div", _hoisted_3$b, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $data.sending,
                 class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$8),
-              createBaseVNode("div", _hoisted_5$5, [
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$9),
+              createBaseVNode("div", _hoisted_5$6, [
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
                     default: withCtx(() => [
-                      _hoisted_6$4
+                      _hoisted_6$5
                     ]),
                     _: 1 /* STABLE */
                   })
                 ]),
-                _hoisted_7$3,
+                _hoisted_7$4,
                 createBaseVNode("div", null, [
-                  _hoisted_8$3,
+                  _hoisted_8$4,
                   createVNode(_component_router_link, { to: { name: "register" } }, {
                     default: withCtx(() => [
                       _hoisted_9$2
@@ -18738,19 +18740,19 @@
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$c = { class: "container" };
-    const _hoisted_2$9 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_1$d = { class: "container" };
+    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
-    const _hoisted_3$8 = [
-      _hoisted_2$9
+    const _hoisted_3$a = [
+      _hoisted_2$a
     ];
 
     function render$d(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$c, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$d, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-        }, _hoisted_3$8, 2 /* CLASS */)
+        }, _hoisted_3$a, 2 /* CLASS */)
       ]))
     }
 
@@ -18758,125 +18760,112 @@
     script$d.__file = "src/views/UserHome.vue";
 
     var script$c = {
-    		name: 'UserProfile',
+    	name: 'UserProfile',
+    	setup() {
+    		const store = inject('store');
+    		return {
+    			store
+    		}
+    	},
+    	data() {
+    		return {
+    			user: {},
+    			characters: [],
+    		}
+    	},
 
-    		data() {
-    			return {
-    				user: {},
-    				characters: [],
-    			}
+    	async mounted() {
+    		if (this.store.state.loggeduser.isadmin && !this.store.state.projects.length) {
+    			console.log("lol");
+    		}
+    		this.user = this.store.state.loggeduser;
+    		/*
+    		await Promise.all([
+    			this.getUser(),
+    			this.getCharacters(),
+    		])
+    		*/
+    	},
+
+    	methods: {
+    		/*
+    		async getUser() {
+    			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ]
+    			if (!this.store.state.skillLevels.length) promises.push(this.store.dispatch('getSkillLevels'))
+
+    			const [ user ] = await Promise.all(promises)
+
+    			this.user = user
+
+    			this.user.skills.forEach(skill => {
+    				skill.levelLabel = this.store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label
+    			})
     		},
 
-    		async mounted() {
-    			if (this.$store.state.loggeduser.isadmin && !this.$store.state.projects.length) {
-    				console.log("lol");
-    			}
+    		async editUser(props = {}) {
+    			const result = await this.$modal({
+    				title: 'Edit user info',
+    				component: FormUserInfo,
+    				props,
+    			})
 
-    			await Promise.all([
-    				this.getUser(),
-    				this.getCharacters(),
-    			]);
+    			if (result) this.getUser()
     		},
 
-    		methods: {
-    			async getUser() {
-    				const promises = [ this.$api.users.get({ id: this.$route.params.id }) ];
-    				if (!this.$store.state.skillLevels.length) promises.push(this.$store.dispatch('getSkillLevels'));
+    		async getCharacters() {
+    			this.characters = await this.$api.users.characters.get({ id: this.$route.params.id })
+    		},
 
-    				const [ user ] = await Promise.all(promises);
+    		async confirmDelete(type, data) {
+    			const success = await this.$confirm.delete(type, data)
+    			
+    			if (success) {
+    				switch (type) {
+    					case 'user':
+    						if (data.id == this.store.state.loggeduser.id) await this.$api.users.log.out()
+    						this.$router.push({ name: 'admin-users' })
+    						break
 
-    				this.user = user;
-
-    				this.user.skills.forEach(skill => {
-    					skill.levelLabel = this.$store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label;
-    				});
-    			},
-
-    			async editUser(props = {}) {
-    				const result = await this.$modal({
-    					title: 'Edit user info',
-    					component: FormUserInfo,
-    					props,
-    				});
-
-    				if (result) this.getUser();
-    			},
-
-    			async getCharacters() {
-    				this.characters = await this.$api.users.characters.get({ id: this.$route.params.id });
-    			},
-
-    			async confirmDelete(type, data) {
-    				const success = await this.$confirm.delete(type, data);
-    				
-    				if (success) {
-    					switch (type) {
-    						case 'user':
-    							if (data.id == this.$store.state.loggeduser.id) await this.$api.users.log.out();
-    							this.$router.push({ name: 'admin-users' });
-    							break
-
-    						case 'user.character':
-    							this.getUser();
-    							break
-    					}
+    					case 'user.character':
+    						this.getUser()
+    						break
     				}
     			}
-    		},
-    	};
+    		}*/
+    	},
+    };
 
-    const _hoisted_1$b = { class: "container" };
-    const _hoisted_2$8 = { class: "row gx-4" };
-    const _hoisted_3$7 = { class: "col-md-4" };
-    const _hoisted_4$7 = { class: "context" };
-    const _hoisted_5$4 = { class: "card-header d-flex align-items-center" };
-    const _hoisted_6$3 = { class: "h3 mb-0 flex-grow-1" };
-    const _hoisted_7$2 = { class: "card-body" };
-    const _hoisted_8$2 = { class: "context-actions hstack gap-1 justify-content-end" };
-    const _hoisted_9$1 = /*#__PURE__*/createBaseVNode("i", {
-      class: "bi-pencil-fill",
-      title: "Edit profile"
-    }, null, -1 /* HOISTED */);
-    const _hoisted_10$1 = [
-      _hoisted_9$1
-    ];
-    const _hoisted_11$1 = /*#__PURE__*/createBaseVNode("i", {
-      class: "bi-trash-fill",
-      title: "Delete profile"
-    }, null, -1 /* HOISTED */);
-    const _hoisted_12 = [
-      _hoisted_11$1
-    ];
-    const _hoisted_13 = /*#__PURE__*/createBaseVNode("div", { class: "col-md-8" }, " Lol ", -1 /* HOISTED */);
+    const _hoisted_1$c = { class: "container" };
+    const _hoisted_2$9 = { class: "row gx-4" };
+    const _hoisted_3$9 = { class: "col-md-4" };
+    const _hoisted_4$8 = { class: "context" };
+    const _hoisted_5$5 = { class: "card-header d-flex align-items-center" };
+    const _hoisted_6$4 = { class: "h3 mb-0 flex-grow-1" };
+    const _hoisted_7$3 = { class: "card-body" };
+    const _hoisted_8$3 = /*#__PURE__*/createBaseVNode("div", { class: "context-actions hstack gap-1 justify-content-end" }, [
+      /*#__PURE__*/createCommentVNode(" <button class='btn btn-unstyled px-1 rounded' v-on:click=\"editUser(user)\"><i class=\"bi-pencil-fill\" title='Edit profile'></i></button>\n\t\t\t\t\t\t\t\t<button class='btn btn-unstyled px-1 rounded' v-on:click=\"confirmDelete('user', user)\"><i class=\"bi-trash-fill\" title='Delete profile'></i></button> ")
+    ], -1 /* HOISTED */);
+    const _hoisted_9$1 = /*#__PURE__*/createBaseVNode("div", { class: "col-md-8" }, " Lol ", -1 /* HOISTED */);
 
     function render$c(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$b, [
-        createBaseVNode("div", _hoisted_2$8, [
-          createBaseVNode("div", _hoisted_3$7, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$c, [
+        createBaseVNode("div", _hoisted_2$9, [
+          createBaseVNode("div", _hoisted_3$9, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, [
-              createBaseVNode("div", _hoisted_4$7, [
-                createBaseVNode("div", _hoisted_5$4, [
-                  createBaseVNode("h1", _hoisted_6$3, toDisplayString($data.user.username), 1 /* TEXT */)
+              createBaseVNode("div", _hoisted_4$8, [
+                createBaseVNode("div", _hoisted_5$5, [
+                  createBaseVNode("h1", _hoisted_6$4, toDisplayString($data.user.username), 1 /* TEXT */)
                 ]),
-                createBaseVNode("div", _hoisted_7$2, [
+                createBaseVNode("div", _hoisted_7$3, [
                   createBaseVNode("div", null, toDisplayString($data.user.email), 1 /* TEXT */),
-                  createBaseVNode("div", _hoisted_8$2, [
-                    createBaseVNode("button", {
-                      class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[0] || (_cache[0] = $event => ($options.editUser($data.user)))
-                    }, _hoisted_10$1),
-                    createBaseVNode("button", {
-                      class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $data.user)))
-                    }, _hoisted_12)
-                  ])
+                  _hoisted_8$3
                 ])
               ])
             ], 2 /* CLASS */)
           ]),
-          _hoisted_13
+          _hoisted_9$1
         ])
       ]))
     }
@@ -18914,14 +18903,14 @@
     		}
     	};
 
-    const _hoisted_1$a = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$b = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
-    const _hoisted_2$7 = ["disabled"];
-    const _hoisted_3$6 = { class: "mt-label" };
-    const _hoisted_4$6 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
-    const _hoisted_5$3 = /*#__PURE__*/createTextVNode("Log in");
+    const _hoisted_2$8 = ["disabled"];
+    const _hoisted_3$8 = { class: "mt-label" };
+    const _hoisted_4$7 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
+    const _hoisted_5$4 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$b(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -18935,7 +18924,7 @@
           class: "vstack gap-2"
         }, {
           default: withCtx(({ errors }) => [
-            _hoisted_1$a,
+            _hoisted_1$b,
             createBaseVNode("div", {
               class: normalizeClass(["input-group", { "has-validation": errors.email }])
             }, [
@@ -18954,7 +18943,7 @@
                 type: "submit",
                 disabled: $data.sending,
                 class: "btn btn-primary gradient"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_2$7),
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_2$8),
               createVNode(_component_ErrorMessage, {
                 name: "email",
                 class: "invalid-feedback shake"
@@ -18963,11 +18952,11 @@
           ]),
           _: 1 /* STABLE */
         }, 8 /* PROPS */, ["onSubmit"]),
-        createBaseVNode("div", _hoisted_3$6, [
-          _hoisted_4$6,
+        createBaseVNode("div", _hoisted_3$8, [
+          _hoisted_4$7,
           createVNode(_component_router_link, { to: { name: "login" } }, {
             default: withCtx(() => [
-              _hoisted_5$3
+              _hoisted_5$4
             ]),
             _: 1 /* STABLE */
           })
@@ -18996,27 +18985,27 @@
     		},
     	};
 
-    const _hoisted_1$9 = {
+    const _hoisted_1$a = {
       key: 0,
       class: "container mt-5"
     };
-    const _hoisted_2$6 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_2$7 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Password reset requested")
     ], -1 /* HOISTED */);
-    const _hoisted_3$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
+    const _hoisted_3$7 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
       /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Password reset requested successfully, check your email.")
     ], -1 /* HOISTED */);
-    const _hoisted_4$5 = [
-      _hoisted_2$6,
-      _hoisted_3$5
+    const _hoisted_4$6 = [
+      _hoisted_2$7,
+      _hoisted_3$7
     ];
 
     function render$a(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.requested)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$a, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-            }, _hoisted_4$5, 2 /* CLASS */)
+            }, _hoisted_4$6, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
     }
@@ -19076,26 +19065,26 @@
     	}
     };
 
-    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$9 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$5 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "username",
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
-    const _hoisted_3$4 = { key: 0 };
-    const _hoisted_4$4 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_3$6 = { key: 0 };
+    const _hoisted_4$5 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_plain",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_5$2 = { key: 1 };
-    const _hoisted_6$2 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_5$3 = { key: 1 };
+    const _hoisted_6$3 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_confirmation",
       class: "form-label"
     }, "Repeat password", -1 /* HOISTED */);
-    const _hoisted_7$1 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
-    const _hoisted_8$1 = ["disabled"];
+    const _hoisted_7$2 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
+    const _hoisted_8$2 = ["disabled"];
     const _hoisted_9 = { key: 0 };
     const _hoisted_10 = /*#__PURE__*/createTextVNode("Already a user? ");
     const _hoisted_11 = /*#__PURE__*/createTextVNode("Log in");
@@ -19113,7 +19102,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$8,
+              _hoisted_1$9,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -19131,7 +19120,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_2$5,
+              _hoisted_2$6,
               createVNode(_component_VField, {
                 modelValue: $data.form.username,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.username = $event)),
@@ -19149,8 +19138,8 @@
               })
             ]),
             (!$options.isAdmin)
-              ? (openBlock(), createElementBlock("div", _hoisted_3$4, [
-                  _hoisted_4$4,
+              ? (openBlock(), createElementBlock("div", _hoisted_3$6, [
+                  _hoisted_4$5,
                   createVNode(_component_VField, {
                     modelValue: $data.form.password_plain,
                     "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => ($data.form.password_plain = $event)),
@@ -19169,8 +19158,8 @@
                 ]))
               : createCommentVNode("v-if", true),
             (!$options.isAdmin)
-              ? (openBlock(), createElementBlock("div", _hoisted_5$2, [
-                  _hoisted_6$2,
+              ? (openBlock(), createElementBlock("div", _hoisted_5$3, [
+                  _hoisted_6$3,
                   createVNode(_component_VField, {
                     rules: "confirmed:@password_plain",
                     type: "password",
@@ -19186,12 +19175,12 @@
                   })
                 ]))
               : createCommentVNode("v-if", true),
-            createBaseVNode("div", _hoisted_7$1, [
+            createBaseVNode("div", _hoisted_7$2, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $data.sending,
                 class: "btn btn-primary gradient align-self-start"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_8$1),
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_8$2),
               (!$options.isAdmin)
                 ? (openBlock(), createElementBlock("div", _hoisted_9, [
                     _hoisted_10,
@@ -19231,27 +19220,27 @@
     		},
     	};
 
-    const _hoisted_1$7 = {
+    const _hoisted_1$8 = {
       key: 0,
       class: "container mt-5"
     };
-    const _hoisted_2$4 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_2$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Invitation sent")
     ], -1 /* HOISTED */);
-    const _hoisted_3$3 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
+    const _hoisted_3$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
       /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Please check your email and follow the confirmation link to activate your account.")
     ], -1 /* HOISTED */);
-    const _hoisted_4$3 = [
-      _hoisted_2$4,
-      _hoisted_3$3
+    const _hoisted_4$4 = [
+      _hoisted_2$5,
+      _hoisted_3$5
     ];
 
     function render$8(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.registered)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-            }, _hoisted_4$3, 2 /* CLASS */)
+            }, _hoisted_4$4, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
     }
@@ -19316,16 +19305,16 @@
     		}
     	};
 
-    const _hoisted_1$6 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$7 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_2$3 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$4 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_confirmation",
       class: "form-label"
     }, "Repeat password", -1 /* HOISTED */);
-    const _hoisted_3$2 = { class: "mt-label" };
-    const _hoisted_4$2 = ["disabled"];
+    const _hoisted_3$4 = { class: "mt-label" };
+    const _hoisted_4$3 = ["disabled"];
 
     function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19338,7 +19327,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$6,
+            _hoisted_1$7,
             createVNode(_component_VField, {
               modelValue: $data.form.password,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.password = $event)),
@@ -19356,7 +19345,7 @@
             })
           ]),
           createBaseVNode("div", null, [
-            _hoisted_2$3,
+            _hoisted_2$4,
             createVNode(_component_VField, {
               rules: "confirmed:@password",
               type: "password",
@@ -19371,12 +19360,12 @@
               class: "invalid-feedback shake"
             })
           ]),
-          createBaseVNode("div", _hoisted_3$2, [
+          createBaseVNode("div", _hoisted_3$4, [
             createBaseVNode("button", {
               type: "submit",
               disabled: $data.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$2)
+            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$3)
           ])
         ]),
         _: 1 /* STABLE */
@@ -19453,37 +19442,37 @@
     		},
     	};
 
-    const _hoisted_1$5 = {
+    const _hoisted_1$6 = {
       key: 0,
       class: "container mt-5"
     };
-    const _hoisted_2$2 = { class: "card shadow" };
-    const _hoisted_3$1 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_2$3 = { class: "card shadow" };
+    const _hoisted_3$3 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Account confirmed")
     ], -1 /* HOISTED */);
-    const _hoisted_4$1 = { class: "card-body" };
-    const _hoisted_5$1 = { class: "mb-0" };
-    const _hoisted_6$1 = /*#__PURE__*/createTextVNode("Your account has been confirmed. You can now ");
-    const _hoisted_7 = /*#__PURE__*/createTextVNode("log in");
-    const _hoisted_8 = /*#__PURE__*/createTextVNode(".");
+    const _hoisted_4$2 = { class: "card-body" };
+    const _hoisted_5$2 = { class: "mb-0" };
+    const _hoisted_6$2 = /*#__PURE__*/createTextVNode("Your account has been confirmed. You can now ");
+    const _hoisted_7$1 = /*#__PURE__*/createTextVNode("log in");
+    const _hoisted_8$1 = /*#__PURE__*/createTextVNode(".");
 
     function render$6(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_router_link = resolveComponent("router-link");
 
       return ($data.confirmed)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$5, [
-            createBaseVNode("div", _hoisted_2$2, [
-              _hoisted_3$1,
-              createBaseVNode("div", _hoisted_4$1, [
-                createBaseVNode("p", _hoisted_5$1, [
-                  _hoisted_6$1,
+        ? (openBlock(), createElementBlock("div", _hoisted_1$6, [
+            createBaseVNode("div", _hoisted_2$3, [
+              _hoisted_3$3,
+              createBaseVNode("div", _hoisted_4$2, [
+                createBaseVNode("p", _hoisted_5$2, [
+                  _hoisted_6$2,
                   createVNode(_component_router_link, { to: { name: "login" } }, {
                     default: withCtx(() => [
-                      _hoisted_7
+                      _hoisted_7$1
                     ]),
                     _: 1 /* STABLE */
                   }),
-                  _hoisted_8
+                  _hoisted_8$1
                 ])
               ])
             ])
@@ -19504,12 +19493,18 @@
     	},
     };
 
-    const _hoisted_1$4 = { class: "container" };
-    const _hoisted_2$1 = { class: "counter" };
+    const _hoisted_1$5 = { class: "container" };
+    const _hoisted_2$2 = { class: "counter" };
+    const _hoisted_3$2 = /*#__PURE__*/createBaseVNode("div", { class: "bigasslogo" }, [
+      /*#__PURE__*/createBaseVNode("img", {
+        src: "/public/assets/uusilogo04_square_nobg.png",
+        alt: ""
+      })
+    ], -1 /* HOISTED */);
 
     function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
-        createBaseVNode("div", _hoisted_2$1, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$5, [
+        createBaseVNode("div", _hoisted_2$2, [
           createTextVNode(toDisplayString($setup.store.state.loggeduser) + " " + toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
           createBaseVNode("button", {
             onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
@@ -19517,7 +19512,8 @@
           createBaseVNode("button", {
             onClick: _cache[1] || (_cache[1] = (...args) => ($setup.store.methods.increase && $setup.store.methods.increase(...args)))
           }, "+")
-        ])
+        ]),
+        _hoisted_3$2
       ]))
     }
 
@@ -19532,13 +19528,13 @@
     	}
     });
 
-    const needLogin = to => store.loggeduser ? true : { name: 'login', query: { redirect: to.fullPath } };
+    const needLogin = to => store.state.loggeduser ? true : { name: 'login', query: { redirect: to.fullPath } };
 
-    const needAdminOrSelf = to => store.loggeduser.isadmin || to.params.id == store.loggeduser.id ? true : error(to);
+    const needAdminOrSelf = to => store.state.loggeduser.isadmin || to.params.id == store.state.loggeduser.id ? true : error(to);
 
     const router$1 = createRouter({
     	routes: [
-    		{ path: '/', name: 'home', redirect: () => ({ name: store.loggeduser && store.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
+    		{ path: '/', name: 'home', redirect: () => ({ name: store.state.loggeduser && store.state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
     		{ path: '/app/confirm', component: script$6, name: 'confirm' },
     		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
     		{ path: '/app/register', component: script$8, name: 'register' },
@@ -19561,8 +19557,10 @@
     router$1.beforeEach((to, from, next) => {
     	const modal = document.querySelector('.modal.show');
     	if (!modal) {
+    		console.log(store.state.loggeduser);
     		next();
     	} else {
+    		console.log(store.state.loggeduser);
     		modal.addEventListener('hidden.bs.modal', () => next());
     		Modal.getInstance(modal).hide();
     	}
@@ -19633,21 +19631,21 @@
     		}
     	};
 
-    const _hoisted_1$3 = ["data-bs-backdrop", "data-bs-keyboard"];
-    const _hoisted_2 = { class: "modal-content shadow-lg" };
-    const _hoisted_3 = {
+    const _hoisted_1$4 = ["data-bs-backdrop", "data-bs-keyboard"];
+    const _hoisted_2$1 = { class: "modal-content shadow-lg" };
+    const _hoisted_3$1 = {
       key: 0,
       class: "modal-header"
     };
-    const _hoisted_4 = { class: "modal-title h2" };
-    const _hoisted_5 = {
+    const _hoisted_4$1 = { class: "modal-title h2" };
+    const _hoisted_5$1 = {
       key: 0,
       type: "button",
       class: "btn-close",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     };
-    const _hoisted_6 = {
+    const _hoisted_6$1 = {
       ref: "body",
       class: "modal-body"
     };
@@ -19662,21 +19660,21 @@
         createBaseVNode("div", {
           class: normalizeClass(["modal-dialog", $options.sizeClass])
         }, [
-          createBaseVNode("div", _hoisted_2, [
+          createBaseVNode("div", _hoisted_2$1, [
             ($props.title)
-              ? (openBlock(), createElementBlock("div", _hoisted_3, [
-                  createBaseVNode("div", _hoisted_4, toDisplayString($props.title), 1 /* TEXT */),
+              ? (openBlock(), createElementBlock("div", _hoisted_3$1, [
+                  createBaseVNode("div", _hoisted_4$1, toDisplayString($props.title), 1 /* TEXT */),
                   ($props.backdrop != "static")
-                    ? (openBlock(), createElementBlock("button", _hoisted_5))
+                    ? (openBlock(), createElementBlock("button", _hoisted_5$1))
                     : createCommentVNode("v-if", true)
                 ]))
               : createCommentVNode("v-if", true),
-            createBaseVNode("div", _hoisted_6, [
+            createBaseVNode("div", _hoisted_6$1, [
               renderSlot(_ctx.$slots, "default")
             ], 512 /* NEED_PATCH */)
           ])
         ], 2 /* CLASS */)
-      ], 8 /* PROPS */, _hoisted_1$3))
+      ], 8 /* PROPS */, _hoisted_1$4))
     }
 
     script$4.render = render$4;
@@ -19706,13 +19704,13 @@
     		},
     	};
 
-    const _hoisted_1$2 = { key: 0 };
+    const _hoisted_1$3 = { key: 0 };
 
     function render$3(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VModal = resolveComponent("VModal");
 
       return (_ctx.modals.length)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$2, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$3, [
             (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.modals, (modal) => {
               return (openBlock(), createBlock(_component_VModal, {
                 ref: $options.id(modal),
@@ -19759,10 +19757,10 @@
     		},
     	};
 
-    const _hoisted_1$1 = { class: "d-flex justify-content-between" };
+    const _hoisted_1$2 = { class: "d-flex justify-content-between" };
 
     function render$2(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$1, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$2, [
         createBaseVNode("button", {
           type: "submit",
           class: "btn btn-secondary",
@@ -19923,12 +19921,94 @@
     	},
     };
 
+    const _hoisted_1$1 = { class: "container-fluid" };
+    const _hoisted_2 = /*#__PURE__*/createBaseVNode("img", {
+      src: "/public/assets/uusilogo04_nobg.png",
+      alt: ""
+    }, null, -1 /* HOISTED */);
+    const _hoisted_3 = { class: "navbar-nav" };
+    const _hoisted_4 = { class: "nav-item dropdown" };
+    const _hoisted_5 = /*#__PURE__*/createBaseVNode("button", {
+      id: "usermenu",
+      class: "nav-link btn btn-unstyled fs-2 rounded-circle",
+      "data-bs-toggle": "dropdown",
+      "aria-expanded": "false"
+    }, [
+      /*#__PURE__*/createBaseVNode("i", { class: "bi-person-circle" })
+    ], -1 /* HOISTED */);
+    const _hoisted_6 = {
+      key: 0,
+      class: "dropdown-menu dropdown-menu-end position-absolute",
+      "aria-labelledby": "usermenu"
+    };
+    const _hoisted_7 = /*#__PURE__*/createBaseVNode("li", null, [
+      /*#__PURE__*/createBaseVNode("hr", { class: "dropdown-divider" })
+    ], -1 /* HOISTED */);
+    const _hoisted_8 = /*#__PURE__*/createTextVNode("Profile");
+
     function render$1(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", null, [
-        createBaseVNode("button", {
-          onClick: _cache[0] || (_cache[0] = $event => ($options.logOut()))
-        }, "Log out")
-      ]))
+      const _component_router_link = resolveComponent("router-link");
+
+      return (openBlock(), createElementBlock("nav", {
+        class: normalizeClass(["navbar navbar-expand-sm shadow mb-4 mb-md-5", _ctx.$colorScheme.navbar])
+      }, [
+        createBaseVNode("div", _hoisted_1$1, [
+          createVNode(_component_router_link, {
+            to: { name: "home" },
+            class: "navbar-brand hki-logo py-0"
+          }, {
+            default: withCtx(() => [
+              _hoisted_2,
+              createCommentVNode(" <svg height='48' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 79 35'>\n\t\t\t\t\t<path fill-rule='nonzero' d='M72.46 15.53c2.01 0 3.25 1.16 3.25 3.03v.75h-3.89c-2.97 0-4.82 1.46-4.82 3.88 0 2.54 1.85 3.94 4.77 3.94 1.65 0 3.25-.69 3.94-1.98v1c0 .46.39.85.86.85.46 0 .85-.39.85-.86v-7.58c0-2.81-1.77-4.68-4.96-4.68-2.32 0-3.8.96-4.58 2.17a.85.85 0 0 0-.14.47c0 .44.36.8.8.8.25 0 .44-.08.72-.39a3.82 3.82 0 0 1 3.2-1.4Zm-.53 10c-2.15 0-3.14-.9-3.14-2.34 0-1.6 1.24-2.34 3.03-2.34h3.89V22c0 2.34-1.85 3.52-3.78 3.52ZM61.88 7.15a.9.9 0 0 0-.88.88v15.74C61 25.9 62.02 27 63.87 27a.83.83 0 0 0 0-1.65c-.75 0-1.1-.48-1.1-1.58V8.03a.89.89 0 0 0-.89-.88Zm-14 6.89c-.5 0-.88.39-.88.88v7.2c0 2.61.88 5.01 5.13 5.01 4.27 0 5.12-2.4 5.12-5.01v-7.2c0-.5-.38-.88-.85-.88a.9.9 0 0 0-.91.88v7.2c0 1.79-.58 3.33-3.36 3.33-2.79 0-3.37-1.54-3.37-3.33v-7.2c0-.5-.4-.88-.88-.88Zm-6.41 4.08v7.94c0 .5.41.94.93.94.53 0 .94-.45.94-.94V8.94c0-.5-.41-.94-.94-.94a.95.95 0 0 0-.93.94v7.47h-9.6V8.94c0-.5-.4-.94-.93-.94a.95.95 0 0 0-.94.94v17.12c0 .5.41.94.94.94.52 0 .93-.45.93-.94v-7.94h9.6Z'/>\n\t\t\t\t</svg> ")
+            ]),
+            _: 1 /* STABLE */
+          }),
+          createBaseVNode("ul", _hoisted_3, [
+            createBaseVNode("li", _hoisted_4, [
+              _hoisted_5,
+              ($data.loggedUser)
+                ? (openBlock(), createElementBlock("ul", _hoisted_6, [
+                    ($data.loggedUser.isadmin)
+                      ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
+                          (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.navigation, ({ name, label }) => {
+                            return (openBlock(), createElementBlock("li", { key: name }, [
+                              createVNode(_component_router_link, {
+                                to: { name },
+                                class: "dropdown-item"
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(label), 1 /* TEXT */)
+                                ]),
+                                _: 2 /* DYNAMIC */
+                              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["to"])
+                            ]))
+                          }), 128 /* KEYED_FRAGMENT */)),
+                          _hoisted_7
+                        ], 64 /* STABLE_FRAGMENT */))
+                      : createCommentVNode("v-if", true),
+                    createBaseVNode("li", null, [
+                      createVNode(_component_router_link, {
+                        to: { name: "user", params: { id: $data.loggedUser.id } },
+                        class: "dropdown-item"
+                      }, {
+                        default: withCtx(() => [
+                          _hoisted_8
+                        ]),
+                        _: 1 /* STABLE */
+                      }, 8 /* PROPS */, ["to"])
+                    ]),
+                    createBaseVNode("li", null, [
+                      createBaseVNode("button", {
+                        onClick: _cache[0] || (_cache[0] = $event => ($options.logOut())),
+                        class: "dropdown-item"
+                      }, "Log out")
+                    ])
+                  ]))
+                : createCommentVNode("v-if", true)
+            ])
+          ])
+        ])
+      ], 2 /* CLASS */))
     }
 
     script$1.render = render$1;
