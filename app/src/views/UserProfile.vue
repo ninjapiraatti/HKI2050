@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import FormUserInfo from '@forms/FormUserInfo.vue'
 import FormCharacter from '@forms/FormCharacter.vue'
 import { ref, inject } from 'vue'
 export default {

@@ -43,7 +43,7 @@ async function handleHttpStatus(response) {
 			type: 'error',
 			title: `Error ${response.status}`,
 			text: errorMessage,
-			time: 5000,
+			time: 1000,
 		}))
 	}
 
