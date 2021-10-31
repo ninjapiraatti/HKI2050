@@ -157,14 +157,6 @@ export const api = {
 		save: save('/api/users/{id}'),
 		delete: remove('/api/users/{id}'),
 
-		skills: {
-			save: save({
-				create: '/api/users/{user_id}/skills',
-				update: '/api/users/skills/{id}',
-			}),
-			delete: remove('/api/users/skills/{id}'),
-		},
-
 		files: {
 			get: (data = {}) => {
 				if ('user_id' in data) return getArray('/api/users/{user_id}/uploads')(data)
@@ -183,6 +175,18 @@ export const api = {
 			},
 
 			delete: remove('/api/users/uploads/{id}'),
+		},
+		characters: {
+			get: async (data = {}) => {
+				const characters = await getArray('/api/users/{id}/characters')(data)
+	
+				return characters
+			},
+	
+			save: save({
+				create: '/api/users/{user_id}/reservations',
+				update: '/api/users/reservations/{id}',
+			}),
 		},
 
 		password: {
@@ -203,6 +207,28 @@ export const api = {
 
 			out: () => request({ url: '/api/auth', method: 'DELETE' }),
 		},
+	},
+	characters: {
+		get: async (data = {}) => {
+			const characters = await getArray('/api/users/{id}/characters')(data)
+
+			characters.forEach(reservation => {
+				if (reservation.begin_time) reservation.begin_time = new Date(reservation.begin_time)
+				if (reservation.end_time) reservation.end_time = new Date(reservation.end_time)
+			})
+
+			return characters
+		},
+
+		save: save({
+			create: '/api/users/{user_id}/reservations',
+			update: '/api/users/reservations/{id}',
+		}),
+
+		delete: remove('/api/users/reservations/{id}'),
+		get: getArray('/api/characters'),
+		save: save('/api/characters/{id}'),
+		delete: remove('/api/characters/{id}'),
 	},
 }
 

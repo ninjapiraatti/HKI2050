@@ -43,7 +43,7 @@ pub async fn add_character(
 	}
 }
 
-pub async fn get_by_uuid(
+pub async fn get_by_character_uuid(
 	character_data: web::Path<String>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
@@ -60,7 +60,33 @@ pub async fn get_by_uuid(
 		return Err(ServiceError::AdminRequired);
 	}
 
-	let res = web::block(move || characters_storage::query_characters(user_id, &pool)).await;
+	let res = web::block(move || characters_storage::query_characters_by_character_uuid(user_id, &pool)).await;
+	match res {
+		Ok(project) => Ok(HttpResponse::Ok().json(&project)),
+		Err(err) => match err {
+			BlockingError::Error(service_error) => Err(service_error.into()),
+			BlockingError::Canceled => Err(ServiceError::InternalServerError),
+		},
+	}
+}
+
+pub async fn get_by_user_uuid(
+	character_data: web::Path<String>,
+	pool: web::Data<Pool>,
+	logged_user: LoggedUser,
+) -> Result<HttpResponse, ServiceError> {
+	trace!(
+		"Getting user characters: logged_user = {:#?}",
+		&logged_user
+	);
+
+	let user_id = logged_user.id;
+
+	if logged_user.isadmin == false && logged_user.id != user_id {
+		return Err(ServiceError::AdminRequired);
+	}
+
+	let res = web::block(move || characters_storage::query_characters_by_user_uuid(user_id, &pool)).await;
 	match res {
 		Ok(project) => Ok(HttpResponse::Ok().json(&project)),
 		Err(err) => match err {

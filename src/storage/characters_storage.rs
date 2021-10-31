@@ -31,7 +31,21 @@ pub fn create_character(
 	Ok(character)
 }
 
-pub fn query_characters(
+pub fn query_characters_by_character_uuid(
+	q_user_id: uuid::Uuid,
+	pool: &web::Data<Pool>,
+) -> Result<Vec<Character>, Error> {
+	use crate::schema::characters::dsl::{user_id, characters};
+	let conn: &PgConnection = &pool.get().unwrap();
+
+	let characters_res = characters
+		.filter(user_id.eq(&q_user_id))
+		.load::<Character>(conn)?;
+
+	Ok(characters_res)
+}
+
+pub fn query_characters_by_user_uuid(
 	q_user_id: uuid::Uuid,
 	pool: &web::Data<Pool>,
 ) -> Result<Vec<Character>, Error> {

@@ -116,8 +116,13 @@ async fn main() -> std::io::Result<()> {
 							.route(web::delete().to(handlers::users_handler::delete_user)),
 					)
 					.service(
-						web::resource("/characters/{user_or_character_id}")
-							.route(web::get().to(handlers::character_handler::get_by_uuid))
+						web::resource("/users/{user_id}/characters")
+							.route(web::get().to(handlers::character_handler::get_by_user_uuid))
+							.route(web::post().to(handlers::character_handler::add_character))
+					)
+					.service(
+						web::resource("/characters/{character_id}")
+							.route(web::get().to(handlers::character_handler::get_by_character_uuid))
 							.route(web::post().to(handlers::character_handler::add_character))
 							.route(web::delete().to(handlers::character_handler::delete_character)),
 					)

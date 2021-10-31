@@ -8256,14 +8256,6 @@
     		save: save('/api/users/{id}'),
     		delete: remove('/api/users/{id}'),
 
-    		skills: {
-    			save: save({
-    				create: '/api/users/{user_id}/skills',
-    				update: '/api/users/skills/{id}',
-    			}),
-    			delete: remove('/api/users/skills/{id}'),
-    		},
-
     		files: {
     			get: (data = {}) => {
     				if ('user_id' in data) return getArray('/api/users/{user_id}/uploads')(data)
@@ -8282,6 +8274,18 @@
     			},
 
     			delete: remove('/api/users/uploads/{id}'),
+    		},
+    		characters: {
+    			get: async (data = {}) => {
+    				const characters = await getArray('/api/users/{id}/characters')(data);
+    	
+    				return characters
+    			},
+    	
+    			save: save({
+    				create: '/api/users/{user_id}/reservations',
+    				update: '/api/users/reservations/{id}',
+    			}),
     		},
 
     		password: {
@@ -8302,6 +8306,28 @@
 
     			out: () => request({ url: '/api/auth', method: 'DELETE' }),
     		},
+    	},
+    	characters: {
+    		get: async (data = {}) => {
+    			const characters = await getArray('/api/users/{id}/characters')(data);
+
+    			characters.forEach(reservation => {
+    				if (reservation.begin_time) reservation.begin_time = new Date(reservation.begin_time);
+    				if (reservation.end_time) reservation.end_time = new Date(reservation.end_time);
+    			});
+
+    			return characters
+    		},
+
+    		save: save({
+    			create: '/api/users/{user_id}/reservations',
+    			update: '/api/users/reservations/{id}',
+    		}),
+
+    		delete: remove('/api/users/reservations/{id}'),
+    		get: getArray('/api/characters'),
+    		save: save('/api/characters/{id}'),
+    		delete: remove('/api/characters/{id}'),
     	},
     };
 
@@ -18779,12 +18805,10 @@
     			console.log("lol");
     		}
     		this.user = this.store.state.loggeduser;
-    		/*
     		await Promise.all([
-    			this.getUser(),
+    			// this.getUser(),
     			this.getCharacters(),
-    		])
-    		*/
+    		]);
     	},
 
     	methods: {
@@ -18801,37 +18825,39 @@
     				skill.levelLabel = this.store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label
     			})
     		},
+    		*/
 
     		async editUser(props = {}) {
     			const result = await this.$modal({
     				title: 'Edit user info',
     				component: FormUserInfo,
     				props,
-    			})
+    			});
 
-    			if (result) this.getUser()
+    			if (result) this.getUser();
     		},
 
     		async getCharacters() {
-    			this.characters = await this.$api.users.characters.get({ id: this.$route.params.id })
+    			console.log(this.$route.params);
+    			this.characters = await this.$api.users.characters.get({ id: this.$route.params.id });
     		},
 
     		async confirmDelete(type, data) {
-    			const success = await this.$confirm.delete(type, data)
+    			const success = await this.$confirm.delete(type, data);
     			
     			if (success) {
     				switch (type) {
     					case 'user':
-    						if (data.id == this.store.state.loggeduser.id) await this.$api.users.log.out()
-    						this.$router.push({ name: 'admin-users' })
+    						if (data.id == this.store.state.loggeduser.id) await this.$api.users.log.out();
+    						this.$router.push({ name: 'admin-users' });
     						break
 
     					case 'user.character':
-    						this.getUser()
+    						this.getUser();
     						break
     				}
     			}
-    		}*/
+    		}
     	},
     };
 
@@ -18842,10 +18868,22 @@
     const _hoisted_5$5 = { class: "card-header d-flex align-items-center" };
     const _hoisted_6$4 = { class: "h3 mb-0 flex-grow-1" };
     const _hoisted_7$3 = { class: "card-body" };
-    const _hoisted_8$3 = /*#__PURE__*/createBaseVNode("div", { class: "context-actions hstack gap-1 justify-content-end" }, [
-      /*#__PURE__*/createCommentVNode(" <button class='btn btn-unstyled px-1 rounded' v-on:click=\"editUser(user)\"><i class=\"bi-pencil-fill\" title='Edit profile'></i></button>\n\t\t\t\t\t\t\t\t<button class='btn btn-unstyled px-1 rounded' v-on:click=\"confirmDelete('user', user)\"><i class=\"bi-trash-fill\" title='Delete profile'></i></button> ")
-    ], -1 /* HOISTED */);
-    const _hoisted_9$1 = /*#__PURE__*/createBaseVNode("div", { class: "col-md-8" }, " Lol ", -1 /* HOISTED */);
+    const _hoisted_8$3 = { class: "context-actions hstack gap-1 justify-content-end" };
+    const _hoisted_9$1 = /*#__PURE__*/createBaseVNode("i", {
+      class: "bi-pencil-fill",
+      title: "Edit profile"
+    }, null, -1 /* HOISTED */);
+    const _hoisted_10$1 = [
+      _hoisted_9$1
+    ];
+    const _hoisted_11$1 = /*#__PURE__*/createBaseVNode("i", {
+      class: "bi-trash-fill",
+      title: "Delete profile"
+    }, null, -1 /* HOISTED */);
+    const _hoisted_12 = [
+      _hoisted_11$1
+    ];
+    const _hoisted_13 = /*#__PURE__*/createBaseVNode("div", { class: "col-md-8" }, " Lol ", -1 /* HOISTED */);
 
     function render$c(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$c, [
@@ -18860,12 +18898,21 @@
                 ]),
                 createBaseVNode("div", _hoisted_7$3, [
                   createBaseVNode("div", null, toDisplayString($data.user.email), 1 /* TEXT */),
-                  _hoisted_8$3
+                  createBaseVNode("div", _hoisted_8$3, [
+                    createBaseVNode("button", {
+                      class: "btn btn-unstyled px-1 rounded",
+                      onClick: _cache[0] || (_cache[0] = $event => (_ctx.editUser($data.user)))
+                    }, _hoisted_10$1),
+                    createBaseVNode("button", {
+                      class: "btn btn-unstyled px-1 rounded",
+                      onClick: _cache[1] || (_cache[1] = $event => (_ctx.confirmDelete('user', $data.user)))
+                    }, _hoisted_12)
+                  ])
                 ])
               ])
             ], 2 /* CLASS */)
           ]),
-          _hoisted_9$1
+          _hoisted_13
         ])
       ]))
     }

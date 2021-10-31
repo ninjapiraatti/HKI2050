@@ -12,8 +12,8 @@
 						<div class='card-body'>
 							<div>{{ user.email }}</div>
 							<div class='context-actions hstack gap-1 justify-content-end'>
-								<!-- <button class='btn btn-unstyled px-1 rounded' v-on:click="editUser(user)"><i class="bi-pencil-fill" title='Edit profile'></i></button>
-								<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user', user)"><i class="bi-trash-fill" title='Delete profile'></i></button> -->
+								<button class='btn btn-unstyled px-1 rounded' v-on:click="editUser(user)"><i class="bi-pencil-fill" title='Edit profile'></i></button>
+								<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user', user)"><i class="bi-trash-fill" title='Delete profile'></i></button>
 							</div>
 						</div>
 					</div>
@@ -48,12 +48,10 @@ export default {
 			console.log("lol")
 		}
 		this.user = this.store.state.loggeduser
-		/*
 		await Promise.all([
-			this.getUser(),
+			// this.getUser(),
 			this.getCharacters(),
 		])
-		*/
 	},
 
 	methods: {
@@ -70,6 +68,7 @@ export default {
 				skill.levelLabel = this.store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label
 			})
 		},
+		*/
 
 		async editUser(props = {}) {
 			const result = await this.$modal({
@@ -82,6 +81,7 @@ export default {
 		},
 
 		async getCharacters() {
+			console.log(this.$route.params)
 			this.characters = await this.$api.users.characters.get({ id: this.$route.params.id })
 		},
 
@@ -100,7 +100,7 @@ export default {
 						break
 				}
 			}
-		}*/
+		}
 	},
 }
 </script>
