@@ -19,6 +19,14 @@ export default modal => {
 				title = 'profile'
 				apiCall = api.users.delete.bind(null, data.id)
 				break
+			
+			case 'user.character':
+				title = data.description
+				apiCall = api.users.characters.delete.bind(null, {
+					id: data.id,
+					user_id: data.user_id,
+				})
+				break
 		}
 	
 		const confirmed = await confirm({

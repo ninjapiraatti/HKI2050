@@ -185,8 +185,10 @@ export const api = {
 	
 			save: save({
 				create: '/api/users/{user_id}/characters',
-				update: '/api/characters/{id}', // Now what
+				update: '/api/users/characters/{id}',
 			}),
+
+			delete: remove('/api/users/characters/{id}'),
 		},
 
 		password: {

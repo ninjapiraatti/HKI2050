@@ -72,3 +72,26 @@ pub fn delete_character(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), 
 	}
 	Err(NotFound)
 }
+
+pub fn update_character(
+	q_uuid_data: uuid::Uuid,
+	q_name: String,
+	q_description: String,
+	q_email: String,
+	pool: &web::Data<Pool>,
+) -> Result<Character, Error> {
+	use crate::schema::characters::dsl::*;
+	use crate::schema::characters::dsl::{id, updated_by};
+	let conn: &PgConnection = &pool.get().unwrap();
+
+	let user_character = diesel::update(characters)
+		.filter(id.eq(q_uuid_data))
+		.set((
+			name.eq(q_name),
+			description.eq(q_description),
+			updated_by.eq(q_email),
+		))
+		.get_result::<Character>(conn)?;
+
+	Ok(user_character)
+}

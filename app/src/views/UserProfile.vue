@@ -91,20 +91,20 @@ export default {
 	},
 
 	methods: {
-		/*
 		async getUser() {
 			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ]
-			if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
+			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
 
 			const [ user ] = await Promise.all(promises)
 
 			this.user = user
 
+			/*
 			this.user.characters.forEach(character => {
 				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
 			})
+			*/
 		},
-		*/
 
 		async editUser(props = {}) {
 			const result = await this.$modal({
@@ -123,9 +123,8 @@ export default {
 
 		async editCharacter(props = {}) {
 			props.user_id = this.user.id
-			console.log(this.user.id)
 			const result = await this.$modal({
-				title: props.id ? `Edit skill: ${props.character_name}` : 'Add skill',
+				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
 				component: FormCharacter,
 				props,
 			})
@@ -134,8 +133,8 @@ export default {
 		},
 
 		async confirmDelete(type, data) {
+			console.log(type, data)
 			const success = await this.$confirm.delete(type, data)
-			
 			if (success) {
 				switch (type) {
 					case 'user':

@@ -56,7 +56,7 @@ export default {
 				this.$flashMessage.show({
 					type: 'success',
 					title: 'Successfully logged out',
-					time: 5000,
+					time: 500,
 				})
 				this.$router.push({ name: 'login' })
 			}

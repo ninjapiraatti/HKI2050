@@ -121,10 +121,14 @@ async fn main() -> std::io::Result<()> {
 							.route(web::post().to(handlers::character_handler::add_character))
 					)
 					.service(
+						web::resource("/users/characters/{character_id}")
+							.route(web::put().to(handlers::character_handler::update_character))
+							.route(web::delete().to(handlers::character_handler::delete_character)),
+					)
+					.service(
 						web::resource("/characters/{character_id}")
 							.route(web::get().to(handlers::character_handler::get_by_character_uuid))
-							.route(web::post().to(handlers::character_handler::add_character))
-							.route(web::delete().to(handlers::character_handler::delete_character)),
+							.route(web::post().to(handlers::character_handler::add_character)),
 					)
 					.service(
 						web::resource("/auth")

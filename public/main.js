@@ -8284,8 +8284,10 @@
     	
     			save: save({
     				create: '/api/users/{user_id}/characters',
-    				update: '/api/characters/{id}', // Now what
+    				update: '/api/users/characters/{id}',
     			}),
+
+    			delete: remove('/api/users/characters/{id}'),
     		},
 
     		password: {
@@ -18794,7 +18796,19 @@
     			}
     		},
     		props: {
+    			id: {
+    				type: String,
+    				default: undefined,
+    			},
     			user_id: {
+    				type: String,
+    				required: true,
+    			},
+    			name: {
+    				type: String,
+    				default: undefined,
+    			},
+    			description: {
     				type: String,
     				default: undefined,
     			},
@@ -18822,6 +18836,7 @@
     		},
     		
     		mounted() {
+    			console.log(this.$props);
     			//if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
     			//if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
     		},
@@ -18937,20 +18952,20 @@
     	},
 
     	methods: {
-    		/*
     		async getUser() {
-    			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ]
-    			if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
+    			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ];
+    			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
 
-    			const [ user ] = await Promise.all(promises)
+    			const [ user ] = await Promise.all(promises);
 
-    			this.user = user
+    			this.user = user;
 
+    			/*
     			this.user.characters.forEach(character => {
     				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
     			})
+    			*/
     		},
-    		*/
 
     		async editUser(props = {}) {
     			const result = await this.$modal({
@@ -18969,9 +18984,8 @@
 
     		async editCharacter(props = {}) {
     			props.user_id = this.user.id;
-    			console.log(this.user.id);
     			const result = await this.$modal({
-    				title: props.id ? `Edit skill: ${props.character_name}` : 'Add skill',
+    				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
     				component: script$d,
     				props,
     			});
@@ -18980,8 +18994,8 @@
     		},
 
     		async confirmDelete(type, data) {
+    			console.log(type, data);
     			const success = await this.$confirm.delete(type, data);
-    			
     			if (success) {
     				switch (type) {
     					case 'user':
@@ -20073,6 +20087,14 @@
     				title = 'profile';
     				apiCall = api.users.delete.bind(null, data.id);
     				break
+    			
+    			case 'user.character':
+    				title = data.description;
+    				apiCall = api.users.characters.delete.bind(null, {
+    					id: data.id,
+    					user_id: data.user_id,
+    				});
+    				break
     		}
     	
     		const confirmed = await confirm({
@@ -20191,7 +20213,7 @@
     				this.$flashMessage.show({
     					type: 'success',
     					title: 'Successfully logged out',
-    					time: 5000,
+    					time: 500,
     				});
     				this.$router.push({ name: 'login' });
     			}

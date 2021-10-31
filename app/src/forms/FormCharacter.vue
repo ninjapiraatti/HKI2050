@@ -50,7 +50,19 @@
 			}
 		},
 		props: {
+			id: {
+				type: String,
+				default: undefined,
+			},
 			user_id: {
+				type: String,
+				required: true,
+			},
+			name: {
+				type: String,
+				default: undefined,
+			},
+			description: {
 				type: String,
 				default: undefined,
 			},
@@ -78,6 +90,7 @@
 		},
 		
 		mounted() {
+			console.log(this.$props)
 			//if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
 			//if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
 		},
