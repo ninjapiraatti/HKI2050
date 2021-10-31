@@ -30,7 +30,8 @@ pub async fn add_character(
       user_id, 
       character_data.name.clone(), 
       character_data.description.clone(), 
-      &pool
+			logged_user.email,
+      &pool,
     )
 	})
 	.await;

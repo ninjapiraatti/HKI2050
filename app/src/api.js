@@ -178,14 +178,14 @@ export const api = {
 		},
 		characters: {
 			get: async (data = {}) => {
-				const characters = await getArray('/api/users/{id}/characters')(data)
+				const characters = await getArray('/api/users/{user_id}/characters')(data)
 	
 				return characters
 			},
 	
 			save: save({
-				create: '/api/users/{user_id}/reservations',
-				update: '/api/users/reservations/{id}',
+				create: '/api/users/{user_id}/characters',
+				update: '/api/characters/{id}', // Now what
 			}),
 		},
 

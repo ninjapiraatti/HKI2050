@@ -11,6 +11,7 @@ pub fn create_character(
 	q_user_id: uuid::Uuid,
 	q_name: String,
 	q_description: String,
+	q_email: String,
 	pool: &web::Data<Pool>,
 ) -> Result<Character, Error> {
 	use crate::schema::characters::dsl::characters;
@@ -22,6 +23,7 @@ pub fn create_character(
 		name: q_name,
 		description: q_description,
 		created_at: chrono::Local::now().naive_local(),
+		updated_by: q_email,
 	};
 
 	let character = diesel::insert_into(characters)

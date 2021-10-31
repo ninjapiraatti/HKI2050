@@ -13,4 +13,5 @@ pub struct Character {
 	pub name: String,
   pub description: String,
   pub created_at: chrono::NaiveDateTime,
+  pub updated_by: String,
 }

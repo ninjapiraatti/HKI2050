@@ -19,14 +19,50 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-8">
-				Lol
+			<div class="mt-4 mt-md-0 col-md-8">
+				<div class="card shadow" :class='$colorScheme.card'>
+					<div class='card-header'>
+						<div class="d-flex flex-wrap justify-content-between align-items-center">
+							<h3 class="h3 mb-0">Characters</h3>
+							<button class="btn btn-primary gradient" v-on:click="editCharacter()">Add character</button>
+						</div>
+					</div>
+					<div class='card-body'>
+						<div v-if='characters && characters.length' class="table-responsive">
+							<table class="table table-striped mb-0" :class='$colorScheme.table'>
+								<thead>
+									<tr>
+										<th scope="col">Character</th>
+										<th scope="col">Level</th>
+										<th scope="col" class='text-center'>Years</th>
+										<th scope="col" class='text-end'>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="character in characters" :key="character.id" class='context'>
+										<td>{{ character.name }}</td>
+										<td>{{ character.description }}</td>
+										<td class='text-center'>{{ character.years }}</td>
+										<td class='text-end'>
+											<div class='context-actions hstack gap-1 justify-content-end'>
+												<button class='btn btn-unstyled px-1 rounded' v-on:click="editCharacter(character)"><i class="bi-pencil-fill" title='Edit character'></i></button>
+												<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user.character', character)"><i class="bi-trash-fill" title='Delete character'></i></button>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div v-else class='fs-3 fw-light text-muted text-center p-4'>No characters</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+import FormCharacter from '@forms/FormCharacter.vue'
 import { ref, inject } from 'vue'
 export default {
 	name: 'UserProfile',
@@ -58,14 +94,14 @@ export default {
 		/*
 		async getUser() {
 			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ]
-			if (!this.store.state.skillLevels.length) promises.push(this.store.dispatch('getSkillLevels'))
+			if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
 
 			const [ user ] = await Promise.all(promises)
 
 			this.user = user
 
-			this.user.skills.forEach(skill => {
-				skill.levelLabel = this.store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label
+			this.user.characters.forEach(character => {
+				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
 			})
 		},
 		*/
@@ -82,7 +118,19 @@ export default {
 
 		async getCharacters() {
 			console.log(this.$route.params)
-			this.characters = await this.$api.users.characters.get({ id: this.$route.params.id })
+			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id })
+		},
+
+		async editCharacter(props = {}) {
+			props.user_id = this.user.id
+			console.log(this.user.id)
+			const result = await this.$modal({
+				title: props.id ? `Edit skill: ${props.character_name}` : 'Add skill',
+				component: FormCharacter,
+				props,
+			})
+
+			if (result) this.getUser()
 		},
 
 		async confirmDelete(type, data) {

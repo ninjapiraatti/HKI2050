@@ -4,7 +4,7 @@
 		<div>
 			<label for='label' class='form-label'>Name</label>
 			<VField
-				v-model='form.label'
+				v-model='form.name'
 				rules='required'
 				type='text'
 				id='label'
@@ -12,7 +12,7 @@
 				label='Name'
 				aria-label='Name'
 				class='form-control'
-				:class='{ "is-invalid": errors.label }'
+				:class='{ "is-invalid": errors.name }'
 			/>
 			<ErrorMessage name='label' class='invalid-feedback shake' />
 		</div>
@@ -40,11 +40,17 @@
 </template>
 
 <script>
+	import { ref, inject } from 'vue'
 	export default {
 		name: 'FormCharacter',
-
+		setup() {
+			const store = inject('store')
+			return {
+				store
+			}
+		},
 		props: {
-			id: {
+			user_id: {
 				type: String,
 				default: undefined,
 			},
@@ -72,16 +78,16 @@
 		},
 		
 		mounted() {
-			if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
-			if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
+			//if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
+			//if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
 		},
 
 		methods: {
 			async onSubmit() {
 				this.sending = true
 
-				const skill = await this.$api.skills.save(this.form)
-				if (skill) this.$emit('success', skill)
+				const character = await this.$api.users.characters.save(this.form)
+				if (character) this.$emit('success', character)
 
 				this.sending = false
 			},

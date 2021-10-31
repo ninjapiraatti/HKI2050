@@ -8277,14 +8277,14 @@
     		},
     		characters: {
     			get: async (data = {}) => {
-    				const characters = await getArray('/api/users/{id}/characters')(data);
+    				const characters = await getArray('/api/users/{user_id}/characters')(data);
     	
     				return characters
     			},
     	
     			save: save({
-    				create: '/api/users/{user_id}/reservations',
-    				update: '/api/users/reservations/{id}',
+    				create: '/api/users/{user_id}/characters',
+    				update: '/api/characters/{id}', // Now what
     			}),
     		},
 
@@ -18601,7 +18601,7 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$f = {
+    var script$g = {
     	name: 'FormLogin',
     	setup() {
     	const store = inject('store');
@@ -18637,23 +18637,23 @@
     	},
     };
 
-    const _hoisted_1$e = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$f = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$b = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$c = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label me-3"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_3$b = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
-    const _hoisted_4$9 = ["disabled"];
+    const _hoisted_3$c = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
+    const _hoisted_4$a = ["disabled"];
     const _hoisted_5$6 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
     const _hoisted_6$5 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$4 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$2 = /*#__PURE__*/createTextVNode("Sign up");
 
-    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -18666,7 +18666,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$e,
+              _hoisted_1$f,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -18684,7 +18684,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_2$b,
+              _hoisted_2$c,
               createVNode(_component_VField, {
                 modelValue: $data.form.password,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.password = $event)),
@@ -18701,12 +18701,12 @@
                 class: "invalid-feedback shake"
               })
             ]),
-            createBaseVNode("div", _hoisted_3$b, [
+            createBaseVNode("div", _hoisted_3$c, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $data.sending,
                 class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$9),
+              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$a),
               createBaseVNode("div", _hoisted_5$6, [
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
@@ -18734,17 +18734,17 @@
       ]))
     }
 
-    script$f.render = render$f;
-    script$f.__file = "src/forms/FormLogin.vue";
+    script$g.render = render$g;
+    script$g.__file = "src/forms/FormLogin.vue";
 
-    var script$e = {
+    var script$f = {
     		name: 'Login',
 
     		async mounted() {
     			// Forgot password will return untrue
     			const success = await this.$modal({
     				title: 'Log in',
-    				component: script$f,
+    				component: script$g,
     				backdrop: 'static',
     			});
 
@@ -18755,35 +18755,160 @@
     		},
     	};
 
-    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
       return null
     }
 
-    script$e.render = render$e;
-    script$e.__file = "src/views/Login.vue";
+    script$f.render = render$f;
+    script$f.__file = "src/views/Login.vue";
 
-    var script$d = {
+    var script$e = {
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$d = { class: "container" };
-    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_1$e = { class: "container" };
+    const _hoisted_2$b = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
-    const _hoisted_3$a = [
-      _hoisted_2$a
+    const _hoisted_3$b = [
+      _hoisted_2$b
     ];
 
-    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$d, [
+    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$e, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-        }, _hoisted_3$a, 2 /* CLASS */)
+        }, _hoisted_3$b, 2 /* CLASS */)
       ]))
     }
 
+    script$e.render = render$e;
+    script$e.__file = "src/views/UserHome.vue";
+
+    var script$d = {
+    		name: 'FormCharacter',
+    		setup() {
+    			const store = inject('store');
+    			return {
+    				store
+    			}
+    		},
+    		props: {
+    			user_id: {
+    				type: String,
+    				default: undefined,
+    			},
+    		},
+
+    		computed: {
+    			submitLabel() {
+    				return this.sending ? 'Saving' : 'Save'
+    			},
+
+    			categories() {
+    				return this.store.state.skillCategories
+    			},
+
+    			scopes() {
+    				return this.store.state.skillScopes
+    			},
+    		},
+
+    		data() {
+    			return {
+    				sending: false,
+    				form: { ...this.$props },
+    			}
+    		},
+    		
+    		mounted() {
+    			//if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
+    			//if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
+    		},
+
+    		methods: {
+    			async onSubmit() {
+    				this.sending = true;
+
+    				const character = await this.$api.users.characters.save(this.form);
+    				if (character) this.$emit('success', character);
+
+    				this.sending = false;
+    			},
+    		},
+    	};
+
+    const _hoisted_1$d = /*#__PURE__*/createBaseVNode("label", {
+      for: "label",
+      class: "form-label"
+    }, "Name", -1 /* HOISTED */);
+    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("label", {
+      for: "description",
+      class: "form-label"
+    }, "Description", -1 /* HOISTED */);
+    const _hoisted_3$a = { class: "mt-label" };
+    const _hoisted_4$9 = ["disabled"];
+
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VField = resolveComponent("VField");
+      const _component_ErrorMessage = resolveComponent("ErrorMessage");
+      const _component_VForm = resolveComponent("VForm");
+
+      return (openBlock(), createBlock(_component_VForm, {
+        onSubmit: $options.onSubmit,
+        class: "vstack gap-2"
+      }, {
+        default: withCtx(({ errors }) => [
+          createBaseVNode("div", null, [
+            _hoisted_1$d,
+            createVNode(_component_VField, {
+              modelValue: $data.form.name,
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.name = $event)),
+              rules: "required",
+              type: "text",
+              id: "label",
+              name: "label",
+              label: "Name",
+              "aria-label": "Name",
+              class: normalizeClass(["form-control", { "is-invalid": errors.name }])
+            }, null, 8 /* PROPS */, ["modelValue", "class"]),
+            createVNode(_component_ErrorMessage, {
+              name: "label",
+              class: "invalid-feedback shake"
+            })
+          ]),
+          createBaseVNode("div", null, [
+            _hoisted_2$a,
+            createVNode(_component_VField, {
+              modelValue: $data.form.description,
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.description = $event)),
+              rules: "required",
+              type: "text",
+              id: "description",
+              name: "description",
+              label: "Description",
+              "aria-label": "Description",
+              class: normalizeClass(["form-control", { "is-invalid": errors.description }])
+            }, null, 8 /* PROPS */, ["modelValue", "class"]),
+            createVNode(_component_ErrorMessage, {
+              name: "description",
+              class: "invalid-feedback shake"
+            })
+          ]),
+          createBaseVNode("div", _hoisted_3$a, [
+            createBaseVNode("button", {
+              type: "submit",
+              disabled: $data.sending,
+              class: "btn btn-primary gradient float-end"
+            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$9)
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["onSubmit"]))
+    }
+
     script$d.render = render$d;
-    script$d.__file = "src/views/UserHome.vue";
+    script$d.__file = "src/forms/FormCharacter.vue";
 
     var script$c = {
     	name: 'UserProfile',
@@ -18815,14 +18940,14 @@
     		/*
     		async getUser() {
     			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ]
-    			if (!this.store.state.skillLevels.length) promises.push(this.store.dispatch('getSkillLevels'))
+    			if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
 
     			const [ user ] = await Promise.all(promises)
 
     			this.user = user
 
-    			this.user.skills.forEach(skill => {
-    				skill.levelLabel = this.store.state.skillLevels.find(({ id }) => id == skill.skillscopelevel_id).label
+    			this.user.characters.forEach(character => {
+    				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
     			})
     		},
     		*/
@@ -18839,7 +18964,19 @@
 
     		async getCharacters() {
     			console.log(this.$route.params);
-    			this.characters = await this.$api.users.characters.get({ id: this.$route.params.id });
+    			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id });
+    		},
+
+    		async editCharacter(props = {}) {
+    			props.user_id = this.user.id;
+    			console.log(this.user.id);
+    			const result = await this.$modal({
+    				title: props.id ? `Edit skill: ${props.character_name}` : 'Add skill',
+    				component: script$d,
+    				props,
+    			});
+
+    			if (result) this.getUser();
     		},
 
     		async confirmDelete(type, data) {
@@ -18883,7 +19020,52 @@
     const _hoisted_12 = [
       _hoisted_11$1
     ];
-    const _hoisted_13 = /*#__PURE__*/createBaseVNode("div", { class: "col-md-8" }, " Lol ", -1 /* HOISTED */);
+    const _hoisted_13 = { class: "mt-4 mt-md-0 col-md-8" };
+    const _hoisted_14 = { class: "card-header" };
+    const _hoisted_15 = { class: "d-flex flex-wrap justify-content-between align-items-center" };
+    const _hoisted_16 = /*#__PURE__*/createBaseVNode("h3", { class: "h3 mb-0" }, "Characters", -1 /* HOISTED */);
+    const _hoisted_17 = { class: "card-body" };
+    const _hoisted_18 = {
+      key: 0,
+      class: "table-responsive"
+    };
+    const _hoisted_19 = /*#__PURE__*/createBaseVNode("thead", null, [
+      /*#__PURE__*/createBaseVNode("tr", null, [
+        /*#__PURE__*/createBaseVNode("th", { scope: "col" }, "Character"),
+        /*#__PURE__*/createBaseVNode("th", { scope: "col" }, "Level"),
+        /*#__PURE__*/createBaseVNode("th", {
+          scope: "col",
+          class: "text-center"
+        }, "Years"),
+        /*#__PURE__*/createBaseVNode("th", {
+          scope: "col",
+          class: "text-end"
+        }, "Actions")
+      ])
+    ], -1 /* HOISTED */);
+    const _hoisted_20 = { class: "text-center" };
+    const _hoisted_21 = { class: "text-end" };
+    const _hoisted_22 = { class: "context-actions hstack gap-1 justify-content-end" };
+    const _hoisted_23 = ["onClick"];
+    const _hoisted_24 = /*#__PURE__*/createBaseVNode("i", {
+      class: "bi-pencil-fill",
+      title: "Edit character"
+    }, null, -1 /* HOISTED */);
+    const _hoisted_25 = [
+      _hoisted_24
+    ];
+    const _hoisted_26 = ["onClick"];
+    const _hoisted_27 = /*#__PURE__*/createBaseVNode("i", {
+      class: "bi-trash-fill",
+      title: "Delete character"
+    }, null, -1 /* HOISTED */);
+    const _hoisted_28 = [
+      _hoisted_27
+    ];
+    const _hoisted_29 = {
+      key: 1,
+      class: "fs-3 fw-light text-muted text-center p-4"
+    };
 
     function render$c(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$c, [
@@ -18901,18 +19083,67 @@
                   createBaseVNode("div", _hoisted_8$3, [
                     createBaseVNode("button", {
                       class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[0] || (_cache[0] = $event => (_ctx.editUser($data.user)))
+                      onClick: _cache[0] || (_cache[0] = $event => ($options.editUser($data.user)))
                     }, _hoisted_10$1),
                     createBaseVNode("button", {
                       class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[1] || (_cache[1] = $event => (_ctx.confirmDelete('user', $data.user)))
+                      onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $data.user)))
                     }, _hoisted_12)
                   ])
                 ])
               ])
             ], 2 /* CLASS */)
           ]),
-          _hoisted_13
+          createBaseVNode("div", _hoisted_13, [
+            createBaseVNode("div", {
+              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+            }, [
+              createBaseVNode("div", _hoisted_14, [
+                createBaseVNode("div", _hoisted_15, [
+                  _hoisted_16,
+                  createBaseVNode("button", {
+                    class: "btn btn-primary gradient",
+                    onClick: _cache[2] || (_cache[2] = $event => ($options.editCharacter()))
+                  }, "Add character")
+                ])
+              ]),
+              createBaseVNode("div", _hoisted_17, [
+                ($data.characters && $data.characters.length)
+                  ? (openBlock(), createElementBlock("div", _hoisted_18, [
+                      createBaseVNode("table", {
+                        class: normalizeClass(["table table-striped mb-0", _ctx.$colorScheme.table])
+                      }, [
+                        _hoisted_19,
+                        createBaseVNode("tbody", null, [
+                          (openBlock(true), createElementBlock(Fragment, null, renderList($data.characters, (character) => {
+                            return (openBlock(), createElementBlock("tr", {
+                              key: character.id,
+                              class: "context"
+                            }, [
+                              createBaseVNode("td", null, toDisplayString(character.name), 1 /* TEXT */),
+                              createBaseVNode("td", null, toDisplayString(character.description), 1 /* TEXT */),
+                              createBaseVNode("td", _hoisted_20, toDisplayString(character.years), 1 /* TEXT */),
+                              createBaseVNode("td", _hoisted_21, [
+                                createBaseVNode("div", _hoisted_22, [
+                                  createBaseVNode("button", {
+                                    class: "btn btn-unstyled px-1 rounded",
+                                    onClick: $event => ($options.editCharacter(character))
+                                  }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
+                                  createBaseVNode("button", {
+                                    class: "btn btn-unstyled px-1 rounded",
+                                    onClick: $event => ($options.confirmDelete('user.character', character))
+                                  }, _hoisted_28, 8 /* PROPS */, _hoisted_26)
+                                ])
+                              ])
+                            ]))
+                          }), 128 /* KEYED_FRAGMENT */))
+                        ])
+                      ], 2 /* CLASS */)
+                    ]))
+                  : (openBlock(), createElementBlock("div", _hoisted_29, "No characters"))
+              ])
+            ], 2 /* CLASS */)
+          ])
         ])
       ]))
     }
@@ -19585,10 +19816,10 @@
     		{ path: '/app/confirm', component: script$6, name: 'confirm' },
     		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
     		{ path: '/app/register', component: script$8, name: 'register' },
-    		{ path: '/app/user', component: script$d, name: 'user-home', beforeEnter: [needLogin] },
+    		{ path: '/app/user', component: script$e, name: 'user-home', beforeEnter: [needLogin] },
     		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
     		{ path: '/app/', component: script$5, name: 'page-home' },
-    		{ path: '/app/login', component: script$e, name: 'login' },
+    		{ path: '/app/login', component: script$f, name: 'login' },
     		{ path: '/app/user/:id', component: script$c, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
