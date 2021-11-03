@@ -30,6 +30,22 @@
 			<ErrorMessage name='email' class='invalid-feedback shake' />
 		</div>
 
+		<div>
+			<label for='username' class='form-label'>Username</label>
+			<VField
+				v-model='form.username'
+				rules='required'
+				type='username'
+				id='username'
+				name='username'
+				label='username'
+				aria-label='username'
+				class='form-control'
+				:class='{ "is-invalid": errors.username }'
+			/>
+			<ErrorMessage name='username' class='invalid-feedback shake' />
+		</div>
+
 		<div class='mt-label'>
 			<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
 		</div>
@@ -54,6 +70,10 @@
 			isadmin: {
 				type: Boolean,
 				default: false,
+			},
+			username: {
+				type: String,
+				default: undefined,
 			},
 			email: String,
 		},

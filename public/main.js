@@ -18650,7 +18650,7 @@
     const _hoisted_3$d = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
     const _hoisted_4$b = ["disabled"];
     const _hoisted_5$7 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
-    const _hoisted_6$5 = /*#__PURE__*/createTextVNode("Forgot password?");
+    const _hoisted_6$6 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$4 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$2 = /*#__PURE__*/createTextVNode("Sign up");
@@ -18713,7 +18713,7 @@
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
                     default: withCtx(() => [
-                      _hoisted_6$5
+                      _hoisted_6$6
                     ]),
                     _: 1 /* STABLE */
                   })
@@ -18804,6 +18804,10 @@
     				type: Boolean,
     				default: false,
     			},
+    			username: {
+    				type: String,
+    				default: undefined,
+    			},
     			email: String,
     		},
 
@@ -18844,8 +18848,12 @@
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_4$a = { class: "mt-label" };
-    const _hoisted_5$6 = ["disabled"];
+    const _hoisted_4$a = /*#__PURE__*/createBaseVNode("label", {
+      for: "username",
+      class: "form-label"
+    }, "Username", -1 /* HOISTED */);
+    const _hoisted_5$6 = { class: "mt-label" };
+    const _hoisted_6$5 = ["disabled"];
 
     function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -18890,12 +18898,30 @@
               class: "invalid-feedback shake"
             })
           ]),
-          createBaseVNode("div", _hoisted_4$a, [
+          createBaseVNode("div", null, [
+            _hoisted_4$a,
+            createVNode(_component_VField, {
+              modelValue: $data.form.username,
+              "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => ($data.form.username = $event)),
+              rules: "required",
+              type: "username",
+              id: "username",
+              name: "username",
+              label: "username",
+              "aria-label": "username",
+              class: normalizeClass(["form-control", { "is-invalid": errors.username }])
+            }, null, 8 /* PROPS */, ["modelValue", "class"]),
+            createVNode(_component_ErrorMessage, {
+              name: "username",
+              class: "invalid-feedback shake"
+            })
+          ]),
+          createBaseVNode("div", _hoisted_5$6, [
             createBaseVNode("button", {
               type: "submit",
               disabled: $data.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_5$6)
+            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_6$5)
           ])
         ]),
         _: 1 /* STABLE */
