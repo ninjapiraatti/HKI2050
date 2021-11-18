@@ -72,6 +72,8 @@ $nav-tabs-link-active-bg: $separator-color !default;
 $nav-tabs-link-active-border-color: $nav-tabs-link-active-bg $nav-tabs-link-active-bg $nav-tabs-link-active-bg !default;
 
 $dropdown-link-hover-bg: mix(white, $primary, 75%) !default;
+$dropdown-link-color: #fff;
+$dropdown-link-hover-color: #000;
 
 $table-border-width: 0 !default;
 

@@ -9186,14 +9186,14 @@ textarea.form-control-lg {
   padding: 0.25rem 1rem;
   clear: both;
   font-weight: 400;
-  color: #0e1c25;
+  color: #fff;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;
   border: 0;
 }
 .dropdown-item:hover, .dropdown-item:focus {
-  color: #0d1921;
+  color: #000;
   background-color: #d2f8ed;
 }
 .dropdown-item.active, .dropdown-item:active {
@@ -9223,7 +9223,7 @@ textarea.form-control-lg {
 .dropdown-item-text {
   display: block;
   padding: 0.25rem 1rem;
-  color: #0e1c25;
+  color: #fff;
 }
 
 .dropdown-menu-dark {

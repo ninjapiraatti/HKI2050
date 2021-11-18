@@ -12,18 +12,21 @@
 					<button id="usermenu" class='nav-link btn btn-unstyled fs-2 rounded-circle' data-bs-toggle="dropdown" aria-expanded="false">
 						<i class='bi-person-circle'></i>
 					</button>
-					<ul v-if="loggedUser" class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="usermenu">
-						<template v-if='loggedUser.isadmin'>
+					<ul class="dropdown-menu dropdown-menu-end position-absolute" aria-labelledby="usermenu">
+						<template v-if='loggedUser && loggedUser.isadmin'>
 							<li v-for='{ name, label } of navigation' :key='name'>
 								<router-link :to='{ name }' class='dropdown-item'>{{ label }}</router-link>
 							</li>
 							<li><hr class='dropdown-divider'></li>
 						</template>
-						<li>
+						<li v-if="loggedUser">
 							<router-link :to='{ name: "user", params: { id: loggedUser.id } }' class="dropdown-item">Profile</router-link>
 						</li>
-						<li>
-							<button v-on:click="logOut()" class="dropdown-item">Log out</button>
+						<li v-if="loggedUser">
+							<button v-on:click="logOut" class="dropdown-item">Log out</button>
+						</li>
+						<li v-else>
+							<router-link :to='{ name: "login" }' class='dropdown-item'>Log in</router-link>
 						</li>
 					</ul>
 				</li>
@@ -33,34 +36,38 @@
 </template>
 
 <script>
-import { inject } from 'vue'
+import { inject, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { flashMessage } from '@smartweb/vue-flash-message';
 export default {
 	name: 'TheHeader',
 	setup() {
+		const router = useRouter()
 		const store = inject('store')
-		return {
-			store
-		}
-	},
-	data() {
-		return {
-			loggedUser: this.store.state.loggeduser // Here loggedUser will result to menu rendering vs. not if you use the state directly
-		}
-	},
 
-	methods: {
-		logOut() {
-			const success = this.store.methods.logout()
+		let loggedUser = computed(() => store.state.loggeduser)
+
+		onMounted(() => loggedUser = store.state.loggeduser)
+
+		function logOut() {
+			const success = store.methods.logout()
 			console.log(success)
+			console.log(router)
 			if (success) {
-				this.$flashMessage.show({
+				flashMessage.show({
 					type: 'success',
 					title: 'Successfully logged out',
 					time: 500,
 				})
-				this.$router.push({ name: 'login' })
+				router.push({ name: 'login' })
 			}
-		},
+		}
+
+		return {
+			store,
+			loggedUser,
+			logOut
+		}
 	},
 }
 </script>

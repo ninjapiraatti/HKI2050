@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<TheHeader v-on:loggedout="logOut" v-if="store.state.counter"/>
+		<TheHeader />
 		<FlashMessage position="right top" />
 		<TheModal />
 		<main id='main'>
@@ -12,10 +12,11 @@
 <script>
 import { provide } from 'vue'
 import store from '@root/store'
-import TheHeader from '@components/TheHeader.vue' 
+import TheHeader from '@components/TheHeader.vue'
 export default {
 	setup() {
 		provide('store', store)
+
 		return {
 			store
 		}
@@ -23,12 +24,6 @@ export default {
 	name: 'App',
 	components: {
 		TheHeader
-	},
-
-	methods: {
-		logOut() {
-			this.$router.push({ name: 'login' })
-		},
 	},
 }
 </script>

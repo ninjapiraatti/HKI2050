@@ -15,40 +15,43 @@
 </template>
 
 <script>
-	import { Modal } from 'bootstrap'
-
-	const sizeClasses = {
-		sm: 'modal-sm',
-		lg: 'modal-lg',
-		xl: 'modal-xl',
-	}
-
-	export default {
-		name: 'VModal',
-		
-		props: {
-			title: String,
-			backdrop: {
-				type: [Boolean, String],
-				default: true,
-				validator: value => typeof value == 'boolean' || value == 'static',
-			},
-			size: {
-				type: String,
-				validator: value => Object.keys(sizeClasses).includes(value)
-			},
-			showAtStart: false,
+import { Modal } from 'bootstrap'
+import { onMounted } from '@vue/runtime-core'
+const sizeClasses = {
+	sm: 'modal-sm',
+	lg: 'modal-lg',
+	xl: 'modal-xl',
+}
+export default {
+	name: 'VModal',
+	props: {
+		title: String,
+		backdrop: {
+			type: [Boolean, String],
+			default: true,
+			validator: value => typeof value == 'boolean' || value == 'static',
 		},
-
-		computed: {
-			sizeClass() {
-				return sizeClasses[this.size] || ''
-			},
+		size: {
+			type: String,
+			validator: value => Object.keys(sizeClasses).includes(value)
 		},
+		showAtStart: false,
+	},
+	setup() {
+		const sizeClass = computed(() => {
+			return sizeClasses[this.size] || ''
+		})
 
-		mounted() {
+		function show() {
+			this.modal.show()
+		}
+
+		function hide() {
+			this.modal.hide()
+		}
+
+		onMounted(() => {
 			this.modal = Modal.getOrCreateInstance(this.$refs.modal)
-
 			this.$refs.modal.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding') })
 			this.$refs.modal.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden') })
 			this.$refs.modal.addEventListener('show.bs.modal', () => { this.$emit('modal-showing') })
@@ -69,16 +72,13 @@
 			})
 
 			if (this.showAtStart) this.modal.show()
-		},
+		})
 
-		methods: {
-			show() {
-				this.modal.show()
-			},
-
-			hide() {
-				this.modal.hide()
-			}
+		return {
+			show,
+			hide,
+			sizeClass,
 		}
 	}
+}
 </script>

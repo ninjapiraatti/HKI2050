@@ -15,29 +15,32 @@
 </template>
 
 <script>
-	import VModal from '@components/VModal.vue'
-	
-	export default {
-		name: 'TheModal',
+import VModal from '@components/VModal.vue'
+export default {
+	name: 'TheModal',
+	setup() {
+		function id(modal) {
+			return `modal-${modal.id}`
+		}
 
-		components: {
-			VModal,
-		},
+		function removeModal(modal) {
+			this.modals.splice(this.modals.indexOf(modal), 1)
+			modal.resolve(null)
+		}
 
-		methods: {
-			id(modal) {
-				return `modal-${modal.id}`
-			},
+		function onSuccess(modal, payload) {
+			modal.resolve(payload)
+			this.$refs[this.id(modal)].hide()
+		}
 
-			removeModal(modal) {
-				this.modals.splice(this.modals.indexOf(modal), 1)
-				modal.resolve(null)
-			},
-
-			onSuccess(modal, payload) {
-				modal.resolve(payload)
-				this.$refs[this.id(modal)].hide()
-			},
-		},
-	}
+		return {
+			id,
+			removeModal,
+			onSuccess,
+		}
+	},
+	components: {
+		VModal,
+	},
+}
 </script>

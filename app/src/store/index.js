@@ -1,11 +1,9 @@
 import { reactive } from 'vue'
 import { api } from '@root/api.js'
-//import router from '@root/router.js'
 
 const state = reactive({
   counter: 666,
 	loggeduser: JSON.parse(localStorage.getItem('user')),
-	//loggeduser: true,
   colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
 })
 
@@ -22,7 +20,6 @@ const methods = {
 		try {
 			await api.users.log.out()
 			await this.setUser(null)
-			router.push({ name: 'login' })
 		} catch (error) {
 			console.warn(`Logout failed: ${error.message}`)
 			return false

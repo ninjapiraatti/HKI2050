@@ -1285,7 +1285,7 @@
             this._setter(newValue);
         }
     }
-    function computed(getterOrOptions, debugOptions) {
+    function computed$1(getterOrOptions, debugOptions) {
         let getter;
         let setter;
         if (isFunction(getterOrOptions)) {
@@ -2625,7 +2625,7 @@
                             warn$2(`Write operation failed: computed property "${key}" is readonly.`);
                         }
                         ;
-                const c = computed({
+                const c = computed$1({
                     get,
                     set
                 });
@@ -8097,7 +8097,7 @@
         initDev();
     }
 
-    let store$1, router$2, flashMessage;
+    let store$1, router$1, flashMessage;
 
     const errorMessages = {
     	UniqueViolation: 'Item already exists',
@@ -8151,14 +8151,14 @@
     	switch (response.status) {
     		case 401:
     			store$1.dispatch('setUser', null);
-    			if (router$2.currentRoute.value.name !== 'login') {
-    				router$2.push({ name: 'login', query: {
-    					redirect: router$2.currentRoute.value.fullPath,
+    			if (router$1.currentRoute.value.name !== 'login') {
+    				router$1.push({ name: 'login', query: {
+    					redirect: router$1.currentRoute.value.fullPath,
     				}});
     			}
     			break
     		case 500:
-    			router$2.push({ name: 'error', params: {
+    			router$1.push({ name: 'error', params: {
     				title: 'Error 500',
     				message: errorMessage,
     			}});
@@ -8336,19 +8336,16 @@
     var api$1 = {
     	install: (app, options) => {
     		store$1 = app.config.globalProperties.$store;
-    		router$2 = app.config.globalProperties.$router;
+    		router$1 = app.config.globalProperties.$router;
     		flashMessage = app.config.globalProperties.$flashMessage;
 
     		app.config.globalProperties.$api = api;
     	},
     };
 
-    //import router from '@root/router.js'
-
     const state = reactive({
       counter: 666,
     	loggeduser: JSON.parse(localStorage.getItem('user')),
-    	//loggeduser: true,
       colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
     });
 
@@ -8365,7 +8362,6 @@
     		try {
     			await api.users.log.out();
     			await this.setUser(null);
-    			router.push({ name: 'login' });
     		} catch (error) {
     			console.warn(`Logout failed: ${error.message}`);
     			return false
@@ -10298,8 +10294,8 @@
     function useLink(props) {
         const router = inject(routerKey);
         const currentRoute = inject(routeLocationKey);
-        const route = computed(() => router.resolve(unref(props.to)));
-        const activeRecordIndex = computed(() => {
+        const route = computed$1(() => router.resolve(unref(props.to)));
+        const activeRecordIndex = computed$1(() => {
             const { matched } = route.value;
             const { length } = matched;
             const routeMatched = matched[length - 1];
@@ -10323,9 +10319,9 @@
                 ? currentMatched.findIndex(isSameRouteRecord.bind(null, matched[length - 2]))
                 : index);
         });
-        const isActive = computed(() => activeRecordIndex.value > -1 &&
+        const isActive = computed$1(() => activeRecordIndex.value > -1 &&
             includesParams(currentRoute.params, route.value.params));
-        const isExactActive = computed(() => activeRecordIndex.value > -1 &&
+        const isExactActive = computed$1(() => activeRecordIndex.value > -1 &&
             activeRecordIndex.value === currentRoute.matched.length - 1 &&
             isSameRouteLocationParams(currentRoute.params, route.value.params));
         function navigate(e = {}) {
@@ -10358,7 +10354,7 @@
         }
         return {
             route,
-            href: computed(() => route.value.href),
+            href: computed$1(() => route.value.href),
             isActive,
             isExactActive,
             navigate,
@@ -10385,7 +10381,7 @@
         setup(props, { slots }) {
             const link = reactive(useLink(props));
             const { options } = inject(routerKey);
-            const elClass = computed(() => ({
+            const elClass = computed$1(() => ({
                 [getLinkClass(props.activeClass, options.linkActiveClass, 'router-link-active')]: link.isActive,
                 // [getLinkClass(
                 //   props.inactiveClass,
@@ -10490,9 +10486,9 @@
         setup(props, { attrs, slots }) {
             warnDeprecatedUsage();
             const injectedRoute = inject(routerViewLocationKey);
-            const routeToDisplay = computed(() => props.route || injectedRoute.value);
+            const routeToDisplay = computed$1(() => props.route || injectedRoute.value);
             const depth = inject(viewDepthKey, 0);
-            const matchedRouteRef = computed(() => routeToDisplay.value.matched[depth]);
+            const matchedRouteRef = computed$1(() => routeToDisplay.value.matched[depth]);
             provide(viewDepthKey, depth + 1);
             provide(matchedRouteKey, matchedRouteRef);
             provide(routerViewLocationKey, routeToDisplay);
@@ -11591,7 +11587,7 @@
                 const reactiveRoute = {};
                 for (const key in START_LOCATION_NORMALIZED) {
                     // @ts-expect-error: the key matches
-                    reactiveRoute[key] = computed(() => currentRoute.value[key]);
+                    reactiveRoute[key] = computed$1(() => currentRoute.value[key]);
                 }
                 app.provide(routerKey, router);
                 app.provide(routeLocationKey, reactive(reactiveRoute));
@@ -11643,6 +11639,14 @@
             }
         }
         return [leavingRecords, updatingRecords, enteringRecords];
+    }
+
+    /**
+     * Returns the router instance. Equivalent to using `$router` inside
+     * templates.
+     */
+    function useRouter() {
+        return inject(routerKey);
     }
 
     var top = 'top';
@@ -18653,7 +18657,7 @@
     const _hoisted_6$6 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$4 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
-    const _hoisted_9$2 = /*#__PURE__*/createTextVNode("Sign up");
+    const _hoisted_9$3 = /*#__PURE__*/createTextVNode("Sign up");
 
     function render$h(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -18723,7 +18727,7 @@
                   _hoisted_8$4,
                   createVNode(_component_router_link, { to: { name: "register" } }, {
                     default: withCtx(() => [
-                      _hoisted_9$2
+                      _hoisted_9$3
                     ]),
                     _: 1 /* STABLE */
                   })
@@ -19164,19 +19168,19 @@
     const _hoisted_6$4 = { class: "h3 mb-0 flex-grow-1" };
     const _hoisted_7$3 = { class: "card-body" };
     const _hoisted_8$3 = { class: "context-actions hstack gap-1 justify-content-end" };
-    const _hoisted_9$1 = /*#__PURE__*/createBaseVNode("i", {
+    const _hoisted_9$2 = /*#__PURE__*/createBaseVNode("i", {
       class: "bi-pencil-fill",
       title: "Edit profile"
     }, null, -1 /* HOISTED */);
-    const _hoisted_10$1 = [
-      _hoisted_9$1
+    const _hoisted_10$2 = [
+      _hoisted_9$2
     ];
-    const _hoisted_11$1 = /*#__PURE__*/createBaseVNode("i", {
+    const _hoisted_11$2 = /*#__PURE__*/createBaseVNode("i", {
       class: "bi-trash-fill",
       title: "Delete profile"
     }, null, -1 /* HOISTED */);
-    const _hoisted_12 = [
-      _hoisted_11$1
+    const _hoisted_12$1 = [
+      _hoisted_11$2
     ];
     const _hoisted_13 = { class: "mt-4 mt-md-0 col-md-8" };
     const _hoisted_14 = { class: "card-header" };
@@ -19242,11 +19246,11 @@
                     createBaseVNode("button", {
                       class: "btn btn-unstyled px-1 rounded",
                       onClick: _cache[0] || (_cache[0] = $event => ($options.editUser($data.user)))
-                    }, _hoisted_10$1),
+                    }, _hoisted_10$2),
                     createBaseVNode("button", {
                       class: "btn btn-unstyled px-1 rounded",
                       onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $data.user)))
-                    }, _hoisted_12)
+                    }, _hoisted_12$1)
                   ])
                 ])
               ])
@@ -19521,9 +19525,9 @@
     }, "Repeat password", -1 /* HOISTED */);
     const _hoisted_7$2 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
     const _hoisted_8$2 = ["disabled"];
-    const _hoisted_9 = { key: 0 };
-    const _hoisted_10 = /*#__PURE__*/createTextVNode("Already a user? ");
-    const _hoisted_11 = /*#__PURE__*/createTextVNode("Log in");
+    const _hoisted_9$1 = { key: 0 };
+    const _hoisted_10$1 = /*#__PURE__*/createTextVNode("Already a user? ");
+    const _hoisted_11$1 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19618,11 +19622,11 @@
                 class: "btn btn-primary gradient align-self-start"
               }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_8$2),
               (!$options.isAdmin)
-                ? (openBlock(), createElementBlock("div", _hoisted_9, [
-                    _hoisted_10,
+                ? (openBlock(), createElementBlock("div", _hoisted_9$1, [
+                    _hoisted_10$1,
                     createVNode(_component_router_link, { to: { name: "login" } }, {
                       default: withCtx(() => [
-                        _hoisted_11
+                        _hoisted_11$1
                       ]),
                       _: 1 /* STABLE */
                     })
@@ -19941,7 +19945,7 @@
     function render$5(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$5, [
         createBaseVNode("div", _hoisted_2$2, [
-          createTextVNode(toDisplayString($setup.store.state.loggeduser) + " " + toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
+          createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
           createBaseVNode("button", {
             onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
           }, "-"),
@@ -19968,7 +19972,7 @@
 
     const needAdminOrSelf = to => store.state.loggeduser.isadmin || to.params.id == store.state.loggeduser.id ? true : error(to);
 
-    const router$1 = createRouter({
+    const router = createRouter({
     	routes: [
     		{ path: '/', name: 'home', redirect: () => ({ name: store.state.loggeduser && store.state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
     		{ path: '/app/confirm', component: script$6, name: 'confirm' },
@@ -19990,7 +19994,7 @@
     });
 
     // Close modal before navigating
-    router$1.beforeEach((to, from, next) => {
+    router.beforeEach((to, from, next) => {
     	const modal = document.querySelector('.modal.show');
     	if (!modal) {
     		console.log(store.state.loggeduser);
@@ -20003,37 +20007,40 @@
     });
 
     const sizeClasses = {
-    		sm: 'modal-sm',
-    		lg: 'modal-lg',
-    		xl: 'modal-xl',
-    	};
-
-    	var script$4 = {
-    		name: 'VModal',
-    		
-    		props: {
-    			title: String,
-    			backdrop: {
-    				type: [Boolean, String],
-    				default: true,
-    				validator: value => typeof value == 'boolean' || value == 'static',
-    			},
-    			size: {
-    				type: String,
-    				validator: value => Object.keys(sizeClasses).includes(value)
-    			},
-    			showAtStart: false,
+    	sm: 'modal-sm',
+    	lg: 'modal-lg',
+    	xl: 'modal-xl',
+    };
+    var script$4 = {
+    	name: 'VModal',
+    	props: {
+    		title: String,
+    		backdrop: {
+    			type: [Boolean, String],
+    			default: true,
+    			validator: value => typeof value == 'boolean' || value == 'static',
     		},
-
-    		computed: {
-    			sizeClass() {
-    				return sizeClasses[this.size] || ''
-    			},
+    		size: {
+    			type: String,
+    			validator: value => Object.keys(sizeClasses).includes(value)
     		},
+    		showAtStart: false,
+    	},
+    	setup() {
+    		const sizeClass = computed(() => {
+    			return sizeClasses[this.size] || ''
+    		});
 
-    		mounted() {
+    		function show() {
+    			this.modal.show();
+    		}
+
+    		function hide() {
+    			this.modal.hide();
+    		}
+
+    		onMounted(() => {
     			this.modal = Modal.getOrCreateInstance(this.$refs.modal);
-
     			this.$refs.modal.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding'); });
     			this.$refs.modal.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden'); });
     			this.$refs.modal.addEventListener('show.bs.modal', () => { this.$emit('modal-showing'); });
@@ -20054,18 +20061,15 @@
     			});
 
     			if (this.showAtStart) this.modal.show();
-    		},
+    		});
 
-    		methods: {
-    			show() {
-    				this.modal.show();
-    			},
-
-    			hide() {
-    				this.modal.hide();
-    			}
+    		return {
+    			show,
+    			hide,
+    			sizeClass,
     		}
-    	};
+    	}
+    };
 
     const _hoisted_1$4 = ["data-bs-backdrop", "data-bs-keyboard"];
     const _hoisted_2$1 = { class: "modal-content shadow-lg" };
@@ -20117,28 +20121,32 @@
     script$4.__file = "src/components/VModal.vue";
 
     var script$3 = {
-    		name: 'TheModal',
+    	name: 'TheModal',
+    	setup() {
+    		function id(modal) {
+    			return `modal-${modal.id}`
+    		}
 
-    		components: {
-    			VModal: script$4,
-    		},
+    		function removeModal(modal) {
+    			this.modals.splice(this.modals.indexOf(modal), 1);
+    			modal.resolve(null);
+    		}
 
-    		methods: {
-    			id(modal) {
-    				return `modal-${modal.id}`
-    			},
+    		function onSuccess(modal, payload) {
+    			modal.resolve(payload);
+    			this.$refs[this.id(modal)].hide();
+    		}
 
-    			removeModal(modal) {
-    				this.modals.splice(this.modals.indexOf(modal), 1);
-    				modal.resolve(null);
-    			},
-
-    			onSuccess(modal, payload) {
-    				modal.resolve(payload);
-    				this.$refs[this.id(modal)].hide();
-    			},
-    		},
-    	};
+    		return {
+    			id,
+    			removeModal,
+    			onSuccess,
+    		}
+    	},
+    	components: {
+    		VModal: script$4,
+    	},
+    };
 
     const _hoisted_1$3 = { key: 0 };
 
@@ -20315,7 +20323,7 @@
     var colorScheme = {
     	install: (app, { scheme }) => {
     		const colorScheme = reactive(Object.entries(classes).reduce((classes, [key, value]) => {
-    			classes[key] = computed(() => value[unref(scheme)]);
+    			classes[key] = computed$1(() => value[unref(scheme)]);
     			return classes
     		}, {}));
 
@@ -20333,35 +20341,37 @@
       * (c) 2020 Roman Privalov
       * @license MIT
       */
-    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed((()=>!!r.value.x&&!!r.value.y)),u=computed((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed((()=>f.messages.value)),d=computed((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
+    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed$1((()=>!!r.value.x&&!!r.value.y)),u=computed$1((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed$1((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed$1((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed$1((()=>f.messages.value)),d=computed$1((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
 
     var script$1 = {
     	name: 'TheHeader',
     	setup() {
+    		const router = useRouter();
     		const store = inject('store');
-    		return {
-    			store
-    		}
-    	},
-    	data() {
-    		return {
-    			loggedUser: this.store.state.loggeduser // Here loggedUser will result to menu rendering vs. not if you use the state directly
-    		}
-    	},
 
-    	methods: {
-    		logOut() {
-    			const success = this.store.methods.logout();
+    		let loggedUser = computed$1(() => store.state.loggeduser);
+
+    		onMounted(() => loggedUser = store.state.loggeduser);
+
+    		function logOut() {
+    			const success = store.methods.logout();
     			console.log(success);
+    			console.log(router);
     			if (success) {
-    				this.$flashMessage.show({
+    				m.show({
     					type: 'success',
     					title: 'Successfully logged out',
     					time: 500,
     				});
-    				this.$router.push({ name: 'login' });
+    				router.push({ name: 'login' });
     			}
-    		},
+    		}
+
+    		return {
+    			store,
+    			loggedUser,
+    			logOut
+    		}
     	},
     };
 
@@ -20381,14 +20391,17 @@
       /*#__PURE__*/createBaseVNode("i", { class: "bi-person-circle" })
     ], -1 /* HOISTED */);
     const _hoisted_6 = {
-      key: 0,
       class: "dropdown-menu dropdown-menu-end position-absolute",
       "aria-labelledby": "usermenu"
     };
     const _hoisted_7 = /*#__PURE__*/createBaseVNode("li", null, [
       /*#__PURE__*/createBaseVNode("hr", { class: "dropdown-divider" })
     ], -1 /* HOISTED */);
-    const _hoisted_8 = /*#__PURE__*/createTextVNode("Profile");
+    const _hoisted_8 = { key: 1 };
+    const _hoisted_9 = /*#__PURE__*/createTextVNode("Profile");
+    const _hoisted_10 = { key: 2 };
+    const _hoisted_11 = { key: 3 };
+    const _hoisted_12 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$1(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_router_link = resolveComponent("router-link");
@@ -20410,45 +20423,57 @@
           createBaseVNode("ul", _hoisted_3, [
             createBaseVNode("li", _hoisted_4, [
               _hoisted_5,
-              ($data.loggedUser)
-                ? (openBlock(), createElementBlock("ul", _hoisted_6, [
-                    ($data.loggedUser.isadmin)
-                      ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
-                          (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.navigation, ({ name, label }) => {
-                            return (openBlock(), createElementBlock("li", { key: name }, [
-                              createVNode(_component_router_link, {
-                                to: { name },
-                                class: "dropdown-item"
-                              }, {
-                                default: withCtx(() => [
-                                  createTextVNode(toDisplayString(label), 1 /* TEXT */)
-                                ]),
-                                _: 2 /* DYNAMIC */
-                              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["to"])
-                            ]))
-                          }), 128 /* KEYED_FRAGMENT */)),
-                          _hoisted_7
-                        ], 64 /* STABLE_FRAGMENT */))
-                      : createCommentVNode("v-if", true),
-                    createBaseVNode("li", null, [
+              createBaseVNode("ul", _hoisted_6, [
+                ($setup.loggedUser && $setup.loggedUser.isadmin)
+                  ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
+                      (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.navigation, ({ name, label }) => {
+                        return (openBlock(), createElementBlock("li", { key: name }, [
+                          createVNode(_component_router_link, {
+                            to: { name },
+                            class: "dropdown-item"
+                          }, {
+                            default: withCtx(() => [
+                              createTextVNode(toDisplayString(label), 1 /* TEXT */)
+                            ]),
+                            _: 2 /* DYNAMIC */
+                          }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["to"])
+                        ]))
+                      }), 128 /* KEYED_FRAGMENT */)),
+                      _hoisted_7
+                    ], 64 /* STABLE_FRAGMENT */))
+                  : createCommentVNode("v-if", true),
+                ($setup.loggedUser)
+                  ? (openBlock(), createElementBlock("li", _hoisted_8, [
                       createVNode(_component_router_link, {
-                        to: { name: "user", params: { id: $data.loggedUser.id } },
+                        to: { name: "user", params: { id: $setup.loggedUser.id } },
                         class: "dropdown-item"
                       }, {
                         default: withCtx(() => [
-                          _hoisted_8
+                          _hoisted_9
                         ]),
                         _: 1 /* STABLE */
                       }, 8 /* PROPS */, ["to"])
-                    ]),
-                    createBaseVNode("li", null, [
+                    ]))
+                  : createCommentVNode("v-if", true),
+                ($setup.loggedUser)
+                  ? (openBlock(), createElementBlock("li", _hoisted_10, [
                       createBaseVNode("button", {
-                        onClick: _cache[0] || (_cache[0] = $event => ($options.logOut())),
+                        onClick: _cache[0] || (_cache[0] = (...args) => ($setup.logOut && $setup.logOut(...args))),
                         class: "dropdown-item"
                       }, "Log out")
-                    ])
-                  ]))
-                : createCommentVNode("v-if", true)
+                    ]))
+                  : (openBlock(), createElementBlock("li", _hoisted_11, [
+                      createVNode(_component_router_link, {
+                        to: { name: "login" },
+                        class: "dropdown-item"
+                      }, {
+                        default: withCtx(() => [
+                          _hoisted_12
+                        ]),
+                        _: 1 /* STABLE */
+                      })
+                    ]))
+              ])
             ])
           ])
         ])
@@ -20461,6 +20486,7 @@
     var script = {
     	setup() {
     		provide('store', store);
+
     		return {
     			store
     		}
@@ -20468,12 +20494,6 @@
     	name: 'App',
     	components: {
     		TheHeader: script$1
-    	},
-
-    	methods: {
-    		logOut() {
-    			this.$router.push({ name: 'login' });
-    		},
     	},
     };
 
@@ -20486,12 +20506,7 @@
       const _component_router_view = resolveComponent("router-view");
 
       return (openBlock(), createElementBlock("div", null, [
-        ($setup.store.state.counter)
-          ? (openBlock(), createBlock(_component_TheHeader, {
-              key: 0,
-              onLoggedout: $options.logOut
-            }, null, 8 /* PROPS */, ["onLoggedout"]))
-          : createCommentVNode("v-if", true),
+        createVNode(_component_TheHeader),
         createVNode(_component_FlashMessage, { position: "right top" }),
         createVNode(_component_TheModal),
         createBaseVNode("main", _hoisted_1, [
@@ -21346,7 +21361,7 @@
             }
             form.setFieldInitialValue(unref(path), value);
         }
-        const initialValue = computed(resolveInitialValue);
+        const initialValue = computed$1(resolveInitialValue);
         // if no form is associated, use a regular ref.
         if (!form) {
             const value = ref(resolveInitialValue());
@@ -21363,7 +21378,7 @@
         const currentValue = modelValue ? unref(modelValue) : getFromPath(form.values, unref(path), unref(initialValue));
         form.stageInitialValue(unref(path), currentValue);
         // otherwise use a computed setter that triggers the `setFieldValue`
-        const value = computed({
+        const value = computed$1({
             get() {
                 return getFromPath(form.values, unref(path));
             },
@@ -21386,8 +21401,8 @@
             pending: false,
             valid: true,
             validated: !!unref(errors).length,
-            initialValue: computed(() => unref(initialValue)),
-            dirty: computed(() => {
+            initialValue: computed$1(() => unref(initialValue)),
+            dirty: computed$1(() => {
                 return !es6(unref(currentValue), unref(initialValue));
             }),
         });
@@ -21414,16 +21429,16 @@
             const errors = ref([]);
             return {
                 errors,
-                errorMessage: computed(() => errors.value[0]),
+                errorMessage: computed$1(() => errors.value[0]),
                 setErrors: (messages) => {
                     errors.value = normalizeErrors(messages);
                 },
             };
         }
-        const errors = computed(() => form.errorBag.value[unref(path)] || []);
+        const errors = computed$1(() => form.errorBag.value[unref(path)] || []);
         return {
             errors,
-            errorMessage: computed(() => errors.value[0]),
+            errorMessage: computed$1(() => errors.value[0]),
             setErrors: (messages) => {
                 form.setFieldErrorBag(unref(path), normalizeErrors(messages));
             },
@@ -21812,7 +21827,7 @@
         const handleBlur = () => {
             meta.touched = true;
         };
-        const normalizedRules = computed(() => {
+        const normalizedRules = computed$1(() => {
             let rulesValue = unref(rules);
             const schema = unref(form === null || form === void 0 ? void 0 : form.schema);
             if (schema && !isYupValidator(schema)) {
@@ -21961,7 +21976,7 @@
             form.unregister(field);
         });
         // extract cross-field dependencies in a computed prop
-        const dependencies = computed(() => {
+        const dependencies = computed$1(() => {
             const rulesVal = normalizedRules.value;
             // is falsy, a function schema or a yup schema
             if (!rulesVal || isCallable(rulesVal) || isYupValidator(rulesVal)) {
@@ -22031,7 +22046,7 @@
         const uncheckedValue = opts === null || opts === void 0 ? void 0 : opts.uncheckedValue;
         function patchCheckboxApi(field) {
             const handleChange = field.handleChange;
-            const checked = computed(() => {
+            const checked = computed$1(() => {
                 const currentValue = unref(field.value);
                 const checkedVal = unref(checkedValue);
                 return Array.isArray(currentValue) ? currentValue.includes(checkedVal) : checkedVal === currentValue;
@@ -22162,7 +22177,7 @@
                     ctx.emit('update:modelValue', value.value);
                 }
                 : handleInput;
-            const fieldProps = computed(() => {
+            const fieldProps = computed$1(() => {
                 const { validateOnInput, validateOnChange, validateOnBlur, validateOnModelUpdate } = resolveValidationTriggers(props);
                 const baseOnBlur = [handleBlur, ctx.attrs.onBlur, validateOnBlur ? validateField : undefined].filter(Boolean);
                 const baseOnInput = [(e) => onChangeHandler(e, validateOnInput), ctx.attrs.onInput].filter(Boolean);
@@ -22281,7 +22296,7 @@
         // the source of errors for the form fields
         const { errorBag, setErrorBag, setFieldErrorBag } = useErrorBag(opts === null || opts === void 0 ? void 0 : opts.initialErrors);
         // Gets the first error of each field
-        const errors = computed(() => {
+        const errors = computed$1(() => {
             return keysOf(errorBag.value).reduce((acc, key) => {
                 const bag = errorBag.value[key];
                 if (bag && bag.length) {
@@ -22300,7 +22315,7 @@
         /**
          * Holds a computed reference to all fields names and labels
          */
-        const fieldNames = computed(() => {
+        const fieldNames = computed$1(() => {
             return keysOf(fieldsByPath.value).reduce((names, path) => {
                 const field = getFirstFieldAtPath(path);
                 if (field) {
@@ -22309,7 +22324,7 @@
                 return names;
             }, {});
         });
-        const fieldBailsMap = computed(() => {
+        const fieldBailsMap = computed$1(() => {
             return keysOf(fieldsByPath.value).reduce((map, path) => {
                 var _a;
                 const field = getFirstFieldAtPath(path);
@@ -22778,10 +22793,10 @@
             pending: 'some',
             valid: 'every',
         };
-        const isDirty = computed(() => {
+        const isDirty = computed$1(() => {
             return !es6(currentValues, unref(initialValues));
         });
-        const flags = computed(() => {
+        const flags = computed$1(() => {
             const fields = Object.values(fieldsByPath.value).flat(1).filter(Boolean);
             return keysOf(MERGE_STRATEGIES).reduce((acc, flag) => {
                 const mergeMethod = MERGE_STRATEGIES[flag];
@@ -22789,7 +22804,7 @@
                 return acc;
             }, {});
         });
-        return computed(() => {
+        return computed$1(() => {
             return Object.assign(Object.assign({ initialValues: unref(initialValues) }, flags.value), { valid: flags.value.valid && !keysOf(errors.value).length, dirty: isDirty.value });
         });
     }
@@ -23033,7 +23048,7 @@
             const key = entryCounter++;
             const entry = {
                 key,
-                value: computed(() => {
+                value: computed$1(() => {
                     const currentValues = getFromPath(form === null || form === void 0 ? void 0 : form.values, unref(arrayPath), []);
                     const idx = fields.value.findIndex(e => e.key === key);
                     return idx === -1 ? value : currentValues[idx];
@@ -23200,7 +23215,7 @@
         },
         setup(props, ctx) {
             const form = inject(FormContextKey, undefined);
-            const message = computed(() => {
+            const message = computed$1(() => {
                 return form === null || form === void 0 ? void 0 : form.errors.value[props.name];
             });
             function slotProps() {
@@ -23321,7 +23336,7 @@
 
     const app = createApp(script)
     	//.use(store)
-    	.use(router$1)
+    	.use(router)
     	.use(api$1)
     	.use(c)
     	.use(modal)
@@ -23330,7 +23345,7 @@
     	.component('VField', Field)
     	.component('ErrorMessage', ErrorMessage);
 
-    router$1.isReady()
+    router.isReady()
     	.then(() => app.mount('#hki2050'));
 
 }());
