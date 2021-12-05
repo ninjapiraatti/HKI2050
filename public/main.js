@@ -1285,7 +1285,7 @@
             this._setter(newValue);
         }
     }
-    function computed$1(getterOrOptions, debugOptions) {
+    function computed(getterOrOptions, debugOptions) {
         let getter;
         let setter;
         if (isFunction(getterOrOptions)) {
@@ -2625,7 +2625,7 @@
                             warn$2(`Write operation failed: computed property "${key}" is readonly.`);
                         }
                         ;
-                const c = computed$1({
+                const c = computed({
                     get,
                     set
                 });
@@ -10294,8 +10294,8 @@
     function useLink(props) {
         const router = inject(routerKey);
         const currentRoute = inject(routeLocationKey);
-        const route = computed$1(() => router.resolve(unref(props.to)));
-        const activeRecordIndex = computed$1(() => {
+        const route = computed(() => router.resolve(unref(props.to)));
+        const activeRecordIndex = computed(() => {
             const { matched } = route.value;
             const { length } = matched;
             const routeMatched = matched[length - 1];
@@ -10319,9 +10319,9 @@
                 ? currentMatched.findIndex(isSameRouteRecord.bind(null, matched[length - 2]))
                 : index);
         });
-        const isActive = computed$1(() => activeRecordIndex.value > -1 &&
+        const isActive = computed(() => activeRecordIndex.value > -1 &&
             includesParams(currentRoute.params, route.value.params));
-        const isExactActive = computed$1(() => activeRecordIndex.value > -1 &&
+        const isExactActive = computed(() => activeRecordIndex.value > -1 &&
             activeRecordIndex.value === currentRoute.matched.length - 1 &&
             isSameRouteLocationParams(currentRoute.params, route.value.params));
         function navigate(e = {}) {
@@ -10354,7 +10354,7 @@
         }
         return {
             route,
-            href: computed$1(() => route.value.href),
+            href: computed(() => route.value.href),
             isActive,
             isExactActive,
             navigate,
@@ -10381,7 +10381,7 @@
         setup(props, { slots }) {
             const link = reactive(useLink(props));
             const { options } = inject(routerKey);
-            const elClass = computed$1(() => ({
+            const elClass = computed(() => ({
                 [getLinkClass(props.activeClass, options.linkActiveClass, 'router-link-active')]: link.isActive,
                 // [getLinkClass(
                 //   props.inactiveClass,
@@ -10486,9 +10486,9 @@
         setup(props, { attrs, slots }) {
             warnDeprecatedUsage();
             const injectedRoute = inject(routerViewLocationKey);
-            const routeToDisplay = computed$1(() => props.route || injectedRoute.value);
+            const routeToDisplay = computed(() => props.route || injectedRoute.value);
             const depth = inject(viewDepthKey, 0);
-            const matchedRouteRef = computed$1(() => routeToDisplay.value.matched[depth]);
+            const matchedRouteRef = computed(() => routeToDisplay.value.matched[depth]);
             provide(viewDepthKey, depth + 1);
             provide(matchedRouteKey, matchedRouteRef);
             provide(routerViewLocationKey, routeToDisplay);
@@ -11587,7 +11587,7 @@
                 const reactiveRoute = {};
                 for (const key in START_LOCATION_NORMALIZED) {
                     // @ts-expect-error: the key matches
-                    reactiveRoute[key] = computed$1(() => currentRoute.value[key]);
+                    reactiveRoute[key] = computed(() => currentRoute.value[key]);
                 }
                 app.provide(routerKey, router);
                 app.provide(routeLocationKey, reactive(reactiveRoute));
@@ -18607,7 +18607,7 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$h = {
+    var script$g = {
     	name: 'FormLogin',
     	setup() {
     	const store = inject('store');
@@ -18643,7 +18643,7 @@
     	},
     };
 
-    const _hoisted_1$g = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$f = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
@@ -18659,7 +18659,7 @@
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$3 = /*#__PURE__*/createTextVNode("Sign up");
 
-    function render$h(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -18672,7 +18672,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$g,
+              _hoisted_1$f,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -18740,39 +18740,44 @@
       ]))
     }
 
-    script$h.render = render$h;
-    script$h.__file = "src/forms/FormLogin.vue";
+    script$g.render = render$g;
+    script$g.__file = "src/forms/FormLogin.vue";
 
-    var script$g = {
-    		name: 'Login',
-
-    		async mounted() {
-    			// Forgot password will return untrue
-    			const success = await this.$modal({
+    //import modal from '@root/plugins/vue-modal'
+    var script$f = {
+    	name: 'Login',
+    	setup() {
+    		const modal = inject('modal');
+    		onMounted(async() => {
+    			const success = await modal({
     				title: 'Log in',
-    				component: script$h,
+    				component: script$g,
     				backdrop: 'static',
     			});
-
     			if (success) {
     				console.log("Logged in");
     				this.$router.replace(this.$route.query.redirect || { name: 'home' });
     			}
-    		},
-    	};
+    		});
 
-    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
+    		return {
+    			modal,
+    		}
+    	},
+    };
+
+    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
       return null
     }
 
-    script$g.render = render$g;
-    script$g.__file = "src/views/Login.vue";
+    script$f.render = render$f;
+    script$f.__file = "src/views/Login.vue";
 
-    var script$f = {
+    var script$e = {
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$f = { class: "container" };
+    const _hoisted_1$e = { class: "container" };
     const _hoisted_2$c = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
@@ -18780,18 +18785,18 @@
       _hoisted_2$c
     ];
 
-    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$f, [
+    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$e, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
         }, _hoisted_3$c, 2 /* CLASS */)
       ]))
     }
 
-    script$f.render = render$f;
-    script$f.__file = "src/views/UserHome.vue";
+    script$e.render = render$e;
+    script$e.__file = "src/views/UserHome.vue";
 
-    var script$e = {
+    var script$d = {
     		name: 'FormUserInfo',
     		setup() {
     			const store = inject('store');
@@ -18840,7 +18845,7 @@
     		},
     	};
 
-    const _hoisted_1$e = {
+    const _hoisted_1$d = {
       key: 0,
       class: "form-check"
     };
@@ -18859,7 +18864,7 @@
     const _hoisted_5$6 = { class: "mt-label" };
     const _hoisted_6$5 = ["disabled"];
 
-    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -18870,7 +18875,7 @@
       }, {
         default: withCtx(({ errors }) => [
           ($setup.store.state.loggeduser.isadmin)
-            ? (openBlock(), createElementBlock("div", _hoisted_1$e, [
+            ? (openBlock(), createElementBlock("div", _hoisted_1$d, [
                 _hoisted_2$b,
                 createVNode(_component_VField, {
                   modelValue: $data.form.isadmin,
@@ -18932,10 +18937,10 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$e.render = render$e;
-    script$e.__file = "src/forms/FormUserInfo.vue";
+    script$d.render = render$d;
+    script$d.__file = "src/forms/FormUserInfo.vue";
 
-    var script$d = {
+    var script$c = {
     		name: 'FormCharacter',
     		setup() {
     			const store = inject('store');
@@ -19001,7 +19006,7 @@
     		},
     	};
 
-    const _hoisted_1$d = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$c = /*#__PURE__*/createBaseVNode("label", {
       for: "label",
       class: "form-label"
     }, "Name", -1 /* HOISTED */);
@@ -19012,7 +19017,7 @@
     const _hoisted_3$a = { class: "mt-label" };
     const _hoisted_4$9 = ["disabled"];
 
-    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19023,7 +19028,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$d,
+            _hoisted_1$c,
             createVNode(_component_VField, {
               modelValue: $data.form.name,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.name = $event)),
@@ -19070,10 +19075,10 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$d.render = render$d;
-    script$d.__file = "src/forms/FormCharacter.vue";
+    script$c.render = render$c;
+    script$c.__file = "src/forms/FormCharacter.vue";
 
-    var script$c = {
+    var script$b = {
     	name: 'UserProfile',
     	setup() {
     		const store = inject('store');
@@ -19118,7 +19123,7 @@
     		async editUser(props = {}) {
     			const result = await this.$modal({
     				title: 'Edit user info',
-    				component: script$e,
+    				component: script$d,
     				props,
     			});
 
@@ -19134,7 +19139,7 @@
     			props.user_id = this.user.id;
     			const result = await this.$modal({
     				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
-    				component: script$d,
+    				component: script$c,
     				props,
     			});
 
@@ -19160,7 +19165,7 @@
     	},
     };
 
-    const _hoisted_1$c = { class: "container" };
+    const _hoisted_1$b = { class: "container" };
     const _hoisted_2$9 = { class: "row gx-4" };
     const _hoisted_3$9 = { class: "col-md-4" };
     const _hoisted_4$8 = { class: "context" };
@@ -19229,8 +19234,8 @@
       class: "fs-3 fw-light text-muted text-center p-4"
     };
 
-    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$c, [
+    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$b, [
         createBaseVNode("div", _hoisted_2$9, [
           createBaseVNode("div", _hoisted_3$9, [
             createBaseVNode("div", {
@@ -19310,10 +19315,10 @@
       ]))
     }
 
-    script$c.render = render$c;
-    script$c.__file = "src/views/UserProfile.vue";
+    script$b.render = render$b;
+    script$b.__file = "src/views/UserProfile.vue";
 
-    var script$b = {
+    var script$a = {
     		name: 'FormForgotPassword',
 
     		data() {
@@ -19343,7 +19348,7 @@
     		}
     	};
 
-    const _hoisted_1$b = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$a = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
@@ -19352,7 +19357,7 @@
     const _hoisted_4$7 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
     const _hoisted_5$4 = /*#__PURE__*/createTextVNode("Log in");
 
-    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19364,7 +19369,7 @@
           class: "vstack gap-2"
         }, {
           default: withCtx(({ errors }) => [
-            _hoisted_1$b,
+            _hoisted_1$a,
             createBaseVNode("div", {
               class: normalizeClass(["input-group", { "has-validation": errors.email }])
             }, [
@@ -19404,10 +19409,10 @@
       ]))
     }
 
-    script$b.render = render$b;
-    script$b.__file = "src/forms/FormForgotPassword.vue";
+    script$a.render = render$a;
+    script$a.__file = "src/forms/FormForgotPassword.vue";
 
-    var script$a = {
+    var script$9 = {
     		name: 'ForgotPassword',
 
     		data() {
@@ -19419,13 +19424,13 @@
     		async mounted() {
     			this.requested = await this.$modal({
     				title: 'Request a password reset',
-    				component: script$b,
+    				component: script$a,
     				backdrop: 'static',
     			});
     		},
     	};
 
-    const _hoisted_1$a = {
+    const _hoisted_1$9 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19440,9 +19445,9 @@
       _hoisted_3$7
     ];
 
-    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.requested)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$a, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, _hoisted_4$6, 2 /* CLASS */)
@@ -19450,10 +19455,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$a.render = render$a;
-    script$a.__file = "src/views/ForgotPassword.vue";
+    script$9.render = render$9;
+    script$9.__file = "src/views/ForgotPassword.vue";
 
-    var script$9 = {
+    var script$8 = {
     	name: 'FormRegister',
     	setup() {
     		const store = inject('store');
@@ -19505,7 +19510,7 @@
     	}
     };
 
-    const _hoisted_1$9 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
@@ -19529,7 +19534,7 @@
     const _hoisted_10$1 = /*#__PURE__*/createTextVNode("Already a user? ");
     const _hoisted_11$1 = /*#__PURE__*/createTextVNode("Log in");
 
-    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -19542,7 +19547,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$9,
+              _hoisted_1$8,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -19639,10 +19644,10 @@
       ]))
     }
 
-    script$9.render = render$9;
-    script$9.__file = "src/forms/FormRegister.vue";
+    script$8.render = render$8;
+    script$8.__file = "src/forms/FormRegister.vue";
 
-    var script$8 = {
+    var script$7 = {
     		name: 'Register',
 
     		data() {
@@ -19654,13 +19659,13 @@
     		async mounted() {
     			this.registered = await this.$modal({
     				title: 'Sign up',
-    				component: script$9,
+    				component: script$8,
     				backdrop: 'static',
     			});
     		},
     	};
 
-    const _hoisted_1$8 = {
+    const _hoisted_1$7 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19675,9 +19680,9 @@
       _hoisted_3$5
     ];
 
-    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.registered)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, _hoisted_4$4, 2 /* CLASS */)
@@ -19685,10 +19690,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$8.render = render$8;
-    script$8.__file = "src/views/Register.vue";
+    script$7.render = render$7;
+    script$7.__file = "src/views/Register.vue";
 
-    var script$7 = {
+    var script$6 = {
     		name: 'FormResetPassword',
 
     		props: {
@@ -19745,7 +19750,7 @@
     		}
     	};
 
-    const _hoisted_1$7 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
@@ -19756,7 +19761,7 @@
     const _hoisted_3$4 = { class: "mt-label" };
     const _hoisted_4$3 = ["disabled"];
 
-    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19767,7 +19772,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$7,
+            _hoisted_1$6,
             createVNode(_component_VField, {
               modelValue: $data.form.password,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.password = $event)),
@@ -19812,10 +19817,10 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$7.render = render$7;
-    script$7.__file = "src/forms/FormResetPassword.vue";
+    script$6.render = render$6;
+    script$6.__file = "src/forms/FormResetPassword.vue";
 
-    var script$6 = {
+    var script$5 = {
     		name: 'Confirm',
 
     		data() {
@@ -19838,7 +19843,7 @@
     			async resetPassword(data) {
     				await this.$modal({
     					title: 'Enter new password',
-    					component: script$7,
+    					component: script$6,
     					props: data,
     					backdrop: 'static',
     				});
@@ -19882,7 +19887,7 @@
     		},
     	};
 
-    const _hoisted_1$6 = {
+    const _hoisted_1$5 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19896,11 +19901,11 @@
     const _hoisted_7$1 = /*#__PURE__*/createTextVNode("log in");
     const _hoisted_8$1 = /*#__PURE__*/createTextVNode(".");
 
-    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$5(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_router_link = resolveComponent("router-link");
 
       return ($data.confirmed)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$6, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$5, [
             createBaseVNode("div", _hoisted_2$3, [
               _hoisted_3$3,
               createBaseVNode("div", _hoisted_4$2, [
@@ -19920,10 +19925,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$6.render = render$6;
-    script$6.__file = "src/views/Confirm.vue";
+    script$5.render = render$5;
+    script$5.__file = "src/views/Confirm.vue";
 
-    var script$5 = {
+    var script$4 = {
     	name: 'Home',
     	setup() {
     		const store = inject('store');
@@ -19933,7 +19938,7 @@
     	},
     };
 
-    const _hoisted_1$5 = { class: "container" };
+    const _hoisted_1$4 = { class: "container" };
     const _hoisted_2$2 = { class: "counter" };
     const _hoisted_3$2 = /*#__PURE__*/createBaseVNode("div", { class: "bigasslogo" }, [
       /*#__PURE__*/createBaseVNode("img", {
@@ -19942,8 +19947,8 @@
       })
     ], -1 /* HOISTED */);
 
-    function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$5, [
+    function render$4(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
         createBaseVNode("div", _hoisted_2$2, [
           createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
           createBaseVNode("button", {
@@ -19957,8 +19962,8 @@
       ]))
     }
 
-    script$5.render = render$5;
-    script$5.__file = "src/views/Home.vue";
+    script$4.render = render$4;
+    script$4.__file = "src/views/Home.vue";
 
     const error = (to, props = {}) => ({
     	name: 'error',
@@ -19975,14 +19980,14 @@
     const router = createRouter({
     	routes: [
     		{ path: '/', name: 'home', redirect: () => ({ name: store.state.loggeduser && store.state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
-    		{ path: '/app/confirm', component: script$6, name: 'confirm' },
-    		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
-    		{ path: '/app/register', component: script$8, name: 'register' },
-    		{ path: '/app/user', component: script$f, name: 'user-home', beforeEnter: [needLogin] },
+    		{ path: '/app/confirm', component: script$5, name: 'confirm' },
+    		{ path: '/app/forgotpassword', component: script$9, name: 'forgot-password' },
+    		{ path: '/app/register', component: script$7, name: 'register' },
+    		{ path: '/app/user', component: script$e, name: 'user-home', beforeEnter: [needLogin] },
     		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
-    		{ path: '/app/', component: script$5, name: 'page-home' },
-    		{ path: '/app/login', component: script$g, name: 'login' },
-    		{ path: '/app/user/:id', component: script$c, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
+    		{ path: '/app/', component: script$4, name: 'page-home' },
+    		{ path: '/app/login', component: script$f, name: 'login' },
+    		{ path: '/app/user/:id', component: script$b, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
     		//] },
@@ -20005,297 +20010,6 @@
     		Modal.getInstance(modal).hide();
     	}
     });
-
-    const sizeClasses = {
-    	sm: 'modal-sm',
-    	lg: 'modal-lg',
-    	xl: 'modal-xl',
-    };
-    var script$4 = {
-    	name: 'VModal',
-    	props: {
-    		title: String,
-    		backdrop: {
-    			type: [Boolean, String],
-    			default: true,
-    			validator: value => typeof value == 'boolean' || value == 'static',
-    		},
-    		size: {
-    			type: String,
-    			validator: value => Object.keys(sizeClasses).includes(value)
-    		},
-    		showAtStart: false,
-    	},
-    	setup() {
-    		const sizeClass = computed(() => {
-    			return sizeClasses[this.size] || ''
-    		});
-
-    		function show() {
-    			this.modal.show();
-    		}
-
-    		function hide() {
-    			this.modal.hide();
-    		}
-
-    		onMounted(() => {
-    			this.modal = Modal.getOrCreateInstance(this.$refs.modal);
-    			this.$refs.modal.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding'); });
-    			this.$refs.modal.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden'); });
-    			this.$refs.modal.addEventListener('show.bs.modal', () => { this.$emit('modal-showing'); });
-    			this.$refs.modal.addEventListener('shown.bs.modal', () => {
-    				this.$emit('modal-shown');
-    				const selectors = [
-    					'input, select',
-    					'button.btn-primary',
-    					'button',
-    				];
-    				for (const selector of selectors) {
-    					const input = this.$refs.body.querySelector(selector);
-    					if (input) {
-    						input.focus();
-    						break
-    					}
-    				}
-    			});
-
-    			if (this.showAtStart) this.modal.show();
-    		});
-
-    		return {
-    			show,
-    			hide,
-    			sizeClass,
-    		}
-    	}
-    };
-
-    const _hoisted_1$4 = ["data-bs-backdrop", "data-bs-keyboard"];
-    const _hoisted_2$1 = { class: "modal-content shadow-lg" };
-    const _hoisted_3$1 = {
-      key: 0,
-      class: "modal-header"
-    };
-    const _hoisted_4$1 = { class: "modal-title h2" };
-    const _hoisted_5$1 = {
-      key: 0,
-      type: "button",
-      class: "btn-close",
-      "data-bs-dismiss": "modal",
-      "aria-label": "Close"
-    };
-    const _hoisted_6$1 = {
-      ref: "body",
-      class: "modal-body"
-    };
-
-    function render$4(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", {
-        class: "modal fade",
-        ref: "modal",
-        "data-bs-backdrop": $props.backdrop,
-        "data-bs-keyboard": $props.backdrop != "static"
-      }, [
-        createBaseVNode("div", {
-          class: normalizeClass(["modal-dialog", $options.sizeClass])
-        }, [
-          createBaseVNode("div", _hoisted_2$1, [
-            ($props.title)
-              ? (openBlock(), createElementBlock("div", _hoisted_3$1, [
-                  createBaseVNode("div", _hoisted_4$1, toDisplayString($props.title), 1 /* TEXT */),
-                  ($props.backdrop != "static")
-                    ? (openBlock(), createElementBlock("button", _hoisted_5$1))
-                    : createCommentVNode("v-if", true)
-                ]))
-              : createCommentVNode("v-if", true),
-            createBaseVNode("div", _hoisted_6$1, [
-              renderSlot(_ctx.$slots, "default")
-            ], 512 /* NEED_PATCH */)
-          ])
-        ], 2 /* CLASS */)
-      ], 8 /* PROPS */, _hoisted_1$4))
-    }
-
-    script$4.render = render$4;
-    script$4.__file = "src/components/VModal.vue";
-
-    var script$3 = {
-    	name: 'TheModal',
-    	setup() {
-    		function id(modal) {
-    			return `modal-${modal.id}`
-    		}
-
-    		function removeModal(modal) {
-    			this.modals.splice(this.modals.indexOf(modal), 1);
-    			modal.resolve(null);
-    		}
-
-    		function onSuccess(modal, payload) {
-    			modal.resolve(payload);
-    			this.$refs[this.id(modal)].hide();
-    		}
-
-    		return {
-    			id,
-    			removeModal,
-    			onSuccess,
-    		}
-    	},
-    	components: {
-    		VModal: script$4,
-    	},
-    };
-
-    const _hoisted_1$3 = { key: 0 };
-
-    function render$3(_ctx, _cache, $props, $setup, $data, $options) {
-      const _component_VModal = resolveComponent("VModal");
-
-      return (_ctx.modals.length)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$3, [
-            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.modals, (modal) => {
-              return (openBlock(), createBlock(_component_VModal, {
-                ref: $options.id(modal),
-                key: modal.id,
-                showAtStart: true,
-                title: modal.title,
-                backdrop: modal.backdrop,
-                size: modal.size,
-                onModalHidden: $event => ($options.removeModal(modal))
-              }, {
-                default: withCtx(() => [
-                  (openBlock(), createBlock(resolveDynamicComponent(modal.component), mergeProps(modal.props, {
-                    onSuccess: $event => ($options.onSuccess(modal, $event))
-                  }), null, 16 /* FULL_PROPS */, ["onSuccess"]))
-                ]),
-                _: 2 /* DYNAMIC */
-              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["title", "backdrop", "size", "onModalHidden"]))
-            }), 128 /* KEYED_FRAGMENT */))
-          ]))
-        : createCommentVNode("v-if", true)
-    }
-
-    script$3.render = render$3;
-    script$3.__file = "src/components/TheModal.vue";
-
-    var script$2 = {
-    		name: 'FormConfirm',
-
-    		props: {
-    			ok: {
-    				type: String,
-    				default: 'OK',
-    			},
-    			cancel: {
-    				type: String,
-    				default: 'Cancel',
-    			},
-    		},
-
-    		methods: {
-    			confirm(choice) {
-    				this.$emit('success', choice);
-    			},
-    		},
-    	};
-
-    const _hoisted_1$2 = { class: "d-flex justify-content-between" };
-
-    function render$2(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$2, [
-        createBaseVNode("button", {
-          type: "submit",
-          class: "btn btn-secondary",
-          onClick: _cache[0] || (_cache[0] = $event => ($options.confirm(false)))
-        }, toDisplayString($props.cancel), 1 /* TEXT */),
-        createBaseVNode("button", {
-          type: "submit",
-          class: "btn btn-primary gradient",
-          onClick: _cache[1] || (_cache[1] = $event => ($options.confirm(true)))
-        }, toDisplayString($props.ok), 1 /* TEXT */)
-      ]))
-    }
-
-    script$2.render = render$2;
-    script$2.__file = "src/forms/FormConfirm.vue";
-
-    var confirm = modal => {
-    	const confirm = ({ title, ok = 'OK', cancel = 'Cancel' } = {}) => modal({
-    		component: script$2,
-    		title,
-    		props: {
-    			ok,
-    			cancel,
-    		},
-    	});
-
-    	confirm.delete = async (type, data) => {
-    		let title, apiCall;
-    	
-    		switch (type) {	
-    			case 'user':
-    				title = 'profile';
-    				apiCall = api.users.delete.bind(null, data.id);
-    				break
-    			
-    			case 'user.character':
-    				title = data.description;
-    				apiCall = api.users.characters.delete.bind(null, {
-    					id: data.id,
-    					user_id: data.user_id,
-    				});
-    				break
-    		}
-    	
-    		const confirmed = await confirm({
-    			title: `Delete ${title}?`,
-    			ok: 'Delete',
-    		});
-    	
-    		return confirmed
-    			? apiCall()
-    			: confirmed
-    	};
-
-    	return confirm
-    };
-
-    var modal = {
-    	install: (app, options) => {
-    		let id = 0;
-    		const modals = ref([]);
-
-    		app.component('TheModal', {
-    			...script$3,
-    			setup() {
-    				return {
-    					modals,
-    				}
-    			}
-    		});
-
-    		const modal = ({ title, component, props = {}, backdrop = true, size } = {}) => {
-    			if ('props' in component) props = Object.keys(component.props).reduce((used, key) => ({ ...used, [key]: props[key] }), {});
-
-    			return new Promise(resolve => {
-    				modals.value.push({
-    					id: ++id,
-    					resolve,
-    					title,
-    					component: shallowRef(component),
-    					props,
-    					backdrop,
-    					size,
-    				});
-    			})
-    		};
-
-    		app.config.globalProperties.$modal = modal;
-    		app.config.globalProperties.$confirm = confirm(modal);
-    	},
-    };
 
     const classes = {
     	navbar: {
@@ -20323,7 +20037,7 @@
     var colorScheme = {
     	install: (app, { scheme }) => {
     		const colorScheme = reactive(Object.entries(classes).reduce((classes, [key, value]) => {
-    			classes[key] = computed$1(() => value[unref(scheme)]);
+    			classes[key] = computed(() => value[unref(scheme)]);
     			return classes
     		}, {}));
 
@@ -20336,12 +20050,238 @@
     	},
     };
 
+    const sizeClasses = {
+    	sm: 'modal-sm',
+    	lg: 'modal-lg',
+    	xl: 'modal-xl',
+    };
+    var script$3 = {
+    	name: 'VModal',
+    	props: {
+    		title: String,
+    		backdrop: {
+    			type: [Boolean, String],
+    			default: true,
+    			validator: value => typeof value == 'boolean' || value == 'static',
+    		},
+    		size: {
+    			type: String,
+    			validator: value => Object.keys(sizeClasses).includes(value)
+    		},
+    		showAtStart: false,
+    	},
+    	setup(props) {
+    		const sizeClass = computed(() => {
+    			return sizeClasses[props.size] || ''
+    		});
+    		const modal = ref(null);
+
+    		function show() {
+    			this.modal.show();
+    		}
+
+    		function hide() {
+    			this.modal.hide();
+    		}
+
+    		onMounted(() => {
+    			let modalElement = modal.value; 
+    			console.log(modalElement);
+    			let modalThing = Modal.getOrCreateInstance(modalElement);
+    			console.log(modalThing);
+    			modalElement.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding'); });
+    			modalElement.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden'); });
+    			modalElement.addEventListener('show.bs.modal', () => { this.$emit('modal-showing'); });
+    			modalElement.addEventListener('shown.bs.modal', () => {
+    				this.$emit('modal-shown');
+    				const selectors = [
+    					'input, select',
+    					'button.btn-primary',
+    					'button',
+    				];
+    				for (const selector of selectors) {
+    					const input = this.$refs.body.querySelector(selector);
+    					if (input) {
+    						input.focus();
+    						break
+    					}
+    				}
+    			});
+
+    			modalThing.show();
+    		});
+
+    		return {
+    			modal,
+    			show,
+    			hide,
+    			sizeClass,
+    		}
+    	}
+    };
+
+    const _hoisted_1$3 = ["data-bs-backdrop", "data-bs-keyboard"];
+    const _hoisted_2$1 = { class: "modal-content shadow-lg" };
+    const _hoisted_3$1 = {
+      key: 0,
+      class: "modal-header"
+    };
+    const _hoisted_4$1 = { class: "modal-title h2" };
+    const _hoisted_5$1 = {
+      key: 0,
+      type: "button",
+      class: "btn-close",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    };
+    const _hoisted_6$1 = {
+      ref: "body",
+      class: "modal-body"
+    };
+
+    function render$3(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", {
+        class: "modal fade",
+        ref: "modal",
+        "data-bs-backdrop": $props.backdrop,
+        "data-bs-keyboard": $props.backdrop != "static"
+      }, [
+        createBaseVNode("div", {
+          class: normalizeClass(["modal-dialog", $setup.sizeClass])
+        }, [
+          createBaseVNode("div", _hoisted_2$1, [
+            ($props.title)
+              ? (openBlock(), createElementBlock("div", _hoisted_3$1, [
+                  createBaseVNode("div", _hoisted_4$1, toDisplayString($props.title), 1 /* TEXT */),
+                  ($props.backdrop != "static")
+                    ? (openBlock(), createElementBlock("button", _hoisted_5$1))
+                    : createCommentVNode("v-if", true)
+                ]))
+              : createCommentVNode("v-if", true),
+            createBaseVNode("div", _hoisted_6$1, [
+              renderSlot(_ctx.$slots, "default")
+            ], 512 /* NEED_PATCH */)
+          ])
+        ], 2 /* CLASS */)
+      ], 8 /* PROPS */, _hoisted_1$3))
+    }
+
+    script$3.render = render$3;
+    script$3.__file = "src/components/VModal.vue";
+
+    var script$2 = {
+    	name: 'TheModal',
+    	setup() {
+    		function id(modal) {
+    			return `modal-${modal.id}`
+    		}
+
+    		function removeModal(modal) {
+    			this.modals.splice(this.modals.indexOf(modal), 1);
+    			modal.resolve(null);
+    		}
+
+    		function sayFoo() {
+    			console.log("Foo");
+    			return "FooTitle"
+    		}
+
+    		function onSuccess(modal, payload) {
+    			modal.resolve(payload);
+    			this.$refs[this.id(modal)].hide();
+    		}
+
+    		onMounted(() => {
+    			console.log("sdfsf");
+    		});
+
+    		return {
+    			id,
+    			removeModal,
+    			sayFoo,
+    			onSuccess,
+    		}
+    	},
+    	components: {
+    		VModal: script$3,
+    	},
+    };
+
+    const _hoisted_1$2 = { key: 0 };
+
+    function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+      const _component_VModal = resolveComponent("VModal");
+
+      return (_ctx.modals.length)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$2, [
+            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.modals, (modal) => {
+              return (openBlock(), createBlock(_component_VModal, {
+                ref: $setup.sayFoo,
+                key: modal.id,
+                showAtStart: true,
+                title: modal.title,
+                backdrop: modal.backdrop,
+                size: modal.size,
+                onModalHidden: $event => ($setup.removeModal(modal))
+              }, {
+                default: withCtx(() => [
+                  (openBlock(), createBlock(resolveDynamicComponent(modal.component), mergeProps(modal.props, {
+                    onSuccess: $event => ($setup.onSuccess(modal, $event))
+                  }), null, 16 /* FULL_PROPS */, ["onSuccess"]))
+                ]),
+                _: 2 /* DYNAMIC */
+              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["title", "backdrop", "size", "onModalHidden"]))
+            }), 128 /* KEYED_FRAGMENT */))
+          ]))
+        : createCommentVNode("v-if", true)
+    }
+
+    script$2.render = render$2;
+    script$2.__file = "src/components/TheModal.vue";
+
+    var modal = {
+    	install: (app, options) => {
+    		let id = 0;
+    		const modals = ref([]);
+
+    		app.component('TheModal', {
+    			...script$2,
+    			setup() {
+    				return {
+    					modals,
+    				}
+    			}
+    		});
+
+    		const modal = ({ title, component, props = {}, backdrop = true, size } = {}) => {
+    			console.log(title);
+    			if ('props' in component) props = Object.keys(component.props).reduce((used, key) => ({ ...used, [key]: props[key] }), {});
+
+    			return new Promise(resolve => {
+    				modals.value.push({
+    					id: ++id,
+    					resolve,
+    					title,
+    					component: shallowRef(component),
+    					props,
+    					backdrop,
+    					size,
+    				});
+    			})
+    		};
+
+    		app.provide('modal', modal);
+    		//app.config.globalProperties.$modal = modal
+    		//app.config.globalProperties.$confirm = confirm(modal)
+    	},
+    };
+
     /*!
       * @smartweb/vue-flash-message v1.0.0-alpha.12
       * (c) 2020 Roman Privalov
       * @license MIT
       */
-    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed$1((()=>!!r.value.x&&!!r.value.y)),u=computed$1((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed$1((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed$1((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed$1((()=>f.messages.value)),d=computed$1((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
+    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed((()=>!!r.value.x&&!!r.value.y)),u=computed((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed((()=>f.messages.value)),d=computed((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
 
     var script$1 = {
     	name: 'TheHeader',
@@ -20349,7 +20289,7 @@
     		const router = useRouter();
     		const store = inject('store');
 
-    		let loggedUser = computed$1(() => store.state.loggeduser);
+    		let loggedUser = computed(() => store.state.loggeduser);
 
     		onMounted(() => loggedUser = store.state.loggeduser);
 
@@ -20367,10 +20307,15 @@
     			}
     		}
 
+    		function lol() {
+    			console.log("lol");
+    		}
+
     		return {
     			store,
     			loggedUser,
-    			logOut
+    			logOut,
+    			lol
     		}
     	},
     };
@@ -20471,7 +20416,11 @@
                           _hoisted_12
                         ]),
                         _: 1 /* STABLE */
-                      })
+                      }),
+                      createBaseVNode("a", {
+                        onClick: _cache[1] || (_cache[1] = (...args) => ($setup.lol && $setup.lol(...args))),
+                        class: "dropdown-item"
+                      }, "Say lol")
                     ]))
               ])
             ])
@@ -20486,14 +20435,16 @@
     var script = {
     	setup() {
     		provide('store', store);
+    		//provide('modal', modal)
 
     		return {
-    			store
+    			store,
+    			//modal,
     		}
     	},
     	name: 'App',
     	components: {
-    		TheHeader: script$1
+    		TheHeader: script$1,
     	},
     };
 
@@ -21361,7 +21312,7 @@
             }
             form.setFieldInitialValue(unref(path), value);
         }
-        const initialValue = computed$1(resolveInitialValue);
+        const initialValue = computed(resolveInitialValue);
         // if no form is associated, use a regular ref.
         if (!form) {
             const value = ref(resolveInitialValue());
@@ -21378,7 +21329,7 @@
         const currentValue = modelValue ? unref(modelValue) : getFromPath(form.values, unref(path), unref(initialValue));
         form.stageInitialValue(unref(path), currentValue);
         // otherwise use a computed setter that triggers the `setFieldValue`
-        const value = computed$1({
+        const value = computed({
             get() {
                 return getFromPath(form.values, unref(path));
             },
@@ -21401,8 +21352,8 @@
             pending: false,
             valid: true,
             validated: !!unref(errors).length,
-            initialValue: computed$1(() => unref(initialValue)),
-            dirty: computed$1(() => {
+            initialValue: computed(() => unref(initialValue)),
+            dirty: computed(() => {
                 return !es6(unref(currentValue), unref(initialValue));
             }),
         });
@@ -21429,16 +21380,16 @@
             const errors = ref([]);
             return {
                 errors,
-                errorMessage: computed$1(() => errors.value[0]),
+                errorMessage: computed(() => errors.value[0]),
                 setErrors: (messages) => {
                     errors.value = normalizeErrors(messages);
                 },
             };
         }
-        const errors = computed$1(() => form.errorBag.value[unref(path)] || []);
+        const errors = computed(() => form.errorBag.value[unref(path)] || []);
         return {
             errors,
-            errorMessage: computed$1(() => errors.value[0]),
+            errorMessage: computed(() => errors.value[0]),
             setErrors: (messages) => {
                 form.setFieldErrorBag(unref(path), normalizeErrors(messages));
             },
@@ -21827,7 +21778,7 @@
         const handleBlur = () => {
             meta.touched = true;
         };
-        const normalizedRules = computed$1(() => {
+        const normalizedRules = computed(() => {
             let rulesValue = unref(rules);
             const schema = unref(form === null || form === void 0 ? void 0 : form.schema);
             if (schema && !isYupValidator(schema)) {
@@ -21976,7 +21927,7 @@
             form.unregister(field);
         });
         // extract cross-field dependencies in a computed prop
-        const dependencies = computed$1(() => {
+        const dependencies = computed(() => {
             const rulesVal = normalizedRules.value;
             // is falsy, a function schema or a yup schema
             if (!rulesVal || isCallable(rulesVal) || isYupValidator(rulesVal)) {
@@ -22046,7 +21997,7 @@
         const uncheckedValue = opts === null || opts === void 0 ? void 0 : opts.uncheckedValue;
         function patchCheckboxApi(field) {
             const handleChange = field.handleChange;
-            const checked = computed$1(() => {
+            const checked = computed(() => {
                 const currentValue = unref(field.value);
                 const checkedVal = unref(checkedValue);
                 return Array.isArray(currentValue) ? currentValue.includes(checkedVal) : checkedVal === currentValue;
@@ -22177,7 +22128,7 @@
                     ctx.emit('update:modelValue', value.value);
                 }
                 : handleInput;
-            const fieldProps = computed$1(() => {
+            const fieldProps = computed(() => {
                 const { validateOnInput, validateOnChange, validateOnBlur, validateOnModelUpdate } = resolveValidationTriggers(props);
                 const baseOnBlur = [handleBlur, ctx.attrs.onBlur, validateOnBlur ? validateField : undefined].filter(Boolean);
                 const baseOnInput = [(e) => onChangeHandler(e, validateOnInput), ctx.attrs.onInput].filter(Boolean);
@@ -22296,7 +22247,7 @@
         // the source of errors for the form fields
         const { errorBag, setErrorBag, setFieldErrorBag } = useErrorBag(opts === null || opts === void 0 ? void 0 : opts.initialErrors);
         // Gets the first error of each field
-        const errors = computed$1(() => {
+        const errors = computed(() => {
             return keysOf(errorBag.value).reduce((acc, key) => {
                 const bag = errorBag.value[key];
                 if (bag && bag.length) {
@@ -22315,7 +22266,7 @@
         /**
          * Holds a computed reference to all fields names and labels
          */
-        const fieldNames = computed$1(() => {
+        const fieldNames = computed(() => {
             return keysOf(fieldsByPath.value).reduce((names, path) => {
                 const field = getFirstFieldAtPath(path);
                 if (field) {
@@ -22324,7 +22275,7 @@
                 return names;
             }, {});
         });
-        const fieldBailsMap = computed$1(() => {
+        const fieldBailsMap = computed(() => {
             return keysOf(fieldsByPath.value).reduce((map, path) => {
                 var _a;
                 const field = getFirstFieldAtPath(path);
@@ -22793,10 +22744,10 @@
             pending: 'some',
             valid: 'every',
         };
-        const isDirty = computed$1(() => {
+        const isDirty = computed(() => {
             return !es6(currentValues, unref(initialValues));
         });
-        const flags = computed$1(() => {
+        const flags = computed(() => {
             const fields = Object.values(fieldsByPath.value).flat(1).filter(Boolean);
             return keysOf(MERGE_STRATEGIES).reduce((acc, flag) => {
                 const mergeMethod = MERGE_STRATEGIES[flag];
@@ -22804,7 +22755,7 @@
                 return acc;
             }, {});
         });
-        return computed$1(() => {
+        return computed(() => {
             return Object.assign(Object.assign({ initialValues: unref(initialValues) }, flags.value), { valid: flags.value.valid && !keysOf(errors.value).length, dirty: isDirty.value });
         });
     }
@@ -23048,7 +22999,7 @@
             const key = entryCounter++;
             const entry = {
                 key,
-                value: computed$1(() => {
+                value: computed(() => {
                     const currentValues = getFromPath(form === null || form === void 0 ? void 0 : form.values, unref(arrayPath), []);
                     const idx = fields.value.findIndex(e => e.key === key);
                     return idx === -1 ? value : currentValues[idx];
@@ -23215,7 +23166,7 @@
         },
         setup(props, ctx) {
             const form = inject(FormContextKey, undefined);
-            const message = computed$1(() => {
+            const message = computed(() => {
                 return form === null || form === void 0 ? void 0 : form.errors.value[props.name];
             });
             function slotProps() {

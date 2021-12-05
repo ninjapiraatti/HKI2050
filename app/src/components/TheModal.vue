@@ -1,7 +1,7 @@
 <template>
 	<div v-if='modals.length'>
 		<VModal
-			:ref='id(modal)'
+			:ref='sayFoo'
 			v-for='modal in modals'
 			:key='modal.id'
 			:showAtStart='true'
@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { onMounted } from "vue";
 import VModal from '@components/VModal.vue'
 export default {
 	name: 'TheModal',
@@ -28,14 +29,24 @@ export default {
 			modal.resolve(null)
 		}
 
+		function sayFoo() {
+			console.log("Foo")
+			return "FooTitle"
+		}
+
 		function onSuccess(modal, payload) {
 			modal.resolve(payload)
 			this.$refs[this.id(modal)].hide()
 		}
 
+		onMounted(() => {
+			console.log("sdfsf")
+		})
+
 		return {
 			id,
 			removeModal,
+			sayFoo,
 			onSuccess,
 		}
 	},

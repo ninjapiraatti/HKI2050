@@ -16,7 +16,8 @@
 
 <script>
 import { Modal } from 'bootstrap'
-import { onMounted } from '@vue/runtime-core'
+//import { computed, onMounted } from '@vue/runtime-core'
+import { ref, computed, onMounted } from "vue";
 const sizeClasses = {
 	sm: 'modal-sm',
 	lg: 'modal-lg',
@@ -37,10 +38,12 @@ export default {
 		},
 		showAtStart: false,
 	},
-	setup() {
+	setup(props) {
 		const sizeClass = computed(() => {
-			return sizeClasses[this.size] || ''
+			return sizeClasses[props.size] || ''
 		})
+		const modal = ref(null)
+		const showAtStart = true
 
 		function show() {
 			this.modal.show()
@@ -51,11 +54,14 @@ export default {
 		}
 
 		onMounted(() => {
-			this.modal = Modal.getOrCreateInstance(this.$refs.modal)
-			this.$refs.modal.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding') })
-			this.$refs.modal.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden') })
-			this.$refs.modal.addEventListener('show.bs.modal', () => { this.$emit('modal-showing') })
-			this.$refs.modal.addEventListener('shown.bs.modal', () => {
+			let modalElement = modal.value 
+			console.log(modalElement)
+			let modalThing = Modal.getOrCreateInstance(modalElement)
+			console.log(modalThing)
+			modalElement.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding') })
+			modalElement.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden') })
+			modalElement.addEventListener('show.bs.modal', () => { this.$emit('modal-showing') })
+			modalElement.addEventListener('shown.bs.modal', () => {
 				this.$emit('modal-shown')
 				const selectors = [
 					'input, select',
@@ -71,10 +77,11 @@ export default {
 				}
 			})
 
-			if (this.showAtStart) this.modal.show()
+			if (showAtStart) modalThing.show()
 		})
 
 		return {
+			modal,
 			show,
 			hide,
 			sizeClass,

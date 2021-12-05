@@ -3,23 +3,28 @@
 </template>
 
 <script>
-	import FormLogin from '@forms/FormLogin.vue'
-
-	export default {
-		name: 'Login',
-
-		async mounted() {
-			// Forgot password will return untrue
-			const success = await this.$modal({
+import { inject, onMounted } from 'vue'
+import FormLogin from '@forms/FormLogin.vue'
+//import modal from '@root/plugins/vue-modal'
+export default {
+	name: 'Login',
+	setup() {
+		const modal = inject('modal')
+		onMounted(async() => {
+			const success = await modal({
 				title: 'Log in',
 				component: FormLogin,
 				backdrop: 'static',
 			})
-
 			if (success) {
 				console.log("Logged in")
 				this.$router.replace(this.$route.query.redirect || { name: 'home' })
 			}
-		},
-	}
+		})
+
+		return {
+			modal,
+		}
+	},
+}
 </script>

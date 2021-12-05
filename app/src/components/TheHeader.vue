@@ -27,6 +27,7 @@
 						</li>
 						<li v-else>
 							<router-link :to='{ name: "login" }' class='dropdown-item'>Log in</router-link>
+							<a @click='lol' class='dropdown-item'>Say lol</a>
 						</li>
 					</ul>
 				</li>
@@ -63,10 +64,15 @@ export default {
 			}
 		}
 
+		function lol() {
+			console.log("lol")
+		}
+
 		return {
 			store,
 			loggedUser,
-			logOut
+			logOut,
+			lol
 		}
 	},
 }

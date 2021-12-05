@@ -17,6 +17,7 @@ export default {
 		})
 
 		const modal = ({ title, component, props = {}, backdrop = true, size } = {}) => {
+			console.log(title)
 			if ('props' in component) props = Object.keys(component.props).reduce((used, key) => ({ ...used, [key]: props[key] }), {})
 
 			return new Promise(resolve => {
@@ -32,7 +33,8 @@ export default {
 			})
 		}
 
-		app.config.globalProperties.$modal = modal
-		app.config.globalProperties.$confirm = confirm(modal)
+		app.provide('modal', modal)
+		//app.config.globalProperties.$modal = modal
+		//app.config.globalProperties.$confirm = confirm(modal)
 	},
 }
