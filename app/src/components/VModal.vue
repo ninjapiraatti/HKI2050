@@ -6,7 +6,7 @@
 					<div class="modal-title h2">{{ title }}</div>
 					<button v-if='backdrop != "static"' type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div ref='body' class="modal-body">
+				<div ref="body" class="modal-body">
 					<slot></slot>
 				</div>
 			</div>
@@ -38,11 +38,12 @@ export default {
 		},
 		showAtStart: false,
 	},
-	setup(props) {
+	setup(props, { emit }) {
 		const sizeClass = computed(() => {
 			return sizeClasses[props.size] || ''
 		})
 		const modal = ref(null)
+		const body = ref(null)
 		const showAtStart = true
 
 		function show() {
@@ -54,22 +55,24 @@ export default {
 		}
 
 		onMounted(() => {
-			let modalElement = modal.value 
+			let modalElement = modal.value
+			let modalBodyElement = body.value 
 			console.log(modalElement)
 			let modalThing = Modal.getOrCreateInstance(modalElement)
 			console.log(modalThing)
-			modalElement.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding') })
-			modalElement.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden') })
-			modalElement.addEventListener('show.bs.modal', () => { this.$emit('modal-showing') })
+			console.log(body)
+			modalElement.addEventListener('hide.bs.modal', () => { emit('modal-hiding') })
+			modalElement.addEventListener('hidden.bs.modal', () => { emit('modal-hidden') })
+			modalElement.addEventListener('show.bs.modal', () => { emit('modal-showing') })
 			modalElement.addEventListener('shown.bs.modal', () => {
-				this.$emit('modal-shown')
+				emit('modal-shown')
 				const selectors = [
 					'input, select',
 					'button.btn-primary',
 					'button',
 				]
 				for (const selector of selectors) {
-					const input = this.$refs.body.querySelector(selector)
+					const input = modalBodyElement.querySelector(selector)
 					if (input) {
 						input.focus()
 						break
@@ -82,6 +85,7 @@ export default {
 
 		return {
 			modal,
+			body,
 			show,
 			hide,
 			sizeClass,

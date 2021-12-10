@@ -1,7 +1,7 @@
 <template>
 	<div v-if='modals.length'>
 		<VModal
-			:ref='sayFoo'
+			:ref='id(modal)'
 			v-for='modal in modals'
 			:key='modal.id'
 			:showAtStart='true'

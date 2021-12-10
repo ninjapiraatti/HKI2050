@@ -20070,11 +20070,12 @@
     		},
     		showAtStart: false,
     	},
-    	setup(props) {
+    	setup(props, { emit }) {
     		const sizeClass = computed(() => {
     			return sizeClasses[props.size] || ''
     		});
     		const modal = ref(null);
+    		const body = ref(null);
 
     		function show() {
     			this.modal.show();
@@ -20085,22 +20086,24 @@
     		}
 
     		onMounted(() => {
-    			let modalElement = modal.value; 
+    			let modalElement = modal.value;
+    			let modalBodyElement = body.value; 
     			console.log(modalElement);
     			let modalThing = Modal.getOrCreateInstance(modalElement);
     			console.log(modalThing);
-    			modalElement.addEventListener('hide.bs.modal', () => { this.$emit('modal-hiding'); });
-    			modalElement.addEventListener('hidden.bs.modal', () => { this.$emit('modal-hidden'); });
-    			modalElement.addEventListener('show.bs.modal', () => { this.$emit('modal-showing'); });
+    			console.log(body);
+    			modalElement.addEventListener('hide.bs.modal', () => { emit('modal-hiding'); });
+    			modalElement.addEventListener('hidden.bs.modal', () => { emit('modal-hidden'); });
+    			modalElement.addEventListener('show.bs.modal', () => { emit('modal-showing'); });
     			modalElement.addEventListener('shown.bs.modal', () => {
-    				this.$emit('modal-shown');
+    				emit('modal-shown');
     				const selectors = [
     					'input, select',
     					'button.btn-primary',
     					'button',
     				];
     				for (const selector of selectors) {
-    					const input = this.$refs.body.querySelector(selector);
+    					const input = modalBodyElement.querySelector(selector);
     					if (input) {
     						input.focus();
     						break
@@ -20113,6 +20116,7 @@
 
     		return {
     			modal,
+    			body,
     			show,
     			hide,
     			sizeClass,
@@ -20216,7 +20220,7 @@
         ? (openBlock(), createElementBlock("div", _hoisted_1$2, [
             (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.modals, (modal) => {
               return (openBlock(), createBlock(_component_VModal, {
-                ref: $setup.sayFoo,
+                ref: $setup.id(modal),
                 key: modal.id,
                 showAtStart: true,
                 title: modal.title,
