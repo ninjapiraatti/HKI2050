@@ -10,8 +10,31 @@ export default {
 		app.component('TheModal', {
 			...TheModal,
 			setup() {
+				function id(modal) {
+					return `modal-${modal.id}`
+				}
+		
+				function removeModal(modal) {
+					this.modals.splice(this.modals.indexOf(modal), 1)
+					modal.resolve(null)
+				}
+		
+				function onSuccess(modal, payload) {
+					modal.resolve(payload)
+					console.log("Great success")
+					this.$refs[this.id(modal)].hide()
+				}
+
+				function sayFoo() {
+					return "FOOBAR"
+				}
+		
 				return {
+					id,
+					removeModal,
+					onSuccess,
 					modals,
+					sayFoo
 				}
 			}
 		})

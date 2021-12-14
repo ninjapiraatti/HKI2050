@@ -11648,6 +11648,13 @@
     function useRouter() {
         return inject(routerKey);
     }
+    /**
+     * Returns the current route location. Equivalent to using `$route` inside
+     * templates.
+     */
+    function useRoute() {
+        return inject(routeLocationKey);
+    }
 
     var top = 'top';
     var bottom = 'bottom';
@@ -18643,7 +18650,7 @@
     	},
     };
 
-    const _hoisted_1$f = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$e = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
@@ -18672,7 +18679,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$f,
+              _hoisted_1$e,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -18747,6 +18754,8 @@
     var script$f = {
     	name: 'Login',
     	setup() {
+    		const router = useRouter();
+    		const route = useRoute();
     		const modal = inject('modal');
     		onMounted(async() => {
     			const success = await modal({
@@ -18755,8 +18764,8 @@
     				backdrop: 'static',
     			});
     			if (success) {
-    				console.log("Logged in");
-    				this.$router.replace(this.$route.query.redirect || { name: 'home' });
+    				console.log(router);
+    				router.replace(route.query.redirect || { name: 'home' });
     			}
     		});
 
@@ -18777,7 +18786,7 @@
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$e = { class: "container" };
+    const _hoisted_1$d = { class: "container" };
     const _hoisted_2$c = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
@@ -18786,7 +18795,7 @@
     ];
 
     function render$e(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$e, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$d, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
         }, _hoisted_3$c, 2 /* CLASS */)
@@ -18845,7 +18854,7 @@
     		},
     	};
 
-    const _hoisted_1$d = {
+    const _hoisted_1$c = {
       key: 0,
       class: "form-check"
     };
@@ -18875,7 +18884,7 @@
       }, {
         default: withCtx(({ errors }) => [
           ($setup.store.state.loggeduser.isadmin)
-            ? (openBlock(), createElementBlock("div", _hoisted_1$d, [
+            ? (openBlock(), createElementBlock("div", _hoisted_1$c, [
                 _hoisted_2$b,
                 createVNode(_component_VField, {
                   modelValue: $data.form.isadmin,
@@ -19006,7 +19015,7 @@
     		},
     	};
 
-    const _hoisted_1$c = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$b = /*#__PURE__*/createBaseVNode("label", {
       for: "label",
       class: "form-label"
     }, "Name", -1 /* HOISTED */);
@@ -19028,7 +19037,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$c,
+            _hoisted_1$b,
             createVNode(_component_VField, {
               modelValue: $data.form.name,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.name = $event)),
@@ -19165,7 +19174,7 @@
     	},
     };
 
-    const _hoisted_1$b = { class: "container" };
+    const _hoisted_1$a = { class: "container" };
     const _hoisted_2$9 = { class: "row gx-4" };
     const _hoisted_3$9 = { class: "col-md-4" };
     const _hoisted_4$8 = { class: "context" };
@@ -19235,7 +19244,7 @@
     };
 
     function render$b(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$b, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$a, [
         createBaseVNode("div", _hoisted_2$9, [
           createBaseVNode("div", _hoisted_3$9, [
             createBaseVNode("div", {
@@ -19348,7 +19357,7 @@
     		}
     	};
 
-    const _hoisted_1$a = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$9 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
@@ -19369,7 +19378,7 @@
           class: "vstack gap-2"
         }, {
           default: withCtx(({ errors }) => [
-            _hoisted_1$a,
+            _hoisted_1$9,
             createBaseVNode("div", {
               class: normalizeClass(["input-group", { "has-validation": errors.email }])
             }, [
@@ -19430,7 +19439,7 @@
     		},
     	};
 
-    const _hoisted_1$9 = {
+    const _hoisted_1$8 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19447,7 +19456,7 @@
 
     function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.requested)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, _hoisted_4$6, 2 /* CLASS */)
@@ -19510,7 +19519,7 @@
     	}
     };
 
-    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$7 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
@@ -19547,7 +19556,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$8,
+              _hoisted_1$7,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
@@ -19665,7 +19674,7 @@
     		},
     	};
 
-    const _hoisted_1$7 = {
+    const _hoisted_1$6 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19682,7 +19691,7 @@
 
     function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.registered)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$6, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, _hoisted_4$4, 2 /* CLASS */)
@@ -19750,7 +19759,7 @@
     		}
     	};
 
-    const _hoisted_1$6 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$5 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
@@ -19772,7 +19781,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$6,
+            _hoisted_1$5,
             createVNode(_component_VField, {
               modelValue: $data.form.password,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.password = $event)),
@@ -19887,7 +19896,7 @@
     		},
     	};
 
-    const _hoisted_1$5 = {
+    const _hoisted_1$4 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19905,7 +19914,7 @@
       const _component_router_link = resolveComponent("router-link");
 
       return ($data.confirmed)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$5, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$4, [
             createBaseVNode("div", _hoisted_2$3, [
               _hoisted_3$3,
               createBaseVNode("div", _hoisted_4$2, [
@@ -19938,7 +19947,7 @@
     	},
     };
 
-    const _hoisted_1$4 = { class: "container" };
+    const _hoisted_1$3 = { class: "container" };
     const _hoisted_2$2 = { class: "counter" };
     const _hoisted_3$2 = /*#__PURE__*/createBaseVNode("div", { class: "bigasslogo" }, [
       /*#__PURE__*/createBaseVNode("img", {
@@ -19948,7 +19957,7 @@
     ], -1 /* HOISTED */);
 
     function render$4(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$3, [
         createBaseVNode("div", _hoisted_2$2, [
           createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
           createBaseVNode("button", {
@@ -20124,7 +20133,7 @@
     	}
     };
 
-    const _hoisted_1$3 = ["data-bs-backdrop", "data-bs-keyboard"];
+    const _hoisted_1$2 = ["data-bs-backdrop", "data-bs-keyboard"];
     const _hoisted_2$1 = { class: "modal-content shadow-lg" };
     const _hoisted_3$1 = {
       key: 0,
@@ -20167,7 +20176,7 @@
             ], 512 /* NEED_PATCH */)
           ])
         ], 2 /* CLASS */)
-      ], 8 /* PROPS */, _hoisted_1$3))
+      ], 8 /* PROPS */, _hoisted_1$2))
     }
 
     script$3.render = render$3;
@@ -20175,68 +20184,38 @@
 
     var script$2 = {
     	name: 'TheModal',
-    	setup() {
-    		function id(modal) {
-    			return `modal-${modal.id}`
-    		}
-
-    		function removeModal(modal) {
-    			this.modals.splice(this.modals.indexOf(modal), 1);
-    			modal.resolve(null);
-    		}
-
-    		function sayFoo() {
-    			console.log("Foo");
-    			return "FooTitle"
-    		}
-
-    		function onSuccess(modal, payload) {
-    			modal.resolve(payload);
-    			this.$refs[this.id(modal)].hide();
-    		}
-
-    		onMounted(() => {
-    			console.log("sdfsf");
-    		});
-
-    		return {
-    			id,
-    			removeModal,
-    			sayFoo,
-    			onSuccess,
-    		}
-    	},
     	components: {
     		VModal: script$3,
     	},
     };
 
-    const _hoisted_1$2 = { key: 0 };
-
     function render$2(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VModal = resolveComponent("VModal");
 
       return (_ctx.modals.length)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$2, [
+        ? (openBlock(), createElementBlock("div", {
+            key: 0,
+            class: normalizeClass(_ctx.sayFoo)
+          }, [
             (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.modals, (modal) => {
               return (openBlock(), createBlock(_component_VModal, {
-                ref: $setup.id(modal),
+                ref: _ctx.id(modal),
                 key: modal.id,
                 showAtStart: true,
                 title: modal.title,
                 backdrop: modal.backdrop,
                 size: modal.size,
-                onModalHidden: $event => ($setup.removeModal(modal))
+                onModalHidden: $event => (_ctx.removeModal(modal))
               }, {
                 default: withCtx(() => [
                   (openBlock(), createBlock(resolveDynamicComponent(modal.component), mergeProps(modal.props, {
-                    onSuccess: $event => ($setup.onSuccess(modal, $event))
+                    onSuccess: $event => (_ctx.onSuccess(modal, $event))
                   }), null, 16 /* FULL_PROPS */, ["onSuccess"]))
                 ]),
                 _: 2 /* DYNAMIC */
               }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["title", "backdrop", "size", "onModalHidden"]))
             }), 128 /* KEYED_FRAGMENT */))
-          ]))
+          ], 2 /* CLASS */))
         : createCommentVNode("v-if", true)
     }
 
@@ -20251,8 +20230,31 @@
     		app.component('TheModal', {
     			...script$2,
     			setup() {
+    				function id(modal) {
+    					return `modal-${modal.id}`
+    				}
+    		
+    				function removeModal(modal) {
+    					this.modals.splice(this.modals.indexOf(modal), 1);
+    					modal.resolve(null);
+    				}
+    		
+    				function onSuccess(modal, payload) {
+    					modal.resolve(payload);
+    					console.log("Great success");
+    					this.$refs[this.id(modal)].hide();
+    				}
+
+    				function sayFoo() {
+    					return "FOOBAR"
+    				}
+    		
     				return {
+    					id,
+    					removeModal,
+    					onSuccess,
     					modals,
+    					sayFoo
     				}
     			}
     		});

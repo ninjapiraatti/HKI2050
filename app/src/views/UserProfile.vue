@@ -69,8 +69,15 @@ export default {
 	name: 'UserProfile',
 	setup() {
 		const store = inject('store')
+
+		async function getCharacters() {
+			console.log(this.$route.params)
+			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id })
+		},
+
 		return {
-			store
+			store,
+			getCharacters,
 		}
 	},
 	data() {
