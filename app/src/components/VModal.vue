@@ -38,7 +38,7 @@ export default {
 		},
 		showAtStart: false,
 	},
-	setup(props, { emit }) {
+	setup(props, {emit}) {
 		const sizeClass = computed(() => {
 			return sizeClasses[props.size] || ''
 		})
@@ -47,11 +47,11 @@ export default {
 		const showAtStart = true
 
 		function show() {
-			this.modal.show()
+			modal.value.show()
 		}
 
 		function hide() {
-			this.modal.hide()
+			modal.value.hide() // TODO: Modal does hide when closed, is this obsolete?
 		}
 
 		onMounted(() => {
@@ -86,9 +86,9 @@ export default {
 		return {
 			modal,
 			body,
+			sizeClass,
 			show,
 			hide,
-			sizeClass,
 		}
 	}
 }

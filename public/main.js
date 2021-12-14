@@ -18616,38 +18616,38 @@
 
     var script$g = {
     	name: 'FormLogin',
-    	setup() {
-    	const store = inject('store');
-    		return {
-    			store
+    	setup(props, { emit }) {
+    		const store = inject('store');
+    		let sending = false;
+    		let form = {
+    			email: '',
+    			password: '',
+    		};
+    		let test = "lol";
+    		let submitLabel = computed(() => sending ? 'Logging in' : 'Log in');
+
+    		async function onSubmit() {
+    			sending = true;
+
+    			const success = await store.methods.login(form);
+    			if (success) {
+    				emit('success', success);
+    			}
+
+    			sending = false;
     		}
-    	},
-    	data() {
+
+    		onMounted(() => { console.log(test); });
+
     		return {
-    			sending: false,
-    			form: {
-    				email: '',
-    				password: '',
-    			},
+    			store,
+    			onSubmit,
+    			sending,
+    			submitLabel,
+    			form,
+    			test,
     		}
-    	},
-
-    	computed: {
-    		submitLabel() {
-    			return this.sending ? 'Logging in' : 'Log in'
-    		},
-    	},
-
-    	methods: {
-    		async onSubmit() {
-    			this.sending = true;
-
-    			const success = await this.store.methods.login(this.form);
-    			if (success) this.$emit('success', success);
-
-    			this.sending = false;
-    		},
-    	},
+    	}
     };
 
     const _hoisted_1$e = /*#__PURE__*/createBaseVNode("label", {
@@ -18674,15 +18674,15 @@
 
       return (openBlock(), createElementBlock("div", null, [
         createVNode(_component_VForm, {
-          onSubmit: $options.onSubmit,
+          onSubmit: $setup.onSubmit,
           class: "vstack gap-2"
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
               _hoisted_1$e,
               createVNode(_component_VField, {
-                modelValue: $data.form.email,
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($data.form.email = $event)),
+                modelValue: $setup.form.email,
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($setup.form.email = $event)),
                 rules: "required|email",
                 type: "email",
                 id: "email",
@@ -18699,8 +18699,8 @@
             createBaseVNode("div", null, [
               _hoisted_2$d,
               createVNode(_component_VField, {
-                modelValue: $data.form.password,
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($data.form.password = $event)),
+                modelValue: $setup.form.password,
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($setup.form.password = $event)),
                 rules: "required",
                 type: "password",
                 id: "password",
@@ -18717,9 +18717,9 @@
             createBaseVNode("div", _hoisted_3$d, [
               createBaseVNode("button", {
                 type: "submit",
-                disabled: $data.sending,
+                disabled: $setup.sending,
                 class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$b),
+              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$b),
               createBaseVNode("div", _hoisted_5$7, [
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
@@ -19091,8 +19091,39 @@
     	name: 'UserProfile',
     	setup() {
     		const store = inject('store');
+    		const modal = inject('modal');
+
+    		async function getCharacters() {
+    			console.log(this.$route.params);
+    			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id });
+    		}
+
+    		async function editUser(props = {}) {
+    			const result = await modal({
+    				title: 'Edit user info',
+    				component: script$d,
+    				props,
+    			});
+
+    			if (result) this.getUser();
+    		}
+
+    		async function editCharacter(props = {}) {
+    			props.user_id = this.user.id;
+    			const result = await modal({
+    				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
+    				component: script$c,
+    				props,
+    			});
+
+    			if (result) this.getUser();
+    		}
+
     		return {
-    			store
+    			store,
+    			getCharacters,
+    			editUser,
+    			editCharacter,
     		}
     	},
     	data() {
@@ -19129,30 +19160,9 @@
     			*/
     		},
 
-    		async editUser(props = {}) {
-    			const result = await this.$modal({
-    				title: 'Edit user info',
-    				component: script$d,
-    				props,
-    			});
-
-    			if (result) this.getUser();
-    		},
-
     		async getCharacters() {
     			console.log(this.$route.params);
     			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id });
-    		},
-
-    		async editCharacter(props = {}) {
-    			props.user_id = this.user.id;
-    			const result = await this.$modal({
-    				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
-    				component: script$c,
-    				props,
-    			});
-
-    			if (result) this.getUser();
     		},
 
     		async confirmDelete(type, data) {
@@ -20079,7 +20089,7 @@
     		},
     		showAtStart: false,
     	},
-    	setup(props, { emit }) {
+    	setup(props, {emit}) {
     		const sizeClass = computed(() => {
     			return sizeClasses[props.size] || ''
     		});
@@ -20087,11 +20097,11 @@
     		const body = ref(null);
 
     		function show() {
-    			this.modal.show();
+    			modal.value.show();
     		}
 
     		function hide() {
-    			this.modal.hide();
+    			modal.value.hide(); // TODO: Modal does hide when closed, is this obsolete?
     		}
 
     		onMounted(() => {
@@ -20126,9 +20136,9 @@
     		return {
     			modal,
     			body,
+    			sizeClass,
     			show,
     			hide,
-    			sizeClass,
     		}
     	}
     };

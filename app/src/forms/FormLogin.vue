@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
-
 			<div>
 				<label for='email' class='form-label'>Email</label>
 				<VField
@@ -47,40 +46,40 @@
 </template>
 
 <script>
-import { inject } from 'vue'
+import { inject, onMounted, computed } from 'vue'
 export default {
 	name: 'FormLogin',
-	setup() {
-	const store = inject('store')
-		return {
-			store
+	setup(props, { emit }) {
+		const store = inject('store')
+		let sending = false
+		let form = {
+			email: '',
+			password: '',
 		}
-	},
-	data() {
-		return {
-			sending: false,
-			form: {
-				email: '',
-				password: '',
-			},
+		let test = "lol"
+		let submitLabel = computed(() => sending ? 'Logging in' : 'Log in')
+
+		async function onSubmit() {
+			sending = true
+
+			const success = await store.methods.login(form)
+			if (success) {
+				emit('success', success)
+			}
+
+			sending = false
 		}
-	},
 
-	computed: {
-		submitLabel() {
-			return this.sending ? 'Logging in' : 'Log in'
-		},
-	},
+		onMounted(() => { console.log(test) });
 
-	methods: {
-		async onSubmit() {
-			this.sending = true
-
-			const success = await this.store.methods.login(this.form)
-			if (success) this.$emit('success', success)
-
-			this.sending = false
-		},
-	},
+		return {
+			store,
+			onSubmit,
+			sending,
+			submitLabel,
+			form,
+			test,
+		}
+	}
 }
 </script>

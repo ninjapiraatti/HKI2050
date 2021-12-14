@@ -69,15 +69,39 @@ export default {
 	name: 'UserProfile',
 	setup() {
 		const store = inject('store')
+		const modal = inject('modal')
 
 		async function getCharacters() {
 			console.log(this.$route.params)
 			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id })
-		},
+		}
+
+		async function editUser(props = {}) {
+			const result = await modal({
+				title: 'Edit user info',
+				component: FormUserInfo,
+				props,
+			})
+
+			if (result) this.getUser()
+		}
+
+		async function editCharacter(props = {}) {
+			props.user_id = this.user.id
+			const result = await modal({
+				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
+				component: FormCharacter,
+				props,
+			})
+
+			if (result) this.getUser()
+		}
 
 		return {
 			store,
 			getCharacters,
+			editUser,
+			editCharacter,
 		}
 	},
 	data() {
@@ -114,30 +138,9 @@ export default {
 			*/
 		},
 
-		async editUser(props = {}) {
-			const result = await this.$modal({
-				title: 'Edit user info',
-				component: FormUserInfo,
-				props,
-			})
-
-			if (result) this.getUser()
-		},
-
 		async getCharacters() {
 			console.log(this.$route.params)
 			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id })
-		},
-
-		async editCharacter(props = {}) {
-			props.user_id = this.user.id
-			const result = await this.$modal({
-				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
-				component: FormCharacter,
-				props,
-			})
-
-			if (result) this.getUser()
 		},
 
 		async confirmDelete(type, data) {
