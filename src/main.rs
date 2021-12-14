@@ -69,7 +69,7 @@ fn initialize_db(name: &str) {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-	aninmals::public_function();
+	aninmals::get_random_aninmal();
 	dotenv::dotenv().ok();
 	let rust_log = std::env::var("RUST_LOG").unwrap_or("info, simple-auth-server=debug".to_string());
 	std::env::set_var("RUST_LOG", rust_log);
