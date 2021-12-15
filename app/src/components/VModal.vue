@@ -46,14 +46,6 @@ export default {
 		const body = ref(null)
 		const showAtStart = true
 
-		function show() {
-			modal.value.show()
-		}
-
-		function hide() {
-			modal.value.hide() // TODO: Modal does hide when closed, is this obsolete?
-		}
-
 		onMounted(() => {
 			let modalElement = modal.value
 			let modalBodyElement = body.value 
@@ -87,8 +79,6 @@ export default {
 			modal,
 			body,
 			sizeClass,
-			show,
-			hide,
 		}
 	}
 }

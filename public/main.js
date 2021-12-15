@@ -19269,7 +19269,7 @@
                   createBaseVNode("div", _hoisted_8$3, [
                     createBaseVNode("button", {
                       class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[0] || (_cache[0] = $event => ($options.editUser($data.user)))
+                      onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($data.user)))
                     }, _hoisted_10$2),
                     createBaseVNode("button", {
                       class: "btn btn-unstyled px-1 rounded",
@@ -19289,7 +19289,7 @@
                   _hoisted_16,
                   createBaseVNode("button", {
                     class: "btn btn-primary gradient",
-                    onClick: _cache[2] || (_cache[2] = $event => ($options.editCharacter()))
+                    onClick: _cache[2] || (_cache[2] = $event => ($setup.editCharacter()))
                   }, "Add character")
                 ])
               ]),
@@ -19313,7 +19313,7 @@
                                 createBaseVNode("div", _hoisted_22, [
                                   createBaseVNode("button", {
                                     class: "btn btn-unstyled px-1 rounded",
-                                    onClick: $event => ($options.editCharacter(character))
+                                    onClick: $event => ($setup.editCharacter(character))
                                   }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
                                   createBaseVNode("button", {
                                     class: "btn btn-unstyled px-1 rounded",
@@ -20096,14 +20096,6 @@
     		const modal = ref(null);
     		const body = ref(null);
 
-    		function show() {
-    			modal.value.show();
-    		}
-
-    		function hide() {
-    			modal.value.hide(); // TODO: Modal does hide when closed, is this obsolete?
-    		}
-
     		onMounted(() => {
     			let modalElement = modal.value;
     			let modalBodyElement = body.value; 
@@ -20137,8 +20129,6 @@
     			modal,
     			body,
     			sizeClass,
-    			show,
-    			hide,
     		}
     	}
     };
@@ -20252,7 +20242,6 @@
     				function onSuccess(modal, payload) {
     					modal.resolve(payload);
     					console.log("Great success");
-    					this.$refs[this.id(modal)].hide();
     				}
 
     				function sayFoo() {

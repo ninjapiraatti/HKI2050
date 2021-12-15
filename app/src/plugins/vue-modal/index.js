@@ -22,7 +22,6 @@ export default {
 				function onSuccess(modal, payload) {
 					modal.resolve(payload)
 					console.log("Great success")
-					this.$refs[this.id(modal)].hide()
 				}
 
 				function sayFoo() {
