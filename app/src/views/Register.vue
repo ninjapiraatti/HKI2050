@@ -12,23 +12,24 @@
 </template>
 
 <script>
-	import FormRegister from '@forms/FormRegister.vue'
+import FormRegister from '@forms/FormRegister.vue'
+import { onMounted } from 'vue'
+export default {
+	name: 'Register',
+	setup() {
+		let registered = false
 
-	export default {
-		name: 'Register',
-
-		data() {
-			return {
-				registered: false,
-			}
-		},
-
-		async mounted() {
+		onMounted(async() => {
 			this.registered = await this.$modal({
 				title: 'Sign up',
 				component: FormRegister,
 				backdrop: 'static',
 			})
-		},
-	}
+		})
+
+		return {
+			registered
+		}
+	},
+}
 </script>
