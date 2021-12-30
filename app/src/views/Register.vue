@@ -13,14 +13,15 @@
 
 <script>
 import FormRegister from '@forms/FormRegister.vue'
-import { onMounted } from 'vue'
+import { inject, onMounted } from 'vue'
 export default {
 	name: 'Register',
 	setup() {
+		const modal = inject('modal')
 		let registered = false
 
 		onMounted(async() => {
-			this.registered = await this.$modal({
+			registered = await modal({
 				title: 'Sign up',
 				component: FormRegister,
 				backdrop: 'static',
