@@ -19385,10 +19385,33 @@
     	setup() {
     		const store = inject('store');
     		const modal = inject('modal');
+    		const route = useRoute();
+    		let user = reactive({
+    			id: "",
+    			username: "",
+    			isadmin: false,
+    			email: "",
+    		});
+    		let characters = ref([]);
 
     		async function getCharacters() {
-    			console.log(this.$route.params);
-    			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id });
+    			characters.value = await api.users.characters.get({ user_id: route.params.id });
+    		}
+
+    		async function getUser() {
+    			const promises = [ api.users.get({ id: route.params.id }) ];
+    			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
+    			console.log(user);
+    			const [ userUpdated ] = await Promise.all(promises);
+    			console.log(userUpdated);
+    			user = userUpdated;
+    			console.log(user);
+
+    			/*
+    			this.user.characters.forEach(character => {
+    				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
+    			})
+    			*/
     		}
 
     		async function editUser(props = {}) {
@@ -19398,65 +19421,44 @@
     				props,
     			});
 
-    			if (result) this.getUser();
+    			if (result) getUser();
+    			//return result
     		}
 
+
     		async function editCharacter(props = {}) {
-    			props.user_id = this.user.id;
+    			props.user_id = user.id;
     			const result = await modal({
     				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
     				component: script$c,
     				props,
     			});
 
-    			if (result) this.getUser();
+    			if (result) getCharacters();
+    			return result
     		}
 
+    		onMounted(async() => {
+    			if (store.state.loggeduser.isadmin && !store.state.characters.length) {
+    				console.log("lol");
+    			}
+    			user = store.state.loggeduser;
+    			await Promise.all([
+    				getUser(),
+    				getCharacters(),
+    			]);
+    		});
+
     		return {
+    			user,
     			store,
+    			characters,
     			getCharacters,
     			editUser,
     			editCharacter,
     		}
     	},
-    	data() {
-    		return {
-    			user: {},
-    			characters: [],
-    		}
-    	},
-
-    	async mounted() {
-    		if (this.store.state.loggeduser.isadmin && !this.store.state.projects.length) {
-    			console.log("lol");
-    		}
-    		this.user = this.store.state.loggeduser;
-    		await Promise.all([
-    			// this.getUser(),
-    			this.getCharacters(),
-    		]);
-    	},
-
     	methods: {
-    		async getUser() {
-    			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ];
-    			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
-
-    			const [ user ] = await Promise.all(promises);
-
-    			this.user = user;
-
-    			/*
-    			this.user.characters.forEach(character => {
-    				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
-    			})
-    			*/
-    		},
-
-    		async getCharacters() {
-    			console.log(this.$route.params);
-    			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id });
-    		},
 
     		async confirmDelete(type, data) {
     			console.log(type, data);
@@ -19478,7 +19480,10 @@
     };
 
     const _hoisted_1$a = { class: "container" };
-    const _hoisted_2$9 = { class: "row gx-4" };
+    const _hoisted_2$9 = {
+      key: 0,
+      class: "row gx-4"
+    };
     const _hoisted_3$9 = { class: "col-md-4" };
     const _hoisted_4$8 = { class: "context" };
     const _hoisted_5$5 = { class: "card-header d-flex align-items-center" };
@@ -19548,82 +19553,85 @@
 
     function render$b(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$a, [
-        createBaseVNode("div", _hoisted_2$9, [
-          createBaseVNode("div", _hoisted_3$9, [
-            createBaseVNode("div", {
-              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-            }, [
-              createBaseVNode("div", _hoisted_4$8, [
-                createBaseVNode("div", _hoisted_5$5, [
-                  createBaseVNode("h1", _hoisted_6$4, toDisplayString($data.user.username), 1 /* TEXT */)
-                ]),
-                createBaseVNode("div", _hoisted_7$3, [
-                  createBaseVNode("div", null, toDisplayString($data.user.email), 1 /* TEXT */),
-                  createBaseVNode("div", _hoisted_8$3, [
-                    createBaseVNode("button", {
-                      class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($data.user)))
-                    }, _hoisted_10$2),
-                    createBaseVNode("button", {
-                      class: "btn btn-unstyled px-1 rounded",
-                      onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $data.user)))
-                    }, _hoisted_12$1)
+        createTextVNode(toDisplayString($setup.user) + " ", 1 /* TEXT */),
+        ($setup.user)
+          ? (openBlock(), createElementBlock("div", _hoisted_2$9, [
+              createBaseVNode("div", _hoisted_3$9, [
+                createBaseVNode("div", {
+                  class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+                }, [
+                  createBaseVNode("div", _hoisted_4$8, [
+                    createBaseVNode("div", _hoisted_5$5, [
+                      createBaseVNode("h1", _hoisted_6$4, toDisplayString($setup.user.username), 1 /* TEXT */)
+                    ]),
+                    createBaseVNode("div", _hoisted_7$3, [
+                      createBaseVNode("div", null, toDisplayString($setup.user.email), 1 /* TEXT */),
+                      createBaseVNode("div", _hoisted_8$3, [
+                        createBaseVNode("button", {
+                          class: "btn btn-unstyled px-1 rounded",
+                          onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($setup.user)))
+                        }, _hoisted_10$2),
+                        createBaseVNode("button", {
+                          class: "btn btn-unstyled px-1 rounded",
+                          onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $setup.user)))
+                        }, _hoisted_12$1)
+                      ])
+                    ])
                   ])
-                ])
-              ])
-            ], 2 /* CLASS */)
-          ]),
-          createBaseVNode("div", _hoisted_13, [
-            createBaseVNode("div", {
-              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
-            }, [
-              createBaseVNode("div", _hoisted_14, [
-                createBaseVNode("div", _hoisted_15, [
-                  _hoisted_16,
-                  createBaseVNode("button", {
-                    class: "btn btn-primary gradient",
-                    onClick: _cache[2] || (_cache[2] = $event => ($setup.editCharacter()))
-                  }, "Add character")
-                ])
+                ], 2 /* CLASS */)
               ]),
-              createBaseVNode("div", _hoisted_17, [
-                ($data.characters && $data.characters.length)
-                  ? (openBlock(), createElementBlock("div", _hoisted_18, [
-                      createBaseVNode("table", {
-                        class: normalizeClass(["table table-striped mb-0", _ctx.$colorScheme.table])
-                      }, [
-                        _hoisted_19,
-                        createBaseVNode("tbody", null, [
-                          (openBlock(true), createElementBlock(Fragment, null, renderList($data.characters, (character) => {
-                            return (openBlock(), createElementBlock("tr", {
-                              key: character.id,
-                              class: "context"
-                            }, [
-                              createBaseVNode("td", null, toDisplayString(character.name), 1 /* TEXT */),
-                              createBaseVNode("td", null, toDisplayString(character.description), 1 /* TEXT */),
-                              createBaseVNode("td", _hoisted_20, toDisplayString(character.years), 1 /* TEXT */),
-                              createBaseVNode("td", _hoisted_21, [
-                                createBaseVNode("div", _hoisted_22, [
-                                  createBaseVNode("button", {
-                                    class: "btn btn-unstyled px-1 rounded",
-                                    onClick: $event => ($setup.editCharacter(character))
-                                  }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
-                                  createBaseVNode("button", {
-                                    class: "btn btn-unstyled px-1 rounded",
-                                    onClick: $event => ($options.confirmDelete('user.character', character))
-                                  }, _hoisted_28, 8 /* PROPS */, _hoisted_26)
-                                ])
-                              ])
-                            ]))
-                          }), 128 /* KEYED_FRAGMENT */))
-                        ])
-                      ], 2 /* CLASS */)
-                    ]))
-                  : (openBlock(), createElementBlock("div", _hoisted_29, "No characters"))
+              createBaseVNode("div", _hoisted_13, [
+                createBaseVNode("div", {
+                  class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+                }, [
+                  createBaseVNode("div", _hoisted_14, [
+                    createBaseVNode("div", _hoisted_15, [
+                      _hoisted_16,
+                      createBaseVNode("button", {
+                        class: "btn btn-primary gradient",
+                        onClick: _cache[2] || (_cache[2] = $event => ($setup.editCharacter()))
+                      }, "Add character")
+                    ])
+                  ]),
+                  createBaseVNode("div", _hoisted_17, [
+                    ($setup.characters && $setup.characters.length)
+                      ? (openBlock(), createElementBlock("div", _hoisted_18, [
+                          createBaseVNode("table", {
+                            class: normalizeClass(["table table-striped mb-0", _ctx.$colorScheme.table])
+                          }, [
+                            _hoisted_19,
+                            createBaseVNode("tbody", null, [
+                              (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
+                                return (openBlock(), createElementBlock("tr", {
+                                  key: character.id,
+                                  class: "context"
+                                }, [
+                                  createBaseVNode("td", null, toDisplayString(character.name), 1 /* TEXT */),
+                                  createBaseVNode("td", null, toDisplayString(character.description), 1 /* TEXT */),
+                                  createBaseVNode("td", _hoisted_20, toDisplayString(character.years), 1 /* TEXT */),
+                                  createBaseVNode("td", _hoisted_21, [
+                                    createBaseVNode("div", _hoisted_22, [
+                                      createBaseVNode("button", {
+                                        class: "btn btn-unstyled px-1 rounded",
+                                        onClick: $event => ($setup.editCharacter(character))
+                                      }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
+                                      createBaseVNode("button", {
+                                        class: "btn btn-unstyled px-1 rounded",
+                                        onClick: $event => ($options.confirmDelete('user.character', character))
+                                      }, _hoisted_28, 8 /* PROPS */, _hoisted_26)
+                                    ])
+                                  ])
+                                ]))
+                              }), 128 /* KEYED_FRAGMENT */))
+                            ])
+                          ], 2 /* CLASS */)
+                        ]))
+                      : (openBlock(), createElementBlock("div", _hoisted_29, "No characters"))
+                  ])
+                ], 2 /* CLASS */)
               ])
-            ], 2 /* CLASS */)
-          ])
-        ])
+            ]))
+          : createCommentVNode("v-if", true)
       ]))
     }
 
@@ -19963,10 +19971,10 @@
     	name: 'Register',
     	setup() {
     		const modal = inject('modal');
-    		let registered = false;
+    		let registered = ref(false);
 
     		onMounted(async() => {
-    			registered = await modal({
+    			registered.value = await modal({
     				title: 'Sign up',
     				component: script$8,
     				backdrop: 'static',

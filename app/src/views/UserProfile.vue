@@ -1,6 +1,7 @@
 <template>
 	<div class="container">
-		<div class="row gx-4">
+		{{ user }}
+		<div v-if="user" class="row gx-4">
 			<div class="col-md-4">
 				<div class="card shadow" :class='$colorScheme.card'>
 					<div class='context'>
@@ -66,19 +67,39 @@ import FormUserInfo from '@forms/FormUserInfo.vue'
 import FormCharacter from '@forms/FormCharacter.vue'
 import { api } from '@root/api.js'
 import { useRoute } from 'vue-router'
-import { inject, onMounted } from 'vue'
+import { inject, reactive, ref, onMounted, toRefs } from 'vue'
 export default {
 	name: 'UserProfile',
 	setup() {
 		const store = inject('store')
 		const modal = inject('modal')
 		const route = useRoute()
-		let user = null
-		let characters = []
+		let user = reactive({
+			id: "",
+			username: "",
+			isadmin: false,
+			email: "",
+		})
+		let characters = ref([])
 
 		async function getCharacters() {
-			console.log(route.params)
-			characters = await api.users.characters.get({ user_id: route.params.id })
+			characters.value = await api.users.characters.get({ user_id: route.params.id })
+		}
+
+		async function getUser() {
+			const promises = [ api.users.get({ id: route.params.id }) ]
+			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
+			console.log(user)
+			const [ userUpdated ] = await Promise.all(promises)
+			console.log(userUpdated)
+			user = userUpdated
+			console.log(user)
+
+			/*
+			this.user.characters.forEach(character => {
+				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
+			})
+			*/
 		}
 
 		async function editUser(props = {}) {
@@ -88,8 +109,10 @@ export default {
 				props,
 			})
 
-			if (result) this.getUser()
+			if (result) getUser()
+			//return result
 		}
+
 
 		async function editCharacter(props = {}) {
 			props.user_id = user.id
@@ -99,7 +122,8 @@ export default {
 				props,
 			})
 
-			if (result) this.getUser()
+			if (result) getCharacters()
+			return result
 		}
 
 		onMounted(async() => {
@@ -108,49 +132,21 @@ export default {
 			}
 			user = store.state.loggeduser
 			await Promise.all([
-				// this.getUser(),
+				getUser(),
 				getCharacters(),
 			])
 		})
 
 		return {
+			user,
 			store,
+			characters,
 			getCharacters,
 			editUser,
 			editCharacter,
 		}
 	},
-	data() {
-		return {
-			user: {},
-			characters: [],
-		}
-	},
-
-	async mounted() {
-		
-	},
-
 	methods: {
-		async getUser() {
-			const promises = [ this.$api.users.get({ id: this.$route.params.id }) ]
-			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
-
-			const [ user ] = await Promise.all(promises)
-
-			this.user = user
-
-			/*
-			this.user.characters.forEach(character => {
-				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
-			})
-			*/
-		},
-
-		async getCharacters() {
-			console.log(this.$route.params)
-			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id })
-		},
 
 		async confirmDelete(type, data) {
 			console.log(type, data)
