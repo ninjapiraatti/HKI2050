@@ -16,7 +16,6 @@
 
 <script>
 import { Modal } from 'bootstrap'
-//import { computed, onMounted } from '@vue/runtime-core'
 import { ref, computed, onMounted } from "vue";
 const sizeClasses = {
 	sm: 'modal-sm',

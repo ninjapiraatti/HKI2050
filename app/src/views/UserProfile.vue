@@ -64,16 +64,21 @@
 <script>
 import FormUserInfo from '@forms/FormUserInfo.vue'
 import FormCharacter from '@forms/FormCharacter.vue'
-import { ref, inject } from 'vue'
+import { api } from '@root/api.js'
+import { useRoute } from 'vue-router'
+import { inject, onMounted } from 'vue'
 export default {
 	name: 'UserProfile',
 	setup() {
 		const store = inject('store')
 		const modal = inject('modal')
+		const route = useRoute()
+		let user = null
+		let characters = []
 
 		async function getCharacters() {
-			console.log(this.$route.params)
-			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id })
+			console.log(route.params)
+			characters = await api.users.characters.get({ user_id: route.params.id })
 		}
 
 		async function editUser(props = {}) {
@@ -87,7 +92,7 @@ export default {
 		}
 
 		async function editCharacter(props = {}) {
-			props.user_id = this.user.id
+			props.user_id = user.id
 			const result = await modal({
 				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
 				component: FormCharacter,
@@ -96,6 +101,17 @@ export default {
 
 			if (result) this.getUser()
 		}
+
+		onMounted(async() => {
+			if (store.state.loggeduser.isadmin && !store.state.characters.length) {
+				console.log("lol")
+			}
+			user = store.state.loggeduser
+			await Promise.all([
+				// this.getUser(),
+				getCharacters(),
+			])
+		})
 
 		return {
 			store,
@@ -112,14 +128,7 @@ export default {
 	},
 
 	async mounted() {
-		if (this.store.state.loggeduser.isadmin && !this.store.state.projects.length) {
-			console.log("lol")
-		}
-		this.user = this.store.state.loggeduser
-		await Promise.all([
-			// this.getUser(),
-			this.getCharacters(),
-		])
+		
 	},
 
 	methods: {

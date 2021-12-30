@@ -19092,10 +19092,12 @@
     	setup() {
     		const store = inject('store');
     		const modal = inject('modal');
+    		const route = useRoute();
+    		let user = null;
 
     		async function getCharacters() {
-    			console.log(this.$route.params);
-    			this.characters = await this.$api.users.characters.get({ user_id: this.$route.params.id });
+    			console.log(route.params);
+    			await api.users.characters.get({ user_id: route.params.id });
     		}
 
     		async function editUser(props = {}) {
@@ -19109,7 +19111,7 @@
     		}
 
     		async function editCharacter(props = {}) {
-    			props.user_id = this.user.id;
+    			props.user_id = user.id;
     			const result = await modal({
     				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
     				component: script$c,
@@ -19118,6 +19120,17 @@
 
     			if (result) this.getUser();
     		}
+
+    		onMounted(async() => {
+    			if (store.state.loggeduser.isadmin && !store.state.characters.length) {
+    				console.log("lol");
+    			}
+    			user = store.state.loggeduser;
+    			await Promise.all([
+    				// this.getUser(),
+    				getCharacters(),
+    			]);
+    		});
 
     		return {
     			store,
@@ -19134,14 +19147,7 @@
     	},
 
     	async mounted() {
-    		if (this.store.state.loggeduser.isadmin && !this.store.state.projects.length) {
-    			console.log("lol");
-    		}
-    		this.user = this.store.state.loggeduser;
-    		await Promise.all([
-    			// this.getUser(),
-    			this.getCharacters(),
-    		]);
+    		
     	},
 
     	methods: {
