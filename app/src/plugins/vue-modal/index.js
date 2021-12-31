@@ -1,5 +1,6 @@
 import { ref, shallowRef } from 'vue'
 import TheModal from '@components/TheModal.vue'
+import { Modal } from 'bootstrap'
 import confirm from './confirm.js'
 
 export default {
@@ -20,8 +21,9 @@ export default {
 				}
 		
 				function onSuccess(modal, payload) {
+					const modalElement = document.querySelector('.modal.show')
 					modal.resolve(payload)
-					console.log("Great success")
+					Modal.getInstance(modalElement).hide()
 				}
 
 				function sayFoo() {

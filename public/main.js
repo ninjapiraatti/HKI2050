@@ -19140,8 +19140,10 @@
     				this.sending = true;
 
     				const user = await this.$api.users.save(this.form);
-    				if (user) this.$emit('success', user);
-
+    				if (user) {
+    					this.$emit('success', user);
+    					console.log("emitted supposedly success");
+    				}
     				this.sending = false;
     			},
     		},
@@ -19299,7 +19301,6 @@
     		methods: {
     			async onSubmit() {
     				this.sending = true;
-
     				const character = await this.$api.users.characters.save(this.form);
     				if (character) this.$emit('success', character);
 
@@ -19386,12 +19387,8 @@
     		const store = inject('store');
     		const modal = inject('modal');
     		const route = useRoute();
-    		let user = reactive({
-    			id: "",
-    			username: "",
-    			isadmin: false,
-    			email: "",
-    		});
+
+    		let userObject = ref({});
     		let characters = ref([]);
 
     		async function getCharacters() {
@@ -19401,20 +19398,20 @@
     		async function getUser() {
     			const promises = [ api.users.get({ id: route.params.id }) ];
     			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
-    			console.log(user);
+    			//console.log(userObject)
     			const [ userUpdated ] = await Promise.all(promises);
-    			console.log(userUpdated);
-    			user = userUpdated;
-    			console.log(user);
-
+    			//console.log(userUpdated)
+    			userObject.value = userUpdated;
+    			//console.log(userObject)
     			/*
-    			this.user.characters.forEach(character => {
+    			this.userObject.characters.forEach(character => {
     				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
     			})
     			*/
     		}
 
     		async function editUser(props = {}) {
+    			props = userObject.value; // This doesn't account for admin wanting to edit another user
     			const result = await modal({
     				title: 'Edit user info',
     				component: script$d,
@@ -19427,7 +19424,7 @@
 
 
     		async function editCharacter(props = {}) {
-    			props.user_id = user.id;
+    			props.user_id = userObject.value.id;
     			const result = await modal({
     				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
     				component: script$c,
@@ -19439,10 +19436,12 @@
     		}
 
     		onMounted(async() => {
+    			/*
     			if (store.state.loggeduser.isadmin && !store.state.characters.length) {
-    				console.log("lol");
+    				console.log("lol")
     			}
-    			user = store.state.loggeduser;
+    			*/
+    			//userObject = store.state.loggeduser // This fucked up everything. WHY?
     			await Promise.all([
     				getUser(),
     				getCharacters(),
@@ -19450,7 +19449,7 @@
     		});
 
     		return {
-    			user,
+    			userObject,
     			store,
     			characters,
     			getCharacters,
@@ -19470,7 +19469,7 @@
     						this.$router.push({ name: 'admin-users' });
     						break
 
-    					case 'user.character':
+    					case 'userObject.character':
     						this.getUser();
     						break
     				}
@@ -19553,8 +19552,7 @@
 
     function render$b(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$a, [
-        createTextVNode(toDisplayString($setup.user) + " ", 1 /* TEXT */),
-        ($setup.user)
+        ($setup.userObject)
           ? (openBlock(), createElementBlock("div", _hoisted_2$9, [
               createBaseVNode("div", _hoisted_3$9, [
                 createBaseVNode("div", {
@@ -19562,18 +19560,18 @@
                 }, [
                   createBaseVNode("div", _hoisted_4$8, [
                     createBaseVNode("div", _hoisted_5$5, [
-                      createBaseVNode("h1", _hoisted_6$4, toDisplayString($setup.user.username), 1 /* TEXT */)
+                      createBaseVNode("h1", _hoisted_6$4, toDisplayString($setup.userObject.username), 1 /* TEXT */)
                     ]),
                     createBaseVNode("div", _hoisted_7$3, [
-                      createBaseVNode("div", null, toDisplayString($setup.user.email), 1 /* TEXT */),
+                      createBaseVNode("div", null, toDisplayString($setup.userObject.email), 1 /* TEXT */),
                       createBaseVNode("div", _hoisted_8$3, [
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
-                          onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($setup.user)))
+                          onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser(_ctx.user)))
                         }, _hoisted_10$2),
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
-                          onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', $setup.user)))
+                          onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', _ctx.user)))
                         }, _hoisted_12$1)
                       ])
                     ])
@@ -19617,7 +19615,7 @@
                                       }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
                                       createBaseVNode("button", {
                                         class: "btn btn-unstyled px-1 rounded",
-                                        onClick: $event => ($options.confirmDelete('user.character', character))
+                                        onClick: $event => ($options.confirmDelete('userObject.character', character))
                                       }, _hoisted_28, 8 /* PROPS */, _hoisted_26)
                                     ])
                                   ])
@@ -20402,10 +20400,10 @@
     		onMounted(() => {
     			let modalElement = modal.value;
     			let modalBodyElement = body.value; 
-    			console.log(modalElement);
+    			//console.log(modalElement)
     			let modalThing = Modal.getOrCreateInstance(modalElement);
-    			console.log(modalThing);
-    			console.log(body);
+    			//console.log(modalThing)
+    			//console.log(body)
     			modalElement.addEventListener('hide.bs.modal', () => { emit('modal-hiding'); });
     			modalElement.addEventListener('hidden.bs.modal', () => { emit('modal-hidden'); });
     			modalElement.addEventListener('show.bs.modal', () => { emit('modal-showing'); });
@@ -20490,6 +20488,12 @@
     	components: {
     		VModal: script$3,
     	},
+    	methods: {
+    		onSuccess(modal, e) {
+    			console.log(modal);
+    			console.log(e);
+    		}
+    	}
     };
 
     function render$2(_ctx, _cache, $props, $setup, $data, $options) {
@@ -20544,8 +20548,9 @@
     				}
     		
     				function onSuccess(modal, payload) {
+    					const modalElement = document.querySelector('.modal.show');
     					modal.resolve(payload);
-    					console.log("Great success");
+    					Modal.getInstance(modalElement).hide();
     				}
 
     				function sayFoo() {

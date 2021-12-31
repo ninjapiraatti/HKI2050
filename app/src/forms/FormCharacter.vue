@@ -98,7 +98,6 @@
 		methods: {
 			async onSubmit() {
 				this.sending = true
-
 				const character = await this.$api.users.characters.save(this.form)
 				if (character) this.$emit('success', character)
 

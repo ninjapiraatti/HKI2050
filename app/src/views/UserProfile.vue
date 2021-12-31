@@ -1,17 +1,16 @@
 <template>
 	<div class="container">
-		{{ user }}
-		<div v-if="user" class="row gx-4">
+		<div v-if="userObject" class="row gx-4">
 			<div class="col-md-4">
 				<div class="card shadow" :class='$colorScheme.card'>
 					<div class='context'>
 						<div class='card-header d-flex align-items-center'>
 							<h1 class="h3 mb-0 flex-grow-1">
-								{{ user.username }}
+								{{ userObject.username }}
 							</h1>
 						</div>
 						<div class='card-body'>
-							<div>{{ user.email }}</div>
+							<div>{{ userObject.email }}</div>
 							<div class='context-actions hstack gap-1 justify-content-end'>
 								<button class='btn btn-unstyled px-1 rounded' v-on:click="editUser(user)"><i class="bi-pencil-fill" title='Edit profile'></i></button>
 								<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user', user)"><i class="bi-trash-fill" title='Delete profile'></i></button>
@@ -47,7 +46,7 @@
 										<td class='text-end'>
 											<div class='context-actions hstack gap-1 justify-content-end'>
 												<button class='btn btn-unstyled px-1 rounded' v-on:click="editCharacter(character)"><i class="bi-pencil-fill" title='Edit character'></i></button>
-												<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user.character', character)"><i class="bi-trash-fill" title='Delete character'></i></button>
+												<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('userObject.character', character)"><i class="bi-trash-fill" title='Delete character'></i></button>
 											</div>
 										</td>
 									</tr>
@@ -67,19 +66,15 @@ import FormUserInfo from '@forms/FormUserInfo.vue'
 import FormCharacter from '@forms/FormCharacter.vue'
 import { api } from '@root/api.js'
 import { useRoute } from 'vue-router'
-import { inject, reactive, ref, onMounted, toRefs } from 'vue'
+import { inject, ref, onMounted } from 'vue'
 export default {
 	name: 'UserProfile',
 	setup() {
 		const store = inject('store')
 		const modal = inject('modal')
 		const route = useRoute()
-		let user = reactive({
-			id: "",
-			username: "",
-			isadmin: false,
-			email: "",
-		})
+
+		let userObject = ref({})
 		let characters = ref([])
 
 		async function getCharacters() {
@@ -89,20 +84,20 @@ export default {
 		async function getUser() {
 			const promises = [ api.users.get({ id: route.params.id }) ]
 			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
-			console.log(user)
+			//console.log(userObject)
 			const [ userUpdated ] = await Promise.all(promises)
-			console.log(userUpdated)
-			user = userUpdated
-			console.log(user)
-
+			//console.log(userUpdated)
+			userObject.value = userUpdated
+			//console.log(userObject)
 			/*
-			this.user.characters.forEach(character => {
+			this.userObject.characters.forEach(character => {
 				character.levelLabel = this.store.state.characterLevels.find(({ id }) => id == character.characterscopelevel_id).label
 			})
 			*/
 		}
 
 		async function editUser(props = {}) {
+			props = userObject.value // This doesn't account for admin wanting to edit another user
 			const result = await modal({
 				title: 'Edit user info',
 				component: FormUserInfo,
@@ -115,7 +110,7 @@ export default {
 
 
 		async function editCharacter(props = {}) {
-			props.user_id = user.id
+			props.user_id = userObject.value.id
 			const result = await modal({
 				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
 				component: FormCharacter,
@@ -127,10 +122,12 @@ export default {
 		}
 
 		onMounted(async() => {
+			/*
 			if (store.state.loggeduser.isadmin && !store.state.characters.length) {
 				console.log("lol")
 			}
-			user = store.state.loggeduser
+			*/
+			//userObject = store.state.loggeduser // This fucked up everything. WHY?
 			await Promise.all([
 				getUser(),
 				getCharacters(),
@@ -138,7 +135,7 @@ export default {
 		})
 
 		return {
-			user,
+			userObject,
 			store,
 			characters,
 			getCharacters,
@@ -158,7 +155,7 @@ export default {
 						this.$router.push({ name: 'admin-users' })
 						break
 
-					case 'user.character':
+					case 'userObject.character':
 						this.getUser()
 						break
 				}

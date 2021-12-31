@@ -96,8 +96,10 @@
 				this.sending = true
 
 				const user = await this.$api.users.save(this.form)
-				if (user) this.$emit('success', user)
-
+				if (user) {
+					this.$emit('success', user)
+					console.log("emitted supposedly success")
+				}
 				this.sending = false
 			},
 		},

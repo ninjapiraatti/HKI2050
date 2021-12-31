@@ -21,5 +21,11 @@ export default {
 	components: {
 		VModal,
 	},
+	methods: {
+		onSuccess(modal, e) {
+			console.log(modal)
+			console.log(e)
+		}
+	}
 }
 </script>
