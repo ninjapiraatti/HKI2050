@@ -12,72 +12,71 @@
 </template>
 
 <script>
-	import FormResetPassword from '@forms/FormResetPassword.vue'
+import FormResetPassword from '@forms/FormResetPassword.vue'
+import { useRoute, useRouter} from 'vue-router'
+import { onMounted, inject } from 'vue'
+export default {
+	name: 'Confirm',
+	setup() {
+		const modal = inject('modal')
+		const route = useRoute()
+		const router = useRouter()
+		let confirmed = false
 
-	export default {
-		name: 'Confirm',
-
-		data() {
-			return {
-				confirmed: false,
-			}
-		},
-
-		async mounted() {
-			const data = this.$route.query
+		onMounted(async() => {
+			const data = route.query
 
 			if (data.type == 'reset') {
-				this.resetPassword(data)
+				resetPassword(data)
 			} else {
-				this.confirmAccount(data)
+				confirmAccount(data)
 			}
-		},
+		})
 
-		methods: {
-			async resetPassword(data) {
-				await this.$modal({
-					title: 'Enter new password',
-					component: FormResetPassword,
-					props: data,
-					backdrop: 'static',
-				})
+		async function resetPassword(data) {
+			await modal({
+				title: 'Enter new password',
+				component: FormResetPassword,
+				props: data,
+				backdrop: 'static',
+			})
 
-				this.$router.push({ name: 'login' })
-			},
+			router.push({ name: 'login' })
+		}
 
-			async confirmAccount(data) {
-				this.confirmed = await this.$api.users.registration.confirm(data)
+		async function confirmAccount(data) {
+			confirmed = await api.users.registration.confirm(data)
 
-				const message = this.confirmed ? {
-					type: 'success',
-					title: 'Account confirmed',
-				} : {
-					type: 'error',
+			const message = confirmed ? {
+				type: 'success',
+				title: 'Account confirmed',
+			} : {
+				type: 'error',
+				title: 'Account confirmation failed',
+			}
+
+			flashMessage.show({
+				...message,
+				time: 5000,
+			})
+
+			if (!confirmed) router.replace({
+				name: 'error',
+				params: {
 					title: 'Account confirmation failed',
-				}
+					message: 'If your account is already confirmed you can try logging in.',
+				},
+			})
 
-				this.$flashMessage.show({
-					...message,
-					time: 5000,
+			if (data.reset_request_id) {
+				confirmed = false // Hide confirmation info in the backround
+				resetPassword({
+					id: data.reset_request_id,
+					email: data.email,
+					type: 'reset',
 				})
-
-				if (!this.confirmed) this.$router.replace({
-					name: 'error',
-					params: {
-						title: 'Account confirmation failed',
-						message: 'If your account is already confirmed you can try logging in.',
-					},
-				})
-
-				if (data.reset_request_id) {
-					this.confirmed = false // Hide confirmation info in the backround
-					this.resetPassword({
-						id: data.reset_request_id,
-						email: data.email,
-						type: 'reset',
-					})
-				}
-			},
-		},
+			}
+		}
 	}
+}
 </script>

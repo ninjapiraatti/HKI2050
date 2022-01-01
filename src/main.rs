@@ -110,6 +110,13 @@ async fn main() -> std::io::Result<()> {
 							.route(web::post().to(handlers::register_handler::register_user)),
 					)
 					.service(
+						web::resource("/resetpassword")
+							.route(web::post().to(handlers::invitation_handler::post_reset_request)),
+					)
+					.service(
+						web::resource("/updatepassword").route(web::put().to(handlers::users_handler::update_password)),
+					)
+					.service(
 						web::resource("/users/{user_id}")
 							.route(web::get().to(handlers::users_handler::get_by_uuid))
 							.route(web::put().to(handlers::users_handler::update_user))

@@ -8225,7 +8225,7 @@
         initDev();
     }
 
-    let store$1, router$2, flashMessage;
+    let store$1, router$2, flashMessage$1;
 
     const errorMessages = {
     	UniqueViolation: 'Item already exists',
@@ -8266,7 +8266,7 @@
     	}
 
     	if (!(errorMessage in debounceFlashMessage)) {
-    		debounceFlashMessage[errorMessage] = debounce$1(() => flashMessage.show({
+    		debounceFlashMessage[errorMessage] = debounce$1(() => flashMessage$1.show({
     			type: 'error',
     			title: `Error ${response.status}`,
     			text: errorMessage,
@@ -8374,7 +8374,7 @@
     		: sendJson({ url: populateUrl(url, data), method: 'DELETE', body: data })
     );
 
-    const api = {
+    const api$1 = {
     	users: {
     		get: async (data = {}) => {
     			if (!data.id) return getArray('/api/users?is_include_skills=true')()
@@ -8461,13 +8461,13 @@
     	},
     };
 
-    var api$1 = {
+    var api$2 = {
     	install: (app, options) => {
     		store$1 = app.config.globalProperties.$store;
     		router$2 = app.config.globalProperties.$router;
-    		flashMessage = app.config.globalProperties.$flashMessage;
+    		flashMessage$1 = app.config.globalProperties.$flashMessage;
 
-    		app.config.globalProperties.$api = api;
+    		app.config.globalProperties.$api = api$1;
     	},
     };
 
@@ -8488,7 +8488,7 @@
 
     	async logout() {
     		try {
-    			await api.users.log.out();
+    			await api$1.users.log.out();
     			await this.setUser(null);
     		} catch (error) {
     			console.warn(`Logout failed: ${error.message}`);
@@ -8499,7 +8499,7 @@
 
       async login(data) {
     		try {
-    			const userId = await api.users.log.in(data);
+    			const userId = await api$1.users.log.in(data);
     			if (userId) await this.setUser(userId);
     		} catch (error) {
     			console.warn(`Login failed: ${error.message}`);
@@ -8512,7 +8512,7 @@
     		if (typeof data == 'string') {
     			try {
     				const [ user ] = await Promise.all([
-    					api.users.get({ id: data }),
+    					api$1.users.get({ id: data }),
     				]);
 
     				data = user;
@@ -19392,11 +19392,11 @@
     		let characters = ref([]);
 
     		async function getCharacters() {
-    			characters.value = await api.users.characters.get({ user_id: route.params.id });
+    			characters.value = await api$1.users.characters.get({ user_id: route.params.id });
     		}
 
     		async function getUser() {
-    			const promises = [ api.users.get({ id: route.params.id }) ];
+    			const promises = [ api$1.users.get({ id: route.params.id }) ];
     			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
     			//console.log(userObject)
     			const [ userUpdated ] = await Promise.all(promises);
@@ -19441,7 +19441,7 @@
     			if (success) {
     				switch (type) {
     					case 'user':
-    						if (data.id == store.state.loggeduser.id) await api.users.log.out();
+    						if (data.id == store.state.loggeduser.id) await api$1.users.log.out();
     						router.push({ name: 'admin-users' });
     						break
 
@@ -19730,22 +19730,24 @@
     script$b.__file = "src/forms/FormForgotPassword.vue";
 
     var script$a = {
-    		name: 'ForgotPassword',
+    	name: 'ForgotPassword',
+    	setup() {
+    		const modal = inject('modal');
+    		let requested = false;
 
-    		data() {
-    			return {
-    				requested: false,
-    			}
-    		},
-
-    		async mounted() {
-    			this.requested = await this.$modal({
+    		onMounted(async() => {
+    			requested = await modal({
     				title: 'Request a password reset',
     				component: script$b,
     				backdrop: 'static',
     			});
-    		},
-    	};
+    		});
+
+    		return {
+    			requested
+    		}
+    	},
+    };
 
     const _hoisted_1$9 = {
       key: 0,
@@ -20000,7 +20002,7 @@
     ];
 
     function render$8(_ctx, _cache, $props, $setup, $data, $options) {
-      return ($setup.registered)
+      return ($data.registered)
         ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
@@ -20140,71 +20142,69 @@
     script$7.__file = "src/forms/FormResetPassword.vue";
 
     var script$6 = {
-    		name: 'Confirm',
+    	name: 'Confirm',
+    	setup() {
+    		const modal = inject('modal');
+    		const route = useRoute();
+    		const router = useRouter();
+    		let confirmed = false;
 
-    		data() {
-    			return {
-    				confirmed: false,
-    			}
-    		},
-
-    		async mounted() {
-    			const data = this.$route.query;
+    		onMounted(async() => {
+    			const data = route.query;
 
     			if (data.type == 'reset') {
-    				this.resetPassword(data);
+    				resetPassword(data);
     			} else {
-    				this.confirmAccount(data);
+    				confirmAccount(data);
     			}
-    		},
+    		});
 
-    		methods: {
-    			async resetPassword(data) {
-    				await this.$modal({
-    					title: 'Enter new password',
-    					component: script$7,
-    					props: data,
-    					backdrop: 'static',
-    				});
+    		async function resetPassword(data) {
+    			await modal({
+    				title: 'Enter new password',
+    				component: script$7,
+    				props: data,
+    				backdrop: 'static',
+    			});
 
-    				this.$router.push({ name: 'login' });
-    			},
+    			router.push({ name: 'login' });
+    		}
 
-    			async confirmAccount(data) {
-    				this.confirmed = await this.$api.users.registration.confirm(data);
+    		async function confirmAccount(data) {
+    			confirmed = await api.users.registration.confirm(data);
 
-    				const message = this.confirmed ? {
-    					type: 'success',
-    					title: 'Account confirmed',
-    				} : {
-    					type: 'error',
+    			const message = confirmed ? {
+    				type: 'success',
+    				title: 'Account confirmed',
+    			} : {
+    				type: 'error',
+    				title: 'Account confirmation failed',
+    			};
+
+    			flashMessage.show({
+    				...message,
+    				time: 5000,
+    			});
+
+    			if (!confirmed) router.replace({
+    				name: 'error',
+    				params: {
     					title: 'Account confirmation failed',
-    				};
+    					message: 'If your account is already confirmed you can try logging in.',
+    				},
+    			});
 
-    				this.$flashMessage.show({
-    					...message,
-    					time: 5000,
+    			if (data.reset_request_id) {
+    				confirmed = false; // Hide confirmation info in the backround
+    				resetPassword({
+    					id: data.reset_request_id,
+    					email: data.email,
+    					type: 'reset',
     				});
-
-    				if (!this.confirmed) this.$router.replace({
-    					name: 'error',
-    					params: {
-    						title: 'Account confirmation failed',
-    						message: 'If your account is already confirmed you can try logging in.',
-    					},
-    				});
-
-    				if (data.reset_request_id) {
-    					this.confirmed = false; // Hide confirmation info in the backround
-    					this.resetPassword({
-    						id: data.reset_request_id,
-    						email: data.email,
-    						type: 'reset',
-    					});
-    				}
-    			},
-    		},
-    	};
+    			}
+    		}
+    	}
+    };
 
     const _hoisted_1$5 = {
       key: 0,
@@ -20586,12 +20586,12 @@
     		switch (type) {	
     			case 'user':
     				title = 'profile';
-    				apiCall = api.users.delete.bind(null, data.id);
+    				apiCall = api$1.users.delete.bind(null, data.id);
     				break
     			
     			case 'userObject.character':
     				title = data.name;
-    				apiCall = api.users.characters.delete.bind(null, {
+    				apiCall = api$1.users.characters.delete.bind(null, {
     					id: data.id,
     					user_id: data.user_id,
     				});
@@ -20757,7 +20757,7 @@
           }, {
             default: withCtx(() => [
               _hoisted_2,
-              createCommentVNode(" <svg height='48' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 79 35'>\r\n\t\t\t\t\t<path fill-rule='nonzero' d='M72.46 15.53c2.01 0 3.25 1.16 3.25 3.03v.75h-3.89c-2.97 0-4.82 1.46-4.82 3.88 0 2.54 1.85 3.94 4.77 3.94 1.65 0 3.25-.69 3.94-1.98v1c0 .46.39.85.86.85.46 0 .85-.39.85-.86v-7.58c0-2.81-1.77-4.68-4.96-4.68-2.32 0-3.8.96-4.58 2.17a.85.85 0 0 0-.14.47c0 .44.36.8.8.8.25 0 .44-.08.72-.39a3.82 3.82 0 0 1 3.2-1.4Zm-.53 10c-2.15 0-3.14-.9-3.14-2.34 0-1.6 1.24-2.34 3.03-2.34h3.89V22c0 2.34-1.85 3.52-3.78 3.52ZM61.88 7.15a.9.9 0 0 0-.88.88v15.74C61 25.9 62.02 27 63.87 27a.83.83 0 0 0 0-1.65c-.75 0-1.1-.48-1.1-1.58V8.03a.89.89 0 0 0-.89-.88Zm-14 6.89c-.5 0-.88.39-.88.88v7.2c0 2.61.88 5.01 5.13 5.01 4.27 0 5.12-2.4 5.12-5.01v-7.2c0-.5-.38-.88-.85-.88a.9.9 0 0 0-.91.88v7.2c0 1.79-.58 3.33-3.36 3.33-2.79 0-3.37-1.54-3.37-3.33v-7.2c0-.5-.4-.88-.88-.88Zm-6.41 4.08v7.94c0 .5.41.94.93.94.53 0 .94-.45.94-.94V8.94c0-.5-.41-.94-.94-.94a.95.95 0 0 0-.93.94v7.47h-9.6V8.94c0-.5-.4-.94-.93-.94a.95.95 0 0 0-.94.94v17.12c0 .5.41.94.94.94.52 0 .93-.45.93-.94v-7.94h9.6Z'/>\r\n\t\t\t\t</svg> ")
+              createCommentVNode(" <svg height='48' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 79 35'>\n\t\t\t\t\t<path fill-rule='nonzero' d='M72.46 15.53c2.01 0 3.25 1.16 3.25 3.03v.75h-3.89c-2.97 0-4.82 1.46-4.82 3.88 0 2.54 1.85 3.94 4.77 3.94 1.65 0 3.25-.69 3.94-1.98v1c0 .46.39.85.86.85.46 0 .85-.39.85-.86v-7.58c0-2.81-1.77-4.68-4.96-4.68-2.32 0-3.8.96-4.58 2.17a.85.85 0 0 0-.14.47c0 .44.36.8.8.8.25 0 .44-.08.72-.39a3.82 3.82 0 0 1 3.2-1.4Zm-.53 10c-2.15 0-3.14-.9-3.14-2.34 0-1.6 1.24-2.34 3.03-2.34h3.89V22c0 2.34-1.85 3.52-3.78 3.52ZM61.88 7.15a.9.9 0 0 0-.88.88v15.74C61 25.9 62.02 27 63.87 27a.83.83 0 0 0 0-1.65c-.75 0-1.1-.48-1.1-1.58V8.03a.89.89 0 0 0-.89-.88Zm-14 6.89c-.5 0-.88.39-.88.88v7.2c0 2.61.88 5.01 5.13 5.01 4.27 0 5.12-2.4 5.12-5.01v-7.2c0-.5-.38-.88-.85-.88a.9.9 0 0 0-.91.88v7.2c0 1.79-.58 3.33-3.36 3.33-2.79 0-3.37-1.54-3.37-3.33v-7.2c0-.5-.4-.88-.88-.88Zm-6.41 4.08v7.94c0 .5.41.94.93.94.53 0 .94-.45.94-.94V8.94c0-.5-.41-.94-.94-.94a.95.95 0 0 0-.93.94v7.47h-9.6V8.94c0-.5-.4-.94-.93-.94a.95.95 0 0 0-.94.94v17.12c0 .5.41.94.94.94.52 0 .93-.45.93-.94v-7.94h9.6Z'/>\n\t\t\t\t</svg> ")
             ]),
             _: 1 /* STABLE */
           }),
@@ -23700,7 +23700,7 @@
     const app = createApp(script)
     	//.use(store)
     	.use(router$1)
-    	.use(api$1)
+    	.use(api$2)
     	.use(c)
     	.use(modal)
     	.use(colorScheme, { scheme: toRef(store.state, 'colorScheme') })

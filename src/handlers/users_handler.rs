@@ -168,3 +168,27 @@ pub async fn delete_user(
 		},
 	}
 }
+
+pub async fn update_password(
+	payload: web::Json<ForgotPasswordData>,
+	pool: web::Data<Pool>,
+) -> Result<HttpResponse, ServiceError> {
+	trace!("Resetting password for: email = {:#?}", &payload.email,);
+
+	let id = reset_requests_storage::get_by_reset_request(payload.id.clone(), &pool);
+	match id {
+		Ok(_) => println!("Reset request found"),
+		Err(_) => return Err(ServiceError::InternalServerError),
+	}
+
+	let res =
+		web::block(move || users_storage::set_password(payload.email.clone(), payload.password.clone(), &pool))
+			.await;
+	match res {
+		Ok(user) => Ok(HttpResponse::Ok().json(&user)),
+		Err(err) => match err {
+			BlockingError::Error(service_error) => Err(service_error.into()),
+			BlockingError::Canceled => Err(ServiceError::InternalServerError),
+		},
+	}
+}

@@ -12,23 +12,25 @@
 </template>
 
 <script>
-	import FormForgotPassword from '@forms/FormForgotPassword.vue'
+import FormForgotPassword from '@forms/FormForgotPassword.vue'
+import { onMounted, inject } from 'vue'
+export default {
+	name: 'ForgotPassword',
+	setup() {
+		const modal = inject('modal')
+		let requested = false
 
-	export default {
-		name: 'ForgotPassword',
-
-		data() {
-			return {
-				requested: false,
-			}
-		},
-
-		async mounted() {
-			this.requested = await this.$modal({
+		onMounted(async() => {
+			requested = await modal({
 				title: 'Request a password reset',
 				component: FormForgotPassword,
 				backdrop: 'static',
 			})
-		},
-	}
+		})
+
+		return {
+			requested
+		}
+	},
+}
 </script>
