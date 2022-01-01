@@ -8225,7 +8225,7 @@
         initDev();
     }
 
-    let store$1, router$1, flashMessage;
+    let store$1, router$2, flashMessage;
 
     const errorMessages = {
     	UniqueViolation: 'Item already exists',
@@ -8279,14 +8279,14 @@
     	switch (response.status) {
     		case 401:
     			store$1.dispatch('setUser', null);
-    			if (router$1.currentRoute.value.name !== 'login') {
-    				router$1.push({ name: 'login', query: {
-    					redirect: router$1.currentRoute.value.fullPath,
+    			if (router$2.currentRoute.value.name !== 'login') {
+    				router$2.push({ name: 'login', query: {
+    					redirect: router$2.currentRoute.value.fullPath,
     				}});
     			}
     			break
     		case 500:
-    			router$1.push({ name: 'error', params: {
+    			router$2.push({ name: 'error', params: {
     				title: 'Error 500',
     				message: errorMessage,
     			}});
@@ -8464,7 +8464,7 @@
     var api$1 = {
     	install: (app, options) => {
     		store$1 = app.config.globalProperties.$store;
-    		router$1 = app.config.globalProperties.$router;
+    		router$2 = app.config.globalProperties.$router;
     		flashMessage = app.config.globalProperties.$flashMessage;
 
     		app.config.globalProperties.$api = api;
@@ -18907,7 +18907,7 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$g = {
+    var script$h = {
     	name: 'FormLogin',
     	setup(props, { emit }) {
     		const store = inject('store');
@@ -18943,7 +18943,7 @@
     	}
     };
 
-    const _hoisted_1$e = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$f = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
@@ -18959,7 +18959,7 @@
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$3 = /*#__PURE__*/createTextVNode("Sign up");
 
-    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$h(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -18972,7 +18972,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$e,
+              _hoisted_1$f,
               createVNode(_component_VField, {
                 modelValue: $setup.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.email) = $event)),
@@ -19040,11 +19040,11 @@
       ]))
     }
 
-    script$g.render = render$g;
-    script$g.__file = "src/forms/FormLogin.vue";
+    script$h.render = render$h;
+    script$h.__file = "src/forms/FormLogin.vue";
 
     //import modal from '@root/plugins/vue-modal'
-    var script$f = {
+    var script$g = {
     	name: 'Login',
     	setup() {
     		const router = useRouter();
@@ -19053,7 +19053,7 @@
     		onMounted(async() => {
     			const success = await modal({
     				title: 'Log in',
-    				component: script$g,
+    				component: script$h,
     				backdrop: 'static',
     			});
     			if (success) {
@@ -19068,18 +19068,18 @@
     	},
     };
 
-    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
       return null
     }
 
-    script$f.render = render$f;
-    script$f.__file = "src/views/Login.vue";
+    script$g.render = render$g;
+    script$g.__file = "src/views/Login.vue";
 
-    var script$e = {
+    var script$f = {
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$d = { class: "container" };
+    const _hoisted_1$e = { class: "container" };
     const _hoisted_2$c = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
@@ -19087,18 +19087,18 @@
       _hoisted_2$c
     ];
 
-    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$d, [
+    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$e, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
         }, _hoisted_3$c, 2 /* CLASS */)
       ]))
     }
 
-    script$e.render = render$e;
-    script$e.__file = "src/views/UserHome.vue";
+    script$f.render = render$f;
+    script$f.__file = "src/views/UserHome.vue";
 
-    var script$d = {
+    var script$e = {
     		name: 'FormUserInfo',
     		setup() {
     			const store = inject('store');
@@ -19142,14 +19142,13 @@
     				const user = await this.$api.users.save(this.form);
     				if (user) {
     					this.$emit('success', user);
-    					console.log("emitted supposedly success");
     				}
     				this.sending = false;
     			},
     		},
     	};
 
-    const _hoisted_1$c = {
+    const _hoisted_1$d = {
       key: 0,
       class: "form-check"
     };
@@ -19168,7 +19167,7 @@
     const _hoisted_5$6 = { class: "mt-label" };
     const _hoisted_6$5 = ["disabled"];
 
-    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19179,7 +19178,7 @@
       }, {
         default: withCtx(({ errors }) => [
           ($setup.store.state.loggeduser.isadmin)
-            ? (openBlock(), createElementBlock("div", _hoisted_1$c, [
+            ? (openBlock(), createElementBlock("div", _hoisted_1$d, [
                 _hoisted_2$b,
                 createVNode(_component_VField, {
                   modelValue: $data.form.isadmin,
@@ -19241,10 +19240,10 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$d.render = render$d;
-    script$d.__file = "src/forms/FormUserInfo.vue";
+    script$e.render = render$e;
+    script$e.__file = "src/forms/FormUserInfo.vue";
 
-    var script$c = {
+    var script$d = {
     		name: 'FormCharacter',
     		setup() {
     			const store = inject('store');
@@ -19309,7 +19308,7 @@
     		},
     	};
 
-    const _hoisted_1$b = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$c = /*#__PURE__*/createBaseVNode("label", {
       for: "label",
       class: "form-label"
     }, "Name", -1 /* HOISTED */);
@@ -19320,7 +19319,7 @@
     const _hoisted_3$a = { class: "mt-label" };
     const _hoisted_4$9 = ["disabled"];
 
-    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19331,7 +19330,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$b,
+            _hoisted_1$c,
             createVNode(_component_VField, {
               modelValue: $data.form.name,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.name) = $event)),
@@ -19378,14 +19377,15 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$c.render = render$c;
-    script$c.__file = "src/forms/FormCharacter.vue";
+    script$d.render = render$d;
+    script$d.__file = "src/forms/FormCharacter.vue";
 
-    var script$b = {
+    var script$c = {
     	name: 'UserProfile',
     	setup() {
     		const store = inject('store');
     		const modal = inject('modal');
+    		const confirm = inject('confirm');
     		const route = useRoute();
 
     		let userObject = ref({});
@@ -19411,10 +19411,10 @@
     		}
 
     		async function editUser(props = {}) {
-    			props = userObject.value; // This doesn't account for admin wanting to edit another user
+    			//props = userObject.value // This doesn't account for admin wanting to edit another user
     			const result = await modal({
     				title: 'Edit user info',
-    				component: script$d,
+    				component: script$e,
     				props,
     			});
 
@@ -19427,12 +19427,29 @@
     			props.user_id = userObject.value.id;
     			const result = await modal({
     				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
-    				component: script$c,
+    				component: script$d,
     				props,
     			});
 
     			if (result) getCharacters();
     			return result
+    		}
+
+    		async function confirmDelete(type, data) {
+    			console.log(type, data);
+    			const success = await confirm.delete(type, data);
+    			if (success) {
+    				switch (type) {
+    					case 'user':
+    						if (data.id == store.state.loggeduser.id) await api.users.log.out();
+    						router.push({ name: 'admin-users' });
+    						break
+
+    					case 'userObject.character':
+    						getUser();
+    						break
+    				}
+    			}
     		}
 
     		onMounted(async() => {
@@ -19453,32 +19470,14 @@
     			store,
     			characters,
     			getCharacters,
+    			confirmDelete,
     			editUser,
     			editCharacter,
     		}
     	},
-    	methods: {
-
-    		async confirmDelete(type, data) {
-    			console.log(type, data);
-    			const success = await this.$confirm.delete(type, data);
-    			if (success) {
-    				switch (type) {
-    					case 'user':
-    						if (data.id == this.store.state.loggeduser.id) await this.$api.users.log.out();
-    						this.$router.push({ name: 'admin-users' });
-    						break
-
-    					case 'userObject.character':
-    						this.getUser();
-    						break
-    				}
-    			}
-    		}
-    	},
     };
 
-    const _hoisted_1$a = { class: "container" };
+    const _hoisted_1$b = { class: "container" };
     const _hoisted_2$9 = {
       key: 0,
       class: "row gx-4"
@@ -19550,8 +19549,8 @@
       class: "fs-3 fw-light text-muted text-center p-4"
     };
 
-    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$a, [
+    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$b, [
         ($setup.userObject)
           ? (openBlock(), createElementBlock("div", _hoisted_2$9, [
               createBaseVNode("div", _hoisted_3$9, [
@@ -19567,11 +19566,11 @@
                       createBaseVNode("div", _hoisted_8$3, [
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
-                          onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser(_ctx.user)))
+                          onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($setup.userObject)))
                         }, _hoisted_10$2),
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
-                          onClick: _cache[1] || (_cache[1] = $event => ($options.confirmDelete('user', _ctx.user)))
+                          onClick: _cache[1] || (_cache[1] = $event => ($setup.confirmDelete('user', $setup.userObject)))
                         }, _hoisted_12$1)
                       ])
                     ])
@@ -19615,7 +19614,7 @@
                                       }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
                                       createBaseVNode("button", {
                                         class: "btn btn-unstyled px-1 rounded",
-                                        onClick: $event => ($options.confirmDelete('userObject.character', character))
+                                        onClick: $event => ($setup.confirmDelete('userObject.character', character))
                                       }, _hoisted_28, 8 /* PROPS */, _hoisted_26)
                                     ])
                                   ])
@@ -19633,10 +19632,10 @@
       ]))
     }
 
-    script$b.render = render$b;
-    script$b.__file = "src/views/UserProfile.vue";
+    script$c.render = render$c;
+    script$c.__file = "src/views/UserProfile.vue";
 
-    var script$a = {
+    var script$b = {
     		name: 'FormForgotPassword',
 
     		data() {
@@ -19666,7 +19665,7 @@
     		}
     	};
 
-    const _hoisted_1$9 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$a = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
@@ -19675,7 +19674,7 @@
     const _hoisted_4$7 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
     const _hoisted_5$4 = /*#__PURE__*/createTextVNode("Log in");
 
-    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19687,7 +19686,7 @@
           class: "vstack gap-2"
         }, {
           default: withCtx(({ errors }) => [
-            _hoisted_1$9,
+            _hoisted_1$a,
             createBaseVNode("div", {
               class: normalizeClass(["input-group", { "has-validation": errors.email }])
             }, [
@@ -19727,10 +19726,10 @@
       ]))
     }
 
-    script$a.render = render$a;
-    script$a.__file = "src/forms/FormForgotPassword.vue";
+    script$b.render = render$b;
+    script$b.__file = "src/forms/FormForgotPassword.vue";
 
-    var script$9 = {
+    var script$a = {
     		name: 'ForgotPassword',
 
     		data() {
@@ -19742,13 +19741,13 @@
     		async mounted() {
     			this.requested = await this.$modal({
     				title: 'Request a password reset',
-    				component: script$a,
+    				component: script$b,
     				backdrop: 'static',
     			});
     		},
     	};
 
-    const _hoisted_1$8 = {
+    const _hoisted_1$9 = {
       key: 0,
       class: "container mt-5"
     };
@@ -19763,9 +19762,9 @@
       _hoisted_3$7
     ];
 
-    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
       return ($data.requested)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, _hoisted_4$6, 2 /* CLASS */)
@@ -19773,10 +19772,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$9.render = render$9;
-    script$9.__file = "src/views/ForgotPassword.vue";
+    script$a.render = render$a;
+    script$a.__file = "src/views/ForgotPassword.vue";
 
-    var script$8 = {
+    var script$9 = {
     	name: 'FormRegister',
     	setup() {
     		const store = inject('store');
@@ -19828,7 +19827,7 @@
     	}
     };
 
-    const _hoisted_1$7 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
@@ -19852,7 +19851,7 @@
     const _hoisted_10$1 = /*#__PURE__*/createTextVNode("Already a user? ");
     const _hoisted_11$1 = /*#__PURE__*/createTextVNode("Log in");
 
-    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -19865,7 +19864,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$7,
+              _hoisted_1$8,
               createVNode(_component_VField, {
                 modelValue: $data.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.email) = $event)),
@@ -19962,10 +19961,10 @@
       ]))
     }
 
-    script$8.render = render$8;
-    script$8.__file = "src/forms/FormRegister.vue";
+    script$9.render = render$9;
+    script$9.__file = "src/forms/FormRegister.vue";
 
-    var script$7 = {
+    var script$8 = {
     	name: 'Register',
     	setup() {
     		const modal = inject('modal');
@@ -19974,7 +19973,7 @@
     		onMounted(async() => {
     			registered.value = await modal({
     				title: 'Sign up',
-    				component: script$8,
+    				component: script$9,
     				backdrop: 'static',
     			});
     		});
@@ -19985,7 +19984,7 @@
     	},
     };
 
-    const _hoisted_1$6 = {
+    const _hoisted_1$7 = {
       key: 0,
       class: "container mt-5"
     };
@@ -20000,9 +19999,9 @@
       _hoisted_3$5
     ];
 
-    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
       return ($setup.registered)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$6, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
             }, _hoisted_4$4, 2 /* CLASS */)
@@ -20010,10 +20009,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$7.render = render$7;
-    script$7.__file = "src/views/Register.vue";
+    script$8.render = render$8;
+    script$8.__file = "src/views/Register.vue";
 
-    var script$6 = {
+    var script$7 = {
     		name: 'FormResetPassword',
 
     		props: {
@@ -20070,7 +20069,7 @@
     		}
     	};
 
-    const _hoisted_1$5 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
@@ -20081,7 +20080,7 @@
     const _hoisted_3$4 = { class: "mt-label" };
     const _hoisted_4$3 = ["disabled"];
 
-    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -20092,7 +20091,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$5,
+            _hoisted_1$6,
             createVNode(_component_VField, {
               modelValue: $data.form.password,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.password) = $event)),
@@ -20137,10 +20136,10 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$6.render = render$6;
-    script$6.__file = "src/forms/FormResetPassword.vue";
+    script$7.render = render$7;
+    script$7.__file = "src/forms/FormResetPassword.vue";
 
-    var script$5 = {
+    var script$6 = {
     		name: 'Confirm',
 
     		data() {
@@ -20163,7 +20162,7 @@
     			async resetPassword(data) {
     				await this.$modal({
     					title: 'Enter new password',
-    					component: script$6,
+    					component: script$7,
     					props: data,
     					backdrop: 'static',
     				});
@@ -20207,7 +20206,7 @@
     		},
     	};
 
-    const _hoisted_1$4 = {
+    const _hoisted_1$5 = {
       key: 0,
       class: "container mt-5"
     };
@@ -20221,11 +20220,11 @@
     const _hoisted_7$1 = /*#__PURE__*/createTextVNode("log in");
     const _hoisted_8$1 = /*#__PURE__*/createTextVNode(".");
 
-    function render$5(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_router_link = resolveComponent("router-link");
 
       return ($data.confirmed)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$4, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$5, [
             createBaseVNode("div", _hoisted_2$3, [
               _hoisted_3$3,
               createBaseVNode("div", _hoisted_4$2, [
@@ -20245,10 +20244,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$5.render = render$5;
-    script$5.__file = "src/views/Confirm.vue";
+    script$6.render = render$6;
+    script$6.__file = "src/views/Confirm.vue";
 
-    var script$4 = {
+    var script$5 = {
     	name: 'Home',
     	setup() {
     		const store = inject('store');
@@ -20258,7 +20257,7 @@
     	},
     };
 
-    const _hoisted_1$3 = { class: "container" };
+    const _hoisted_1$4 = { class: "container" };
     const _hoisted_2$2 = { class: "counter" };
     const _hoisted_3$2 = /*#__PURE__*/createBaseVNode("div", { class: "bigasslogo" }, [
       /*#__PURE__*/createBaseVNode("img", {
@@ -20267,8 +20266,8 @@
       })
     ], -1 /* HOISTED */);
 
-    function render$4(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$3, [
+    function render$5(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
         createBaseVNode("div", _hoisted_2$2, [
           createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
           createBaseVNode("button", {
@@ -20282,8 +20281,8 @@
       ]))
     }
 
-    script$4.render = render$4;
-    script$4.__file = "src/views/Home.vue";
+    script$5.render = render$5;
+    script$5.__file = "src/views/Home.vue";
 
     const error = (to, props = {}) => ({
     	name: 'error',
@@ -20297,17 +20296,17 @@
 
     const needAdminOrSelf = to => store.state.loggeduser.isadmin || to.params.id == store.state.loggeduser.id ? true : error(to);
 
-    const router = createRouter({
+    const router$1 = createRouter({
     	routes: [
     		{ path: '/', name: 'home', redirect: () => ({ name: store.state.loggeduser && store.state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
-    		{ path: '/app/confirm', component: script$5, name: 'confirm' },
-    		{ path: '/app/forgotpassword', component: script$9, name: 'forgot-password' },
-    		{ path: '/app/register', component: script$7, name: 'register' },
-    		{ path: '/app/user', component: script$e, name: 'user-home', beforeEnter: [needLogin] },
+    		{ path: '/app/confirm', component: script$6, name: 'confirm' },
+    		{ path: '/app/forgotpassword', component: script$a, name: 'forgot-password' },
+    		{ path: '/app/register', component: script$8, name: 'register' },
+    		{ path: '/app/user', component: script$f, name: 'user-home', beforeEnter: [needLogin] },
     		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
-    		{ path: '/app/', component: script$4, name: 'page-home' },
-    		{ path: '/app/login', component: script$f, name: 'login' },
-    		{ path: '/app/user/:id', component: script$b, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
+    		{ path: '/app/', component: script$5, name: 'page-home' },
+    		{ path: '/app/login', component: script$g, name: 'login' },
+    		{ path: '/app/user/:id', component: script$c, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
     		//] },
@@ -20319,7 +20318,7 @@
     });
 
     // Close modal before navigating
-    router.beforeEach((to, from, next) => {
+    router$1.beforeEach((to, from, next) => {
     	const modal = document.querySelector('.modal.show');
     	if (!modal) {
     		console.log(store.state.loggeduser);
@@ -20375,7 +20374,7 @@
     	lg: 'modal-lg',
     	xl: 'modal-xl',
     };
-    var script$3 = {
+    var script$4 = {
     	name: 'VModal',
     	props: {
     		title: String,
@@ -20434,7 +20433,7 @@
     	}
     };
 
-    const _hoisted_1$2 = ["data-bs-backdrop", "data-bs-keyboard"];
+    const _hoisted_1$3 = ["data-bs-backdrop", "data-bs-keyboard"];
     const _hoisted_2$1 = { class: "modal-content shadow-lg" };
     const _hoisted_3$1 = {
       key: 0,
@@ -20453,7 +20452,7 @@
       class: "modal-body"
     };
 
-    function render$3(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$4(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", {
         class: "modal fade",
         ref: "modal",
@@ -20477,16 +20476,16 @@
             ], 512 /* NEED_PATCH */)
           ])
         ], 2 /* CLASS */)
-      ], 8 /* PROPS */, _hoisted_1$2))
+      ], 8 /* PROPS */, _hoisted_1$3))
     }
 
-    script$3.render = render$3;
-    script$3.__file = "src/components/VModal.vue";
+    script$4.render = render$4;
+    script$4.__file = "src/components/VModal.vue";
 
-    var script$2 = {
+    var script$3 = {
     	name: 'TheModal',
     	components: {
-    		VModal: script$3,
+    		VModal: script$4,
     	},
     	methods: {
     		onSuccess(modal, e) {
@@ -20496,7 +20495,7 @@
     	}
     };
 
-    function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$3(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VModal = resolveComponent("VModal");
 
       return (_ctx.modals.length)
@@ -20527,8 +20526,90 @@
         : createCommentVNode("v-if", true)
     }
 
+    script$3.render = render$3;
+    script$3.__file = "src/components/TheModal.vue";
+
+    var script$2 = {
+    		name: 'FormConfirm',
+
+    		props: {
+    			ok: {
+    				type: String,
+    				default: 'OK',
+    			},
+    			cancel: {
+    				type: String,
+    				default: 'Cancel',
+    			},
+    		},
+
+    		methods: {
+    			confirm(choice) {
+    				this.$emit('success', choice);
+    			},
+    		},
+    	};
+
+    const _hoisted_1$2 = { class: "d-flex justify-content-between" };
+
+    function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$2, [
+        createBaseVNode("button", {
+          type: "submit",
+          class: "btn btn-secondary",
+          onClick: _cache[0] || (_cache[0] = $event => ($options.confirm(false)))
+        }, toDisplayString($props.cancel), 1 /* TEXT */),
+        createBaseVNode("button", {
+          type: "submit",
+          class: "btn btn-primary gradient",
+          onClick: _cache[1] || (_cache[1] = $event => ($options.confirm(true)))
+        }, toDisplayString($props.ok), 1 /* TEXT */)
+      ]))
+    }
+
     script$2.render = render$2;
-    script$2.__file = "src/components/TheModal.vue";
+    script$2.__file = "src/forms/FormConfirm.vue";
+
+    var confirm = modal => {
+    	const confirm = ({ title, ok = 'OK', cancel = 'Cancel' } = {}) => modal({
+    		component: script$2,
+    		title,
+    		props: {
+    			ok,
+    			cancel,
+    		},
+    	});
+
+    	confirm.delete = async (type, data) => {
+    		let title, apiCall;
+    	
+    		switch (type) {	
+    			case 'user':
+    				title = 'profile';
+    				apiCall = api.users.delete.bind(null, data.id);
+    				break
+    			
+    			case 'userObject.character':
+    				title = data.name;
+    				apiCall = api.users.characters.delete.bind(null, {
+    					id: data.id,
+    					user_id: data.user_id,
+    				});
+    				break
+    		}
+    	
+    		const confirmed = await confirm({
+    			title: `Delete ${title}?`,
+    			ok: 'Delete',
+    		});
+    	
+    		return confirmed
+    			? apiCall()
+    			: confirmed
+    	};
+
+    	return confirm
+    };
 
     var modal = {
     	install: (app, options) => {
@@ -20536,7 +20617,7 @@
     		const modals = ref([]);
 
     		app.component('TheModal', {
-    			...script$2,
+    			...script$3,
     			setup() {
     				function id(modal) {
     					return `modal-${modal.id}`
@@ -20585,6 +20666,7 @@
     		};
 
     		app.provide('modal', modal);
+    		app.provide('confirm', confirm(modal));
     		//app.config.globalProperties.$modal = modal
     		//app.config.globalProperties.$confirm = confirm(modal)
     	},
@@ -23617,7 +23699,7 @@
 
     const app = createApp(script)
     	//.use(store)
-    	.use(router)
+    	.use(router$1)
     	.use(api$1)
     	.use(c)
     	.use(modal)
@@ -23626,7 +23708,7 @@
     	.component('VField', Field)
     	.component('ErrorMessage', ErrorMessage);
 
-    router.isReady()
+    router$1.isReady()
     	.then(() => app.mount('#hki2050'));
 
 })();

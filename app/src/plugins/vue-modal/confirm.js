@@ -20,8 +20,8 @@ export default modal => {
 				apiCall = api.users.delete.bind(null, data.id)
 				break
 			
-			case 'user.character':
-				title = data.description
+			case 'userObject.character':
+				title = data.name
 				apiCall = api.users.characters.delete.bind(null, {
 					id: data.id,
 					user_id: data.user_id,

@@ -12,8 +12,8 @@
 						<div class='card-body'>
 							<div>{{ userObject.email }}</div>
 							<div class='context-actions hstack gap-1 justify-content-end'>
-								<button class='btn btn-unstyled px-1 rounded' v-on:click="editUser(user)"><i class="bi-pencil-fill" title='Edit profile'></i></button>
-								<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user', user)"><i class="bi-trash-fill" title='Delete profile'></i></button>
+								<button class='btn btn-unstyled px-1 rounded' v-on:click="editUser(userObject)"><i class="bi-pencil-fill" title='Edit profile'></i></button>
+								<button class='btn btn-unstyled px-1 rounded' v-on:click="confirmDelete('user', userObject)"><i class="bi-trash-fill" title='Delete profile'></i></button>
 							</div>
 						</div>
 					</div>
@@ -72,6 +72,7 @@ export default {
 	setup() {
 		const store = inject('store')
 		const modal = inject('modal')
+		const confirm = inject('confirm')
 		const route = useRoute()
 
 		let userObject = ref({})
@@ -97,7 +98,7 @@ export default {
 		}
 
 		async function editUser(props = {}) {
-			props = userObject.value // This doesn't account for admin wanting to edit another user
+			//props = userObject.value // This doesn't account for admin wanting to edit another user
 			const result = await modal({
 				title: 'Edit user info',
 				component: FormUserInfo,
@@ -121,6 +122,23 @@ export default {
 			return result
 		}
 
+		async function confirmDelete(type, data) {
+			console.log(type, data)
+			const success = await confirm.delete(type, data)
+			if (success) {
+				switch (type) {
+					case 'user':
+						if (data.id == store.state.loggeduser.id) await api.users.log.out()
+						router.push({ name: 'admin-users' })
+						break
+
+					case 'userObject.character':
+						getUser()
+						break
+				}
+			}
+		}
+
 		onMounted(async() => {
 			/*
 			if (store.state.loggeduser.isadmin && !store.state.characters.length) {
@@ -139,27 +157,9 @@ export default {
 			store,
 			characters,
 			getCharacters,
+			confirmDelete,
 			editUser,
 			editCharacter,
-		}
-	},
-	methods: {
-
-		async confirmDelete(type, data) {
-			console.log(type, data)
-			const success = await this.$confirm.delete(type, data)
-			if (success) {
-				switch (type) {
-					case 'user':
-						if (data.id == this.store.state.loggeduser.id) await this.$api.users.log.out()
-						this.$router.push({ name: 'admin-users' })
-						break
-
-					case 'userObject.character':
-						this.getUser()
-						break
-				}
-			}
 		}
 	},
 }

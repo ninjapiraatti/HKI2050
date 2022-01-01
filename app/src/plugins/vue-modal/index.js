@@ -58,6 +58,7 @@ export default {
 		}
 
 		app.provide('modal', modal)
+		app.provide('confirm', confirm(modal))
 		//app.config.globalProperties.$modal = modal
 		//app.config.globalProperties.$confirm = confirm(modal)
 	},
