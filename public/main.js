@@ -8463,28 +8463,32 @@
 
     var api$2 = {
     	install: (app, options) => {
-    		store$1 = app.config.globalProperties.$store;
-    		router$2 = app.config.globalProperties.$router;
-    		flashMessage$1 = app.config.globalProperties.$flashMessage;
+    		//store = app.config.globalProperties.$store
+    		//router = app.config.globalProperties.$router
+    		//flashMessage = app.config.globalProperties.$flashMessage
 
-    		app.config.globalProperties.$api = api$1;
+    		//app.config.globalProperties.$api = api
+    		// All of these are now imported per component. Maybe refactor the way modal is done?
+
+    		app.provide('api', api$1);
+    		//app.provide('confirm', confirm(modal))
     	},
     };
 
     const state = reactive({
-      counter: 666,
+    	counter: 666,
     	loggeduser: JSON.parse(localStorage.getItem('user')),
-      colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
+    	colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
     });
 
     const methods = {
-      increase() {
-        state.counter++;
-      },
+    	increase() {
+    		state.counter++;
+    	},
 
-      decrease() {
-        state.counter--;
-      },
+    	decrease() {
+    		state.counter--;
+    	},
 
     	async logout() {
     		try {
@@ -8497,7 +8501,7 @@
     		return true
     	},
 
-      async login(data) {
+    	async login(data) {
     		try {
     			const userId = await api$1.users.log.in(data);
     			if (userId) await this.setUser(userId);
@@ -8508,7 +8512,7 @@
     		return true
     	},
 
-      async setUser(data) {
+    	async setUser(data) {
     		if (typeof data == 'string') {
     			try {
     				const [ user ] = await Promise.all([
@@ -8520,7 +8524,7 @@
     				data = null;
     			}
     		}
-        state.loggeduser = data;
+    		state.loggeduser = data;
     		if (data) {
     			console.log(data);
     			localStorage.setItem('user', JSON.stringify(data));
@@ -8532,7 +8536,7 @@
 
     var store = {
     	state,
-      methods
+    	methods
     };
 
     function getDevtoolsGlobalHook() {
@@ -19050,13 +19054,25 @@
     		const router = useRouter();
     		const route = useRoute();
     		const modal = inject('modal');
+    		inject('colorScheme');
     		onMounted(async() => {
+    			//console.log(colorScheme.navbar)
     			const success = await modal({
     				title: 'Log in',
     				component: script$h,
     				backdrop: 'static',
     			});
     			if (success) {
+    				/*
+    				const message = {
+    				type: 'success',
+    				title: 'Successful login'
+    				}
+
+    				flashMessage.show({
+    					...message,
+    					time: 5000,
+    				})*/
     				console.log(router);
     				router.replace(route.query.redirect || { name: 'home' });
     			}
@@ -19386,17 +19402,18 @@
     		const store = inject('store');
     		const modal = inject('modal');
     		const confirm = inject('confirm');
+    		const api = inject('api');
     		const route = useRoute();
 
     		let userObject = ref({});
     		let characters = ref([]);
 
     		async function getCharacters() {
-    			characters.value = await api$1.users.characters.get({ user_id: route.params.id });
+    			characters.value = await api.users.characters.get({ user_id: route.params.id });
     		}
 
     		async function getUser() {
-    			const promises = [ api$1.users.get({ id: route.params.id }) ];
+    			const promises = [ api.users.get({ id: route.params.id }) ];
     			//if (!this.store.state.characterLevels.length) promises.push(this.store.dispatch('getcharacterLevels'))
     			//console.log(userObject)
     			const [ userUpdated ] = await Promise.all(promises);
@@ -19441,7 +19458,7 @@
     			if (success) {
     				switch (type) {
     					case 'user':
-    						if (data.id == store.state.loggeduser.id) await api$1.users.log.out();
+    						if (data.id == store.state.loggeduser.id) await api.users.log.out();
     						router.push({ name: 'admin-users' });
     						break
 
@@ -19458,6 +19475,7 @@
     				console.log("lol")
     			}
     			*/
+    			console.log(store.state.loggeduser);
     			//userObject = store.state.loggeduser // This fucked up everything. WHY?
     			await Promise.all([
     				getUser(),
@@ -20002,7 +20020,7 @@
     ];
 
     function render$8(_ctx, _cache, $props, $setup, $data, $options) {
-      return ($data.registered)
+      return ($setup.registered)
         ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
@@ -20366,6 +20384,7 @@
     		}, { immediate: true });
 
     		app.config.globalProperties.$colorScheme = colorScheme;
+    		//app.provide('colorScheme', colorScheme)
     	},
     };
 
@@ -20757,7 +20776,7 @@
           }, {
             default: withCtx(() => [
               _hoisted_2,
-              createCommentVNode(" <svg height='48' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 79 35'>\n\t\t\t\t\t<path fill-rule='nonzero' d='M72.46 15.53c2.01 0 3.25 1.16 3.25 3.03v.75h-3.89c-2.97 0-4.82 1.46-4.82 3.88 0 2.54 1.85 3.94 4.77 3.94 1.65 0 3.25-.69 3.94-1.98v1c0 .46.39.85.86.85.46 0 .85-.39.85-.86v-7.58c0-2.81-1.77-4.68-4.96-4.68-2.32 0-3.8.96-4.58 2.17a.85.85 0 0 0-.14.47c0 .44.36.8.8.8.25 0 .44-.08.72-.39a3.82 3.82 0 0 1 3.2-1.4Zm-.53 10c-2.15 0-3.14-.9-3.14-2.34 0-1.6 1.24-2.34 3.03-2.34h3.89V22c0 2.34-1.85 3.52-3.78 3.52ZM61.88 7.15a.9.9 0 0 0-.88.88v15.74C61 25.9 62.02 27 63.87 27a.83.83 0 0 0 0-1.65c-.75 0-1.1-.48-1.1-1.58V8.03a.89.89 0 0 0-.89-.88Zm-14 6.89c-.5 0-.88.39-.88.88v7.2c0 2.61.88 5.01 5.13 5.01 4.27 0 5.12-2.4 5.12-5.01v-7.2c0-.5-.38-.88-.85-.88a.9.9 0 0 0-.91.88v7.2c0 1.79-.58 3.33-3.36 3.33-2.79 0-3.37-1.54-3.37-3.33v-7.2c0-.5-.4-.88-.88-.88Zm-6.41 4.08v7.94c0 .5.41.94.93.94.53 0 .94-.45.94-.94V8.94c0-.5-.41-.94-.94-.94a.95.95 0 0 0-.93.94v7.47h-9.6V8.94c0-.5-.4-.94-.93-.94a.95.95 0 0 0-.94.94v17.12c0 .5.41.94.94.94.52 0 .93-.45.93-.94v-7.94h9.6Z'/>\n\t\t\t\t</svg> ")
+              createCommentVNode(" <svg height='48' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 79 35'>\r\n\t\t\t\t\t<path fill-rule='nonzero' d='M72.46 15.53c2.01 0 3.25 1.16 3.25 3.03v.75h-3.89c-2.97 0-4.82 1.46-4.82 3.88 0 2.54 1.85 3.94 4.77 3.94 1.65 0 3.25-.69 3.94-1.98v1c0 .46.39.85.86.85.46 0 .85-.39.85-.86v-7.58c0-2.81-1.77-4.68-4.96-4.68-2.32 0-3.8.96-4.58 2.17a.85.85 0 0 0-.14.47c0 .44.36.8.8.8.25 0 .44-.08.72-.39a3.82 3.82 0 0 1 3.2-1.4Zm-.53 10c-2.15 0-3.14-.9-3.14-2.34 0-1.6 1.24-2.34 3.03-2.34h3.89V22c0 2.34-1.85 3.52-3.78 3.52ZM61.88 7.15a.9.9 0 0 0-.88.88v15.74C61 25.9 62.02 27 63.87 27a.83.83 0 0 0 0-1.65c-.75 0-1.1-.48-1.1-1.58V8.03a.89.89 0 0 0-.89-.88Zm-14 6.89c-.5 0-.88.39-.88.88v7.2c0 2.61.88 5.01 5.13 5.01 4.27 0 5.12-2.4 5.12-5.01v-7.2c0-.5-.38-.88-.85-.88a.9.9 0 0 0-.91.88v7.2c0 1.79-.58 3.33-3.36 3.33-2.79 0-3.37-1.54-3.37-3.33v-7.2c0-.5-.4-.88-.88-.88Zm-6.41 4.08v7.94c0 .5.41.94.93.94.53 0 .94-.45.94-.94V8.94c0-.5-.41-.94-.94-.94a.95.95 0 0 0-.93.94v7.47h-9.6V8.94c0-.5-.4-.94-.93-.94a.95.95 0 0 0-.94.94v17.12c0 .5.41.94.94.94.52 0 .93-.45.93-.94v-7.94h9.6Z'/>\r\n\t\t\t\t</svg> ")
             ]),
             _: 1 /* STABLE */
           }),
@@ -20831,7 +20850,7 @@
     var script = {
     	setup() {
     		provide('store', store);
-    		//provide('modal', modal)
+    		//provide('modal', modal) // The store is not provided either, right?
 
     		return {
     			store,
@@ -23703,6 +23722,7 @@
     	.use(api$2)
     	.use(c)
     	.use(modal)
+    	//app.provide('colorScheme', colorScheme)
     	.use(colorScheme, { scheme: toRef(store.state, 'colorScheme') })
     	.component('VForm', Form)
     	.component('VField', Field)

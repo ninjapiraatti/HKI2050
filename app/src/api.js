@@ -236,10 +236,14 @@ export const api = {
 
 export default {
 	install: (app, options) => {
-		store = app.config.globalProperties.$store
-		router = app.config.globalProperties.$router
-		flashMessage = app.config.globalProperties.$flashMessage
+		//store = app.config.globalProperties.$store
+		//router = app.config.globalProperties.$router
+		//flashMessage = app.config.globalProperties.$flashMessage
 
-		app.config.globalProperties.$api = api
+		//app.config.globalProperties.$api = api
+		// All of these are now imported per component. Maybe refactor the way modal is done?
+
+		app.provide('api', api)
+		//app.provide('confirm', confirm(modal))
 	},
 }

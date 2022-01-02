@@ -64,7 +64,7 @@
 <script>
 import FormUserInfo from '@forms/FormUserInfo.vue'
 import FormCharacter from '@forms/FormCharacter.vue'
-import { api } from '@root/api.js'
+//import { api } from '@root/api.js'
 import { useRoute } from 'vue-router'
 import { inject, ref, onMounted } from 'vue'
 export default {
@@ -73,6 +73,7 @@ export default {
 		const store = inject('store')
 		const modal = inject('modal')
 		const confirm = inject('confirm')
+		const api = inject('api')
 		const route = useRoute()
 
 		let userObject = ref({})
@@ -145,6 +146,7 @@ export default {
 				console.log("lol")
 			}
 			*/
+			console.log(store.state.loggeduser)
 			//userObject = store.state.loggeduser // This fucked up everything. WHY?
 			await Promise.all([
 				getUser(),

@@ -2,19 +2,19 @@ import { reactive } from 'vue'
 import { api } from '@root/api.js'
 
 const state = reactive({
-  counter: 666,
+	counter: 666,
 	loggeduser: JSON.parse(localStorage.getItem('user')),
-  colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
+	colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
 })
 
 const methods = {
-  increase() {
-    state.counter++
-  },
+	increase() {
+		state.counter++
+	},
 
-  decrease() {
-    state.counter--
-  },
+	decrease() {
+		state.counter--
+	},
 
 	async logout() {
 		try {
@@ -27,7 +27,7 @@ const methods = {
 		return true
 	},
 
-  async login(data) {
+	async login(data) {
 		try {
 			const userId = await api.users.log.in(data)
 			if (userId) await this.setUser(userId)
@@ -38,7 +38,7 @@ const methods = {
 		return true
 	},
 
-  async setUser(data) {
+	async setUser(data) {
 		if (typeof data == 'string') {
 			try {
 				const [ user ] = await Promise.all([
@@ -50,7 +50,7 @@ const methods = {
 				data = null
 			}
 		}
-    state.loggeduser = data
+		state.loggeduser = data
 		if (data) {
 			console.log(data)
 			localStorage.setItem('user', JSON.stringify(data))
@@ -62,5 +62,5 @@ const methods = {
 
 export default {
 	state,
-  methods
+	methods
 }

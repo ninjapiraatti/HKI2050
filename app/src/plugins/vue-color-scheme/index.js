@@ -36,5 +36,6 @@ export default {
 		}, { immediate: true })
 
 		app.config.globalProperties.$colorScheme = colorScheme
+		//app.provide('colorScheme', colorScheme)
 	},
 }

@@ -18,7 +18,7 @@ import FormLogin from '@forms/FormLogin.vue'
 export default {
 	setup() {
 		provide('store', store)
-		//provide('modal', modal)
+		//provide('modal', modal) // The store is not provided either, right?
 
 		return {
 			store,

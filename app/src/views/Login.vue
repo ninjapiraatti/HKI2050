@@ -13,13 +13,25 @@ export default {
 		const router = useRouter()
 		const route = useRoute()
 		const modal = inject('modal')
+		const colorScheme = inject('colorScheme')
 		onMounted(async() => {
+			//console.log(colorScheme.navbar)
 			const success = await modal({
 				title: 'Log in',
 				component: FormLogin,
 				backdrop: 'static',
 			})
 			if (success) {
+				/*
+				const message = {
+				type: 'success',
+				title: 'Successful login'
+				}
+
+				flashMessage.show({
+					...message,
+					time: 5000,
+				})*/
 				console.log(router)
 				router.replace(route.query.redirect || { name: 'home' })
 			}
