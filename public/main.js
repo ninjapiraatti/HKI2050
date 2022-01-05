@@ -19116,12 +19116,6 @@
 
     var script$e = {
     		name: 'FormUserInfo',
-    		setup() {
-    			const store = inject('store');
-    			return {
-    				store
-    			}
-    		},
     		props: {	
     			id: {
     				type: String,
@@ -19137,30 +19131,40 @@
     			},
     			email: String,
     		},
+    		setup(props, {emit}) {
+    			const store = inject('store');
+    			const api = inject('api');
+    			let sending = false;
+    			let form = { ...props };
 
-    		data() {
-    			return {
-    				sending: false,
-    				form: { ...this.$props },
-    			}
-    		},
+    			const submitLabel = computed(() => {
+    				return sending ? 'Saving' : 'Save'
+    			});
 
-    		computed: {
-    			submitLabel() {
-    				return this.sending ? 'Saving' : 'Save'
-    			},
-    		},
+    			let loggedUser = computed(() => store.state.loggeduser);
 
-    		methods: {
-    			async onSubmit() {
-    				this.sending = true;
+    			async function onSubmit() {
+    				sending = true;
 
-    				const user = await this.$api.users.save(this.form);
+    				const user = await api.users.save(form);
     				if (user) {
-    					this.$emit('success', user);
+    					emit('success', user);
     				}
-    				this.sending = false;
-    			},
+    				sending = false;
+    			}
+
+    			onMounted(() => {
+    				console.log(props);
+    			});
+
+    			return {
+    				store,
+    				sending,
+    				submitLabel,
+    				form,
+    				loggedUser,
+    				onSubmit
+    			}
     		},
     	};
 
@@ -19189,16 +19193,16 @@
       const _component_VForm = resolveComponent("VForm");
 
       return (openBlock(), createBlock(_component_VForm, {
-        onSubmit: $options.onSubmit,
+        onSubmit: $setup.onSubmit,
         class: "vstack gap-2"
       }, {
         default: withCtx(({ errors }) => [
-          ($setup.store.state.loggeduser.isadmin)
+          ($setup.loggedUser.isadmin)
             ? (openBlock(), createElementBlock("div", _hoisted_1$d, [
                 _hoisted_2$b,
                 createVNode(_component_VField, {
-                  modelValue: $data.form.isadmin,
-                  "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.isadmin) = $event)),
+                  modelValue: $setup.form.isadmin,
+                  "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.isadmin) = $event)),
                   value: true,
                   "unchecked-value": false,
                   type: "checkbox",
@@ -19211,8 +19215,8 @@
           createBaseVNode("div", null, [
             _hoisted_3$b,
             createVNode(_component_VField, {
-              modelValue: $data.form.email,
-              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($data.form.email) = $event)),
+              modelValue: $setup.form.email,
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.email) = $event)),
               rules: "required|email",
               type: "email",
               id: "email",
@@ -19229,8 +19233,8 @@
           createBaseVNode("div", null, [
             _hoisted_4$a,
             createVNode(_component_VField, {
-              modelValue: $data.form.username,
-              "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($data.form.username) = $event)),
+              modelValue: $setup.form.username,
+              "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.username) = $event)),
               rules: "required",
               type: "username",
               id: "username",
@@ -19247,9 +19251,9 @@
           createBaseVNode("div", _hoisted_5$6, [
             createBaseVNode("button", {
               type: "submit",
-              disabled: $data.sending,
+              disabled: $setup.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_6$5)
+            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_6$5)
           ])
         ]),
         _: 1 /* STABLE */
@@ -19295,6 +19299,7 @@
     			}
 
     			const submitLabel = computed(() => {
+    				return sending ? 'Saving' : 'Save'
     			});
 
     			onMounted(() => {

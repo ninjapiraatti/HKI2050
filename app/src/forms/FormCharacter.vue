@@ -76,7 +76,7 @@
 			}
 
 			const submitLabel = computed(() => {
-				sending ? 'Saving' : 'Save'
+				return sending ? 'Saving' : 'Save'
 			})
 
 			onMounted(() => {

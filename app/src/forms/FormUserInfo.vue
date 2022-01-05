@@ -1,7 +1,7 @@
 <template>	
 	<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 
-		<div class='form-check' v-if='store.state.loggeduser.isadmin'>
+		<div class='form-check' v-if='loggedUser.isadmin'>
 			<label for='isadmin' class='form-label'>Admin</label>
 			<VField
 				v-model='form.isadmin'
@@ -53,15 +53,9 @@
 </template>
 
 <script>
-	import { ref, inject } from 'vue'
+	import { inject, computed, onMounted} from 'vue'
 	export default {
 		name: 'FormUserInfo',
-		setup() {
-			const store = inject('store')
-			return {
-				store
-			}
-		},
 		props: {	
 			id: {
 				type: String,
@@ -77,30 +71,40 @@
 			},
 			email: String,
 		},
+		setup(props, {emit}) {
+			const store = inject('store')
+			const api = inject('api')
+			let sending = false
+			let form = { ...props }
 
-		data() {
-			return {
-				sending: false,
-				form: { ...this.$props },
-			}
-		},
+			const submitLabel = computed(() => {
+				return sending ? 'Saving' : 'Save'
+			})
 
-		computed: {
-			submitLabel() {
-				return this.sending ? 'Saving' : 'Save'
-			},
-		},
+			let loggedUser = computed(() => store.state.loggeduser)
 
-		methods: {
-			async onSubmit() {
-				this.sending = true
+			async function onSubmit() {
+				sending = true
 
-				const user = await this.$api.users.save(this.form)
+				const user = await api.users.save(form)
 				if (user) {
-					this.$emit('success', user)
+					emit('success', user)
 				}
-				this.sending = false
-			},
+				sending = false
+			}
+
+			onMounted(() => {
+				console.log(props)
+			})
+
+			return {
+				store,
+				sending,
+				submitLabel,
+				form,
+				loggedUser,
+				onSubmit
+			}
 		},
 	}
 </script>
