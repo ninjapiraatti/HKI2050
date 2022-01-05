@@ -114,7 +114,7 @@ export default {
 		async function editCharacter(props = {}) {
 			props.user_id = userObject.value.id
 			const result = await modal({
-				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
+				title: props.id ? `Edit character: ${props.name}` : 'Add character',
 				component: FormCharacter,
 				props,
 			})

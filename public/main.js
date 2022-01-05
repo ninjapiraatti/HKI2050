@@ -19261,12 +19261,6 @@
 
     var script$d = {
     		name: 'FormCharacter',
-    		setup() {
-    			const store = inject('store');
-    			return {
-    				store
-    			}
-    		},
     		props: {
     			id: {
     				type: String,
@@ -19286,41 +19280,34 @@
     			},
     		},
 
-    		computed: {
-    			submitLabel() {
-    				return this.sending ? 'Saving' : 'Save'
-    			},
+    		setup(props, {emit}) {
+    			const store = inject('store');
+    			const api = inject('api');
+    			let sending = false;
+    			let form = { ...props };
 
-    			categories() {
-    				return this.store.state.skillCategories
-    			},
+    			async function onSubmit() {
+    				sending = true;
+    				let character = await api.users.characters.save(form);
+    				if (character) emit('success', character);
 
-    			scopes() {
-    				return this.store.state.skillScopes
-    			},
-    		},
-
-    		data() {
-    			return {
-    				sending: false,
-    				form: { ...this.$props },
+    				sending = false;
     			}
-    		},
-    		
-    		mounted() {
-    			console.log(this.$props);
-    			//if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
-    			//if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
-    		},
 
-    		methods: {
-    			async onSubmit() {
-    				this.sending = true;
-    				const character = await this.$api.users.characters.save(this.form);
-    				if (character) this.$emit('success', character);
+    			const submitLabel = computed(() => {
+    			});
 
-    				this.sending = false;
-    			},
+    			onMounted(() => {
+    				console.log(props);
+    			});
+
+    			return {
+    				store,
+    				sending,
+    				submitLabel,
+    				form,
+    				onSubmit
+    			}
     		},
     	};
 
@@ -19341,15 +19328,15 @@
       const _component_VForm = resolveComponent("VForm");
 
       return (openBlock(), createBlock(_component_VForm, {
-        onSubmit: $options.onSubmit,
+        onSubmit: $setup.onSubmit,
         class: "vstack gap-2"
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
             _hoisted_1$c,
             createVNode(_component_VField, {
-              modelValue: $data.form.name,
-              "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.name) = $event)),
+              modelValue: $setup.form.name,
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.name) = $event)),
               rules: "required",
               type: "text",
               id: "label",
@@ -19366,8 +19353,8 @@
           createBaseVNode("div", null, [
             _hoisted_2$a,
             createVNode(_component_VField, {
-              modelValue: $data.form.description,
-              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($data.form.description) = $event)),
+              modelValue: $setup.form.description,
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.description) = $event)),
               rules: "required",
               type: "text",
               id: "description",
@@ -19384,9 +19371,9 @@
           createBaseVNode("div", _hoisted_3$a, [
             createBaseVNode("button", {
               type: "submit",
-              disabled: $data.sending,
+              disabled: _ctx.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$9)
+            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$9)
           ])
         ]),
         _: 1 /* STABLE */
@@ -19443,7 +19430,7 @@
     		async function editCharacter(props = {}) {
     			props.user_id = userObject.value.id;
     			const result = await modal({
-    				title: props.id ? `Edit skill: ${props.name}` : 'Add skill',
+    				title: props.id ? `Edit character: ${props.name}` : 'Add character',
     				component: script$d,
     				props,
     			});

@@ -1,6 +1,5 @@
 <template>
 	<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
-
 		<div>
 			<label for='label' class='form-label'>Name</label>
 			<VField
@@ -40,15 +39,9 @@
 </template>
 
 <script>
-	import { ref, inject } from 'vue'
+	import { inject, computed, onMounted } from 'vue'
 	export default {
 		name: 'FormCharacter',
-		setup() {
-			const store = inject('store')
-			return {
-				store
-			}
-		},
 		props: {
 			id: {
 				type: String,
@@ -68,41 +61,35 @@
 			},
 		},
 
-		computed: {
-			submitLabel() {
-				return this.sending ? 'Saving' : 'Save'
-			},
+		setup(props, {emit}) {
+			const store = inject('store')
+			const api = inject('api')
+			let sending = false
+			let form = { ...props }
 
-			categories() {
-				return this.store.state.skillCategories
-			},
+			async function onSubmit() {
+				sending = true
+				let character = await api.users.characters.save(form)
+				if (character) emit('success', character)
 
-			scopes() {
-				return this.store.state.skillScopes
-			},
-		},
-
-		data() {
-			return {
-				sending: false,
-				form: { ...this.$props },
+				sending = false
 			}
-		},
-		
-		mounted() {
-			console.log(this.$props)
-			//if (!this.store.state.skillCategories.length) this.$store.dispatch('getSkillCategories')
-			//if (!this.store.state.skillScopes.length) this.$store.dispatch('getSkillScopes')
-		},
 
-		methods: {
-			async onSubmit() {
-				this.sending = true
-				const character = await this.$api.users.characters.save(this.form)
-				if (character) this.$emit('success', character)
+			const submitLabel = computed(() => {
+				sending ? 'Saving' : 'Save'
+			})
 
-				this.sending = false
-			},
+			onMounted(() => {
+				console.log(props)
+			})
+
+			return {
+				store,
+				sending,
+				submitLabel,
+				form,
+				onSubmit
+			}
 		},
 	}
 </script>
