@@ -1,7 +1,7 @@
 <template>
 	<div class="container">
-		<div v-if="userObject" class="row gx-4">
-			<div class="col-md-4">
+		<div class="row gx-4">
+			<!-- <div class="col-md-4">
 				<div class="card shadow p-2" :class='colorScheme.card'>
 					<div class='context'>
 						<div class='card-header d-flex align-items-center'>
@@ -18,7 +18,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<div class="mt-4 mt-md-0 col-md-8">
 				<div class="card shadow p-2" :class='colorScheme.card'>
 					<div class='card-header'>

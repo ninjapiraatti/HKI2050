@@ -19484,40 +19484,17 @@
     };
 
     const _hoisted_1$b = { class: "container" };
-    const _hoisted_2$9 = {
-      key: 0,
-      class: "row gx-4"
-    };
-    const _hoisted_3$9 = { class: "col-md-4" };
-    const _hoisted_4$9 = { class: "context" };
-    const _hoisted_5$6 = { class: "card-header d-flex align-items-center" };
-    const _hoisted_6$5 = { class: "h3 mb-0 flex-grow-1" };
+    const _hoisted_2$9 = { class: "row gx-4" };
+    const _hoisted_3$9 = { class: "mt-4 mt-md-0 col-md-8" };
+    const _hoisted_4$9 = { class: "card-header" };
+    const _hoisted_5$6 = { class: "d-flex flex-wrap justify-content-between align-items-center" };
+    const _hoisted_6$5 = /*#__PURE__*/createBaseVNode("h3", { class: "h3 mb-0" }, "Characters", -1 /* HOISTED */);
     const _hoisted_7$3 = { class: "card-body" };
-    const _hoisted_8$3 = { class: "context-actions hstack gap-1 justify-content-end" };
-    const _hoisted_9$2 = /*#__PURE__*/createBaseVNode("i", {
-      class: "bi-pencil-fill",
-      title: "Edit profile"
-    }, null, -1 /* HOISTED */);
-    const _hoisted_10$2 = [
-      _hoisted_9$2
-    ];
-    const _hoisted_11$2 = /*#__PURE__*/createBaseVNode("i", {
-      class: "bi-trash-fill",
-      title: "Delete profile"
-    }, null, -1 /* HOISTED */);
-    const _hoisted_12$2 = [
-      _hoisted_11$2
-    ];
-    const _hoisted_13 = { class: "mt-4 mt-md-0 col-md-8" };
-    const _hoisted_14 = { class: "card-header" };
-    const _hoisted_15 = { class: "d-flex flex-wrap justify-content-between align-items-center" };
-    const _hoisted_16 = /*#__PURE__*/createBaseVNode("h3", { class: "h3 mb-0" }, "Characters", -1 /* HOISTED */);
-    const _hoisted_17 = { class: "card-body" };
-    const _hoisted_18 = {
+    const _hoisted_8$3 = {
       key: 0,
       class: "table-responsive"
     };
-    const _hoisted_19 = /*#__PURE__*/createBaseVNode("thead", null, [
+    const _hoisted_9$2 = /*#__PURE__*/createBaseVNode("thead", null, [
       /*#__PURE__*/createBaseVNode("tr", null, [
         /*#__PURE__*/createBaseVNode("th", { scope: "col" }, "Character"),
         /*#__PURE__*/createBaseVNode("th", { scope: "col" }, "Level"),
@@ -19531,110 +19508,85 @@
         }, "Actions")
       ])
     ], -1 /* HOISTED */);
-    const _hoisted_20 = { class: "text-center" };
-    const _hoisted_21 = { class: "text-end" };
-    const _hoisted_22 = { class: "context-actions hstack gap-1 justify-content-end" };
-    const _hoisted_23 = ["onClick"];
-    const _hoisted_24 = /*#__PURE__*/createBaseVNode("i", {
+    const _hoisted_10$2 = { class: "text-center" };
+    const _hoisted_11$2 = { class: "text-end" };
+    const _hoisted_12$2 = { class: "context-actions hstack gap-1 justify-content-end" };
+    const _hoisted_13 = ["onClick"];
+    const _hoisted_14 = /*#__PURE__*/createBaseVNode("i", {
       class: "bi-pencil-fill",
       title: "Edit character"
     }, null, -1 /* HOISTED */);
-    const _hoisted_25 = [
-      _hoisted_24
+    const _hoisted_15 = [
+      _hoisted_14
     ];
-    const _hoisted_26 = ["onClick"];
-    const _hoisted_27 = /*#__PURE__*/createBaseVNode("i", {
+    const _hoisted_16 = ["onClick"];
+    const _hoisted_17 = /*#__PURE__*/createBaseVNode("i", {
       class: "bi-trash-fill",
       title: "Delete character"
     }, null, -1 /* HOISTED */);
-    const _hoisted_28 = [
-      _hoisted_27
+    const _hoisted_18 = [
+      _hoisted_17
     ];
-    const _hoisted_29 = {
+    const _hoisted_19 = {
       key: 1,
       class: "fs-3 fw-light text-muted text-center p-4"
     };
 
     function render$c(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$b, [
-        ($setup.userObject)
-          ? (openBlock(), createElementBlock("div", _hoisted_2$9, [
-              createBaseVNode("div", _hoisted_3$9, [
-                createBaseVNode("div", {
-                  class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
-                }, [
-                  createBaseVNode("div", _hoisted_4$9, [
-                    createBaseVNode("div", _hoisted_5$6, [
-                      createBaseVNode("h1", _hoisted_6$5, toDisplayString($setup.userObject.username), 1 /* TEXT */)
-                    ]),
-                    createBaseVNode("div", _hoisted_7$3, [
-                      createBaseVNode("div", null, toDisplayString($setup.userObject.email), 1 /* TEXT */),
-                      createBaseVNode("div", _hoisted_8$3, [
-                        createBaseVNode("button", {
-                          class: "btn btn-unstyled px-1 rounded",
-                          onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($setup.userObject)))
-                        }, _hoisted_10$2),
-                        createBaseVNode("button", {
-                          class: "btn btn-unstyled px-1 rounded",
-                          onClick: _cache[1] || (_cache[1] = $event => ($setup.confirmDelete('user', $setup.userObject)))
-                        }, _hoisted_12$2)
-                      ])
-                    ])
-                  ])
-                ], 2 /* CLASS */)
+        createBaseVNode("div", _hoisted_2$9, [
+          createCommentVNode(" <div class=\"col-md-4\">\r\n\t\t\t\t<div class=\"card shadow p-2\" :class='colorScheme.card'>\r\n\t\t\t\t\t<div class='context'>\r\n\t\t\t\t\t\t<div class='card-header d-flex align-items-center'>\r\n\t\t\t\t\t\t\t<h1 class=\"h3 mb-0 flex-grow-1\">\r\n\t\t\t\t\t\t\t\t{{ userObject.username }}\r\n\t\t\t\t\t\t\t</h1>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class='card-body'>\r\n\t\t\t\t\t\t\t<div>{{ userObject.email }}</div>\r\n\t\t\t\t\t\t\t<div class='context-actions hstack gap-1 justify-content-end'>\r\n\t\t\t\t\t\t\t\t<button class='btn btn-unstyled px-1 rounded' v-on:click=\"editUser(userObject)\"><i class=\"bi-pencil-fill\" title='Edit profile'></i></button>\r\n\t\t\t\t\t\t\t\t<button class='btn btn-unstyled px-1 rounded' v-on:click=\"confirmDelete('user', userObject)\"><i class=\"bi-trash-fill\" title='Delete profile'></i></button>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div> "),
+          createBaseVNode("div", _hoisted_3$9, [
+            createBaseVNode("div", {
+              class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
+            }, [
+              createBaseVNode("div", _hoisted_4$9, [
+                createBaseVNode("div", _hoisted_5$6, [
+                  _hoisted_6$5,
+                  createBaseVNode("button", {
+                    class: "btn btn-primary gradient",
+                    onClick: _cache[0] || (_cache[0] = $event => ($setup.editCharacter()))
+                  }, "Add character")
+                ])
               ]),
-              createBaseVNode("div", _hoisted_13, [
-                createBaseVNode("div", {
-                  class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
-                }, [
-                  createBaseVNode("div", _hoisted_14, [
-                    createBaseVNode("div", _hoisted_15, [
-                      _hoisted_16,
-                      createBaseVNode("button", {
-                        class: "btn btn-primary gradient",
-                        onClick: _cache[2] || (_cache[2] = $event => ($setup.editCharacter()))
-                      }, "Add character")
-                    ])
-                  ]),
-                  createBaseVNode("div", _hoisted_17, [
-                    ($setup.characters && $setup.characters.length)
-                      ? (openBlock(), createElementBlock("div", _hoisted_18, [
-                          createBaseVNode("table", {
-                            class: normalizeClass(["table table-striped mb-0", $setup.colorScheme.table])
-                          }, [
-                            _hoisted_19,
-                            createBaseVNode("tbody", null, [
-                              (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
-                                return (openBlock(), createElementBlock("tr", {
-                                  key: character.id,
-                                  class: "context"
-                                }, [
-                                  createBaseVNode("td", null, toDisplayString(character.name), 1 /* TEXT */),
-                                  createBaseVNode("td", null, toDisplayString(character.description), 1 /* TEXT */),
-                                  createBaseVNode("td", _hoisted_20, toDisplayString(character.years), 1 /* TEXT */),
-                                  createBaseVNode("td", _hoisted_21, [
-                                    createBaseVNode("div", _hoisted_22, [
-                                      createBaseVNode("button", {
-                                        class: "btn btn-unstyled px-1 rounded",
-                                        onClick: $event => ($setup.editCharacter(character))
-                                      }, _hoisted_25, 8 /* PROPS */, _hoisted_23),
-                                      createBaseVNode("button", {
-                                        class: "btn btn-unstyled px-1 rounded",
-                                        onClick: $event => ($setup.confirmDelete('userObject.character', character))
-                                      }, _hoisted_28, 8 /* PROPS */, _hoisted_26)
-                                    ])
-                                  ])
-                                ]))
-                              }), 128 /* KEYED_FRAGMENT */))
-                            ])
-                          ], 2 /* CLASS */)
-                        ]))
-                      : (openBlock(), createElementBlock("div", _hoisted_29, "No characters"))
-                  ])
-                ], 2 /* CLASS */)
+              createBaseVNode("div", _hoisted_7$3, [
+                ($setup.characters && $setup.characters.length)
+                  ? (openBlock(), createElementBlock("div", _hoisted_8$3, [
+                      createBaseVNode("table", {
+                        class: normalizeClass(["table table-striped mb-0", $setup.colorScheme.table])
+                      }, [
+                        _hoisted_9$2,
+                        createBaseVNode("tbody", null, [
+                          (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
+                            return (openBlock(), createElementBlock("tr", {
+                              key: character.id,
+                              class: "context"
+                            }, [
+                              createBaseVNode("td", null, toDisplayString(character.name), 1 /* TEXT */),
+                              createBaseVNode("td", null, toDisplayString(character.description), 1 /* TEXT */),
+                              createBaseVNode("td", _hoisted_10$2, toDisplayString(character.years), 1 /* TEXT */),
+                              createBaseVNode("td", _hoisted_11$2, [
+                                createBaseVNode("div", _hoisted_12$2, [
+                                  createBaseVNode("button", {
+                                    class: "btn btn-unstyled px-1 rounded",
+                                    onClick: $event => ($setup.editCharacter(character))
+                                  }, _hoisted_15, 8 /* PROPS */, _hoisted_13),
+                                  createBaseVNode("button", {
+                                    class: "btn btn-unstyled px-1 rounded",
+                                    onClick: $event => ($setup.confirmDelete('userObject.character', character))
+                                  }, _hoisted_18, 8 /* PROPS */, _hoisted_16)
+                                ])
+                              ])
+                            ]))
+                          }), 128 /* KEYED_FRAGMENT */))
+                        ])
+                      ], 2 /* CLASS */)
+                    ]))
+                  : (openBlock(), createElementBlock("div", _hoisted_19, "No characters"))
               ])
-            ]))
-          : createCommentVNode("v-if", true)
+            ], 2 /* CLASS */)
+          ])
+        ])
       ]))
     }
 
