@@ -8449,13 +8449,6 @@
     			return characters
     		},
 
-    		save: save({
-    			create: '/api/users/{user_id}/reservations',
-    			update: '/api/users/reservations/{id}',
-    		}),
-
-    		delete: remove('/api/users/reservations/{id}'),
-    		get: getArray('/api/characters'),
     		save: save('/api/characters/{id}'),
     		delete: remove('/api/characters/{id}'),
     	},
