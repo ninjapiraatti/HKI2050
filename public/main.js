@@ -18955,8 +18955,8 @@
       class: "form-label me-3"
     }, "Password", -1 /* HOISTED */);
     const _hoisted_3$d = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
-    const _hoisted_4$b = ["disabled"];
-    const _hoisted_5$7 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
+    const _hoisted_4$c = ["disabled"];
+    const _hoisted_5$8 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
     const _hoisted_6$7 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$4 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
@@ -19015,8 +19015,8 @@
                 type: "submit",
                 disabled: $setup.sending,
                 class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
-              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$b),
-              createBaseVNode("div", _hoisted_5$7, [
+              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$c),
+              createBaseVNode("div", _hoisted_5$8, [
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
                     default: withCtx(() => [
@@ -19174,11 +19174,11 @@
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_4$a = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_4$b = /*#__PURE__*/createBaseVNode("label", {
       for: "username",
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
-    const _hoisted_5$6 = { class: "mt-label" };
+    const _hoisted_5$7 = { class: "mt-label" };
     const _hoisted_6$6 = ["disabled"];
 
     function render$e(_ctx, _cache, $props, $setup, $data, $options) {
@@ -19225,7 +19225,7 @@
             })
           ]),
           createBaseVNode("div", null, [
-            _hoisted_4$a,
+            _hoisted_4$b,
             createVNode(_component_VField, {
               modelValue: $setup.form.username,
               "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.username) = $event)),
@@ -19242,7 +19242,7 @@
               class: "invalid-feedback shake"
             })
           ]),
-          createBaseVNode("div", _hoisted_5$6, [
+          createBaseVNode("div", _hoisted_5$7, [
             createBaseVNode("button", {
               type: "submit",
               disabled: $setup.sending,
@@ -19319,7 +19319,7 @@
       class: "form-label"
     }, "Description", -1 /* HOISTED */);
     const _hoisted_3$a = { class: "mt-label" };
-    const _hoisted_4$9 = ["disabled"];
+    const _hoisted_4$a = ["disabled"];
 
     function render$d(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19372,7 +19372,7 @@
               type: "submit",
               disabled: _ctx.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$9)
+            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$a)
           ])
         ]),
         _: 1 /* STABLE */
@@ -19489,8 +19489,8 @@
       class: "row gx-4"
     };
     const _hoisted_3$9 = { class: "col-md-4" };
-    const _hoisted_4$8 = { class: "context" };
-    const _hoisted_5$5 = { class: "card-header d-flex align-items-center" };
+    const _hoisted_4$9 = { class: "context" };
+    const _hoisted_5$6 = { class: "card-header d-flex align-items-center" };
     const _hoisted_6$5 = { class: "h3 mb-0 flex-grow-1" };
     const _hoisted_7$3 = { class: "card-body" };
     const _hoisted_8$3 = { class: "context-actions hstack gap-1 justify-content-end" };
@@ -19563,8 +19563,8 @@
                 createBaseVNode("div", {
                   class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
                 }, [
-                  createBaseVNode("div", _hoisted_4$8, [
-                    createBaseVNode("div", _hoisted_5$5, [
+                  createBaseVNode("div", _hoisted_4$9, [
+                    createBaseVNode("div", _hoisted_5$6, [
                       createBaseVNode("h1", _hoisted_6$5, toDisplayString($setup.userObject.username), 1 /* TEXT */)
                     ]),
                     createBaseVNode("div", _hoisted_7$3, [
@@ -19697,8 +19697,8 @@
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
     const _hoisted_3$8 = ["disabled"];
-    const _hoisted_4$7 = { class: "mt-label" };
-    const _hoisted_5$4 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
+    const _hoisted_4$8 = { class: "mt-label" };
+    const _hoisted_5$5 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
     const _hoisted_6$4 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$b(_ctx, _cache, $props, $setup, $data, $options) {
@@ -19742,8 +19742,8 @@
               ]),
               _: 1 /* STABLE */
             }, 8 /* PROPS */, ["onSubmit"]),
-            createBaseVNode("div", _hoisted_4$7, [
-              _hoisted_5$4,
+            createBaseVNode("div", _hoisted_4$8, [
+              _hoisted_5$5,
               createVNode(_component_router_link, { to: { name: "login" } }, {
                 default: withCtx(() => [
                   _hoisted_6$4
@@ -19790,7 +19790,7 @@
     const _hoisted_3$7 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
       /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Password reset requested successfully, check your email.")
     ], -1 /* HOISTED */);
-    const _hoisted_4$6 = [
+    const _hoisted_4$7 = [
       _hoisted_2$7,
       _hoisted_3$7
     ];
@@ -19800,7 +19800,7 @@
         ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", $setup.colorScheme.card])
-            }, _hoisted_4$6, 2 /* CLASS */)
+            }, _hoisted_4$7, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
     }
@@ -19865,8 +19865,8 @@
       for: "username",
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
-    const _hoisted_4$5 = { key: 0 };
-    const _hoisted_5$3 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_4$6 = { key: 0 };
+    const _hoisted_5$4 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_plain",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
@@ -19931,8 +19931,8 @@
                   })
                 ]),
                 (!_ctx.isAdmin)
-                  ? (openBlock(), createElementBlock("div", _hoisted_4$5, [
-                      _hoisted_5$3,
+                  ? (openBlock(), createElementBlock("div", _hoisted_4$6, [
+                      _hoisted_5$4,
                       createVNode(_component_VField, {
                         modelValue: $setup.form.password_plain,
                         "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.password_plain) = $event)),
@@ -20028,7 +20028,7 @@
     const _hoisted_3$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
       /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Please check your email and follow the confirmation link to activate your account.")
     ], -1 /* HOISTED */);
-    const _hoisted_4$4 = [
+    const _hoisted_4$5 = [
       _hoisted_2$5,
       _hoisted_3$5
     ];
@@ -20038,7 +20038,7 @@
         ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", $setup.colorScheme.card])
-            }, _hoisted_4$4, 2 /* CLASS */)
+            }, _hoisted_4$5, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
     }
@@ -20120,7 +20120,7 @@
       class: "form-label"
     }, "Repeat password", -1 /* HOISTED */);
     const _hoisted_3$4 = { class: "mt-label" };
-    const _hoisted_4$3 = ["disabled"];
+    const _hoisted_4$4 = ["disabled"];
 
     function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -20173,7 +20173,7 @@
                   type: "submit",
                   disabled: $setup.sending,
                   class: "btn btn-primary gradient float-end"
-                }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$3)
+                }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$4)
               ])
             ]),
             _: 1 /* STABLE */
@@ -20250,8 +20250,8 @@
     const _hoisted_3$3 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Account confirmed")
     ], -1 /* HOISTED */);
-    const _hoisted_4$2 = { class: "card-body" };
-    const _hoisted_5$2 = { class: "mb-0" };
+    const _hoisted_4$3 = { class: "card-body" };
+    const _hoisted_5$3 = { class: "mb-0" };
     const _hoisted_6$2 = /*#__PURE__*/createTextVNode("Your account has been confirmed. You can now ");
     const _hoisted_7$1 = /*#__PURE__*/createTextVNode("log in");
     const _hoisted_8$1 = /*#__PURE__*/createTextVNode(".");
@@ -20263,8 +20263,8 @@
         ? (openBlock(), createElementBlock("div", _hoisted_1$5, [
             createBaseVNode("div", _hoisted_2$3, [
               _hoisted_3$3,
-              createBaseVNode("div", _hoisted_4$2, [
-                createBaseVNode("p", _hoisted_5$2, [
+              createBaseVNode("div", _hoisted_4$3, [
+                createBaseVNode("p", _hoisted_5$3, [
                   _hoisted_6$2,
                   createVNode(_component_router_link, { to: { name: "login" } }, {
                     default: withCtx(() => [
@@ -20293,9 +20293,14 @@
     	},
     };
 
-    const _hoisted_1$4 = { class: "container" };
-    const _hoisted_2$2 = { class: "counter" };
-    const _hoisted_3$2 = /*#__PURE__*/createBaseVNode("div", { class: "bigasslogo" }, [
+    const _hoisted_1$4 = {
+      key: 0,
+      class: "row gx-4"
+    };
+    const _hoisted_2$2 = { class: "col" };
+    const _hoisted_3$2 = { class: "container" };
+    const _hoisted_4$2 = { class: "counter" };
+    const _hoisted_5$2 = /*#__PURE__*/createBaseVNode("div", { class: "bigasslogo" }, [
       /*#__PURE__*/createBaseVNode("img", {
         src: "/public/assets/uusilogo04_square_nobg.png",
         alt: ""
@@ -20303,18 +20308,28 @@
     ], -1 /* HOISTED */);
 
     function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
-        createBaseVNode("div", _hoisted_2$2, [
-          createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
-          createBaseVNode("button", {
-            onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
-          }, "-"),
-          createBaseVNode("button", {
-            onClick: _cache[1] || (_cache[1] = (...args) => ($setup.store.methods.increase && $setup.store.methods.increase(...args)))
-          }, "+")
-        ]),
-        _hoisted_3$2
-      ]))
+      return (_ctx.userObject)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$4, [
+            createBaseVNode("div", _hoisted_2$2, [
+              createBaseVNode("div", {
+                class: normalizeClass(["card shadow p-2", _ctx.colorScheme.card])
+              }, [
+                createBaseVNode("div", _hoisted_3$2, [
+                  createBaseVNode("div", _hoisted_4$2, [
+                    createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
+                    createBaseVNode("button", {
+                      onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
+                    }, "-"),
+                    createBaseVNode("button", {
+                      onClick: _cache[1] || (_cache[1] = (...args) => ($setup.store.methods.increase && $setup.store.methods.increase(...args)))
+                    }, "+")
+                  ]),
+                  _hoisted_5$2
+                ])
+              ], 2 /* CLASS */)
+            ])
+          ]))
+        : createCommentVNode("v-if", true)
     }
 
     script$5.render = render$5;
