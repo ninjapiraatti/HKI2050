@@ -13,6 +13,7 @@
 
 <script>
 import FormResetPassword from '@forms/FormResetPassword.vue'
+import { flashMessage } from '@smartweb/vue-flash-message'
 import { useRoute, useRouter} from 'vue-router'
 import { onMounted, inject } from 'vue'
 export default {
@@ -55,11 +56,10 @@ export default {
 				type: 'error',
 				title: 'Account confirmation failed',
 			}
-			/*
 			flashMessage.show({
 				...message,
 				time: 5000,
-			})*/
+			})
 
 			if (!confirmed) router.replace({
 				name: 'error',

@@ -10,15 +10,12 @@
 </template>
 
 <script>
-import { provide, inject, onMounted } from 'vue'
+import { provide, onMounted } from 'vue'
 import store from '@root/store'
-//import modal from '@root/plugins/vue-modal'
 import TheHeader from '@components/TheHeader.vue'
-import FormLogin from '@forms/FormLogin.vue'
 export default {
 	setup() {
 		provide('store', store)
-		//provide('modal', modal) // The store is not provided either, right?
 
 		onMounted(() => {
 			console.log(store)
@@ -26,7 +23,6 @@ export default {
 
 		return {
 			store,
-			//modal,
 		}
 	},
 	name: 'App',

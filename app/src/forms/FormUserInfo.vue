@@ -53,7 +53,7 @@
 </template>
 
 <script>
-	import { inject, computed, onMounted} from 'vue'
+	import { inject, computed } from 'vue'
 	export default {
 		name: 'FormUserInfo',
 		props: {	

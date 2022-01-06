@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import { flashMessage } from '@smartweb/vue-flash-message';
-import { inject, computed, onMounted } from 'vue'
+import { flashMessage } from '@smartweb/vue-flash-message'
+import { inject, computed } from 'vue'
 export default {
 	name: 'FormForgotPassword',
 

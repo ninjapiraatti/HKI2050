@@ -77,7 +77,7 @@ import { flashMessage } from '@smartweb/vue-flash-message';
 import { inject, computed} from 'vue'
 	export default {
 	name: 'FormRegister',
-	setup(props, {emit}) {
+	setup(_, {emit}) {
 		const store = inject('store')
 		const api = inject('api')
 		let sending = false
@@ -104,7 +104,7 @@ import { inject, computed} from 'vue'
 			const success = await api.users.registration.invite(form)
 			if (success) {
 				emit('success', success)
-				this.$flashMessage.show({
+				flashMessage.show({
 					type: 'success',
 					title: 'Invitation sent',
 					time: 5000,

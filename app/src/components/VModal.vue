@@ -48,10 +48,7 @@ export default {
 		onMounted(() => {
 			let modalElement = modal.value
 			let modalBodyElement = body.value 
-			//console.log(modalElement)
 			let modalThing = Modal.getOrCreateInstance(modalElement)
-			//console.log(modalThing)
-			//console.log(body)
 			modalElement.addEventListener('hide.bs.modal', () => { emit('modal-hiding') })
 			modalElement.addEventListener('hidden.bs.modal', () => { emit('modal-hidden') })
 			modalElement.addEventListener('show.bs.modal', () => { emit('modal-showing') })
