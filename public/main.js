@@ -8225,7 +8225,7 @@
         initDev();
     }
 
-    let store$1, router$2, flashMessage$1;
+    let store$1, router$2, flashMessage;
 
     const errorMessages = {
     	UniqueViolation: 'Item already exists',
@@ -8266,7 +8266,7 @@
     	}
 
     	if (!(errorMessage in debounceFlashMessage)) {
-    		debounceFlashMessage[errorMessage] = debounce$1(() => flashMessage$1.show({
+    		debounceFlashMessage[errorMessage] = debounce$1(() => flashMessage.show({
     			type: 'error',
     			title: `Error ${response.status}`,
     			text: errorMessage,
@@ -8374,7 +8374,7 @@
     		: sendJson({ url: populateUrl(url, data), method: 'DELETE', body: data })
     );
 
-    const api$1 = {
+    const api = {
     	users: {
     		get: async (data = {}) => {
     			if (!data.id) return getArray('/api/users?is_include_skills=true')()
@@ -8461,7 +8461,7 @@
     	},
     };
 
-    var api$2 = {
+    var api$1 = {
     	install: (app, options) => {
     		//store = app.config.globalProperties.$store
     		//router = app.config.globalProperties.$router
@@ -8470,7 +8470,7 @@
     		//app.config.globalProperties.$api = api
     		// All of these are now imported per component. Maybe refactor the way modal is done?
 
-    		app.provide('api', api$1);
+    		app.provide('api', api);
     		//app.provide('confirm', confirm(modal))
     	},
     };
@@ -8492,7 +8492,7 @@
 
     	async logout() {
     		try {
-    			await api$1.users.log.out();
+    			await api.users.log.out();
     			await this.setUser(null);
     		} catch (error) {
     			console.warn(`Logout failed: ${error.message}`);
@@ -8503,7 +8503,7 @@
 
     	async login(data) {
     		try {
-    			const userId = await api$1.users.log.in(data);
+    			const userId = await api.users.log.in(data);
     			if (userId) await this.setUser(userId);
     		} catch (error) {
     			console.warn(`Login failed: ${error.message}`);
@@ -8516,7 +8516,7 @@
     		if (typeof data == 'string') {
     			try {
     				const [ user ] = await Promise.all([
-    					api$1.users.get({ id: data }),
+    					api.users.get({ id: data }),
     				]);
 
     				data = user;
@@ -8526,7 +8526,6 @@
     		}
     		state.loggeduser = data;
     		if (data) {
-    			console.log(data);
     			localStorage.setItem('user', JSON.stringify(data));
     		} else {
     			localStorage.removeItem('user');
@@ -18958,7 +18957,7 @@
     const _hoisted_3$d = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
     const _hoisted_4$b = ["disabled"];
     const _hoisted_5$7 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
-    const _hoisted_6$6 = /*#__PURE__*/createTextVNode("Forgot password?");
+    const _hoisted_6$7 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$4 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$4 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$3 = /*#__PURE__*/createTextVNode("Sign up");
@@ -19021,7 +19020,7 @@
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
                     default: withCtx(() => [
-                      _hoisted_6$6
+                      _hoisted_6$7
                     ]),
                     _: 1 /* STABLE */
                   })
@@ -19073,7 +19072,6 @@
     					...message,
     					time: 5000,
     				})*/
-    				console.log(router);
     				router.replace(route.query.redirect || { name: 'home' });
     			}
     		});
@@ -19153,10 +19151,6 @@
     				sending = false;
     			}
 
-    			onMounted(() => {
-    				console.log(props);
-    			});
-
     			return {
     				store,
     				sending,
@@ -19185,7 +19179,7 @@
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
     const _hoisted_5$6 = { class: "mt-label" };
-    const _hoisted_6$5 = ["disabled"];
+    const _hoisted_6$6 = ["disabled"];
 
     function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19253,7 +19247,7 @@
               type: "submit",
               disabled: $setup.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_6$5)
+            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_6$6)
           ])
         ]),
         _: 1 /* STABLE */
@@ -19264,57 +19258,57 @@
     script$e.__file = "src/forms/FormUserInfo.vue";
 
     var script$d = {
-    		name: 'FormCharacter',
-    		props: {
-    			id: {
-    				type: String,
-    				default: undefined,
-    			},
-    			user_id: {
-    				type: String,
-    				required: true,
-    			},
-    			name: {
-    				type: String,
-    				default: undefined,
-    			},
-    			description: {
-    				type: String,
-    				default: undefined,
-    			},
+    	name: 'FormCharacter',
+    	props: {
+    		id: {
+    			type: String,
+    			default: undefined,
     		},
-
-    		setup(props, {emit}) {
-    			const store = inject('store');
-    			const api = inject('api');
-    			let sending = false;
-    			let form = { ...props };
-
-    			async function onSubmit() {
-    				sending = true;
-    				let character = await api.users.characters.save(form);
-    				if (character) emit('success', character);
-
-    				sending = false;
-    			}
-
-    			const submitLabel = computed(() => {
-    				return sending ? 'Saving' : 'Save'
-    			});
-
-    			onMounted(() => {
-    				console.log(props);
-    			});
-
-    			return {
-    				store,
-    				sending,
-    				submitLabel,
-    				form,
-    				onSubmit
-    			}
+    		user_id: {
+    			type: String,
+    			required: true,
     		},
-    	};
+    		name: {
+    			type: String,
+    			default: undefined,
+    		},
+    		description: {
+    			type: String,
+    			default: undefined,
+    		},
+    	},
+
+    	setup(props, {emit}) {
+    		const store = inject('store');
+    		const api = inject('api');
+    		let sending = false;
+    		let form = { ...props };
+
+    		async function onSubmit() {
+    			sending = true;
+    			let character = await api.users.characters.save(form);
+    			if (character) emit('success', character);
+
+    			sending = false;
+    		}
+
+    		const submitLabel = computed(() => {
+    			return sending ? 'Saving' : 'Save'
+    		});
+
+    		onMounted(() => {
+    			console.log(props);
+    		});
+
+    		return {
+    			store,
+    			sending,
+    			submitLabel,
+    			form,
+    			onSubmit
+    		}
+    	},
+    };
 
     const _hoisted_1$c = /*#__PURE__*/createBaseVNode("label", {
       for: "label",
@@ -19458,6 +19452,7 @@
     						getUser();
     						break
     				}
+    				getCharacters();
     			}
     		}
 
@@ -19467,7 +19462,6 @@
     				console.log("lol")
     			}
     			*/
-    			console.log(store.state.loggeduser);
     			//userObject = store.state.loggeduser // This fucked up everything. WHY?
     			await Promise.all([
     				getUser(),
@@ -19495,7 +19489,7 @@
     const _hoisted_3$9 = { class: "col-md-4" };
     const _hoisted_4$8 = { class: "context" };
     const _hoisted_5$5 = { class: "card-header d-flex align-items-center" };
-    const _hoisted_6$4 = { class: "h3 mb-0 flex-grow-1" };
+    const _hoisted_6$5 = { class: "h3 mb-0 flex-grow-1" };
     const _hoisted_7$3 = { class: "card-body" };
     const _hoisted_8$3 = { class: "context-actions hstack gap-1 justify-content-end" };
     const _hoisted_9$2 = /*#__PURE__*/createBaseVNode("i", {
@@ -19509,7 +19503,7 @@
       class: "bi-trash-fill",
       title: "Delete profile"
     }, null, -1 /* HOISTED */);
-    const _hoisted_12$1 = [
+    const _hoisted_12$2 = [
       _hoisted_11$2
     ];
     const _hoisted_13 = { class: "mt-4 mt-md-0 col-md-8" };
@@ -19569,7 +19563,7 @@
                 }, [
                   createBaseVNode("div", _hoisted_4$8, [
                     createBaseVNode("div", _hoisted_5$5, [
-                      createBaseVNode("h1", _hoisted_6$4, toDisplayString($setup.userObject.username), 1 /* TEXT */)
+                      createBaseVNode("h1", _hoisted_6$5, toDisplayString($setup.userObject.username), 1 /* TEXT */)
                     ]),
                     createBaseVNode("div", _hoisted_7$3, [
                       createBaseVNode("div", null, toDisplayString($setup.userObject.email), 1 /* TEXT */),
@@ -19581,7 +19575,7 @@
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
                           onClick: _cache[1] || (_cache[1] = $event => ($setup.confirmDelete('user', $setup.userObject)))
-                        }, _hoisted_12$1)
+                        }, _hoisted_12$2)
                       ])
                     ])
                   ])
@@ -19645,44 +19639,65 @@
     script$c.render = render$c;
     script$c.__file = "src/views/UserProfile.vue";
 
+    /*!
+      * @smartweb/vue-flash-message v1.0.0-alpha.12
+      * (c) 2020 Roman Privalov
+      * @license MIT
+      */
+    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed((()=>!!r.value.x&&!!r.value.y)),u=computed((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed((()=>f.messages.value)),d=computed((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
+
     var script$b = {
-    		name: 'FormForgotPassword',
+    	name: 'FormForgotPassword',
 
-    		data() {
-    			return {
-    				sending: false,
-    				form: {
-    					email: '',
-    				},
-    			}
-    		},
+    	setup(_, {emit}) {
+    		const api = inject('api');
+    		let sending = false;
+    		let form = {email: ''};
 
-    		computed: {
-    			submitLabel() {
-    				return this.sending ? 'Requesting' : 'Request'
-    			},
-    		},
+    		const submitLabel = computed(() => {
+    			return sending ? 'Requesting' : 'Request'
+    		});
 
-    		methods: {
-    			async onSubmit() {
-    				this.sending = true;
+    		async function onSubmit() {
+    			sending = true;
+    			const success = await api.users.password.requestReset(form);
 
-    				const success = await this.$api.users.password.requestReset(this.form);
-    				if (success) this.$emit('success', success);
+    			const message = success ? {
+    				type: 'success',
+    				title: 'Reset request sent, check your email.',
+    			} : {
+    				type: 'error',
+    				title: 'Reset request failed.',
+    			};
 
-    				this.sending = false;
-    			},
+    			m.show({
+    				...message,
+    				time: 5000,
+    			});
+
+    			if (success) emit('success', success);
+
+    			sending = false;
     		}
-    	};
 
-    const _hoisted_1$a = /*#__PURE__*/createBaseVNode("label", {
+    		return {
+    			sending,
+    			submitLabel,
+    			form,
+    			onSubmit
+    		}
+    	}
+    };
+
+    const _hoisted_1$a = { key: 0 };
+    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
-    const _hoisted_2$8 = ["disabled"];
-    const _hoisted_3$8 = { class: "mt-label" };
-    const _hoisted_4$7 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
-    const _hoisted_5$4 = /*#__PURE__*/createTextVNode("Log in");
+    const _hoisted_3$8 = ["disabled"];
+    const _hoisted_4$7 = { class: "mt-label" };
+    const _hoisted_5$4 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
+    const _hoisted_6$4 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$b(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19690,50 +19705,52 @@
       const _component_VForm = resolveComponent("VForm");
       const _component_router_link = resolveComponent("router-link");
 
-      return (openBlock(), createElementBlock("div", null, [
-        createVNode(_component_VForm, {
-          onSubmit: $options.onSubmit,
-          class: "vstack gap-2"
-        }, {
-          default: withCtx(({ errors }) => [
-            _hoisted_1$a,
-            createBaseVNode("div", {
-              class: normalizeClass(["input-group", { "has-validation": errors.email }])
-            }, [
-              createVNode(_component_VField, {
-                modelValue: $data.form.email,
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.email) = $event)),
-                rules: "required|email",
-                type: "email",
-                id: "email",
-                name: "email",
-                label: "Email",
-                "aria-label": "Email",
-                class: normalizeClass(["form-control", { "is-invalid": errors.email }])
-              }, null, 8 /* PROPS */, ["modelValue", "class"]),
-              createBaseVNode("button", {
-                type: "submit",
-                disabled: $data.sending,
-                class: "btn btn-primary gradient"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_2$8),
-              createVNode(_component_ErrorMessage, {
-                name: "email",
-                class: "invalid-feedback shake"
+      return ($setup.form)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$a, [
+            createVNode(_component_VForm, {
+              onSubmit: $setup.onSubmit,
+              class: "vstack gap-2"
+            }, {
+              default: withCtx(({ errors }) => [
+                _hoisted_2$8,
+                createBaseVNode("div", {
+                  class: normalizeClass(["input-group", { "has-validation": errors.email }])
+                }, [
+                  createVNode(_component_VField, {
+                    modelValue: $setup.form.email,
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.email) = $event)),
+                    rules: "required|email",
+                    type: "email",
+                    id: "email",
+                    name: "email",
+                    label: "Email",
+                    "aria-label": "Email",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.email }])
+                  }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                  createBaseVNode("button", {
+                    type: "submit",
+                    disabled: $setup.sending,
+                    class: "btn btn-primary gradient"
+                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_3$8),
+                  createVNode(_component_ErrorMessage, {
+                    name: "email",
+                    class: "invalid-feedback shake"
+                  })
+                ], 2 /* CLASS */)
+              ]),
+              _: 1 /* STABLE */
+            }, 8 /* PROPS */, ["onSubmit"]),
+            createBaseVNode("div", _hoisted_4$7, [
+              _hoisted_5$4,
+              createVNode(_component_router_link, { to: { name: "login" } }, {
+                default: withCtx(() => [
+                  _hoisted_6$4
+                ]),
+                _: 1 /* STABLE */
               })
-            ], 2 /* CLASS */)
-          ]),
-          _: 1 /* STABLE */
-        }, 8 /* PROPS */, ["onSubmit"]),
-        createBaseVNode("div", _hoisted_3$8, [
-          _hoisted_4$7,
-          createVNode(_component_router_link, { to: { name: "login" } }, {
-            default: withCtx(() => [
-              _hoisted_5$4
-            ]),
-            _: 1 /* STABLE */
-          })
-        ])
-      ]))
+            ])
+          ]))
+        : createCommentVNode("v-if", true)
     }
 
     script$b.render = render$b;
@@ -19789,79 +19806,76 @@
 
     var script$9 = {
     	name: 'FormRegister',
-    	setup() {
+    	setup(props, {emit}) {
     		const store = inject('store');
-    		return {
-    			store
-    		}
-    	},
-    	data() {
-    		return {
-    			sending: false,
-    			form: {
-    				email: '',
-    				username: '',
-    				password_plain: '',
-    			}
-    		}
-    	},
+    		const api = inject('api');
+    		let sending = false;
+    		let form = {
+    			email: '',
+    			username: '',
+    			password_plain: '',
+    		};
 
-    	computed: {
-    		isAdmin() {
-    			return this.store.state.loggeduser && this.store.state.loggeduser.isadmin
-    		},
+    		const isAdmin = computed(() => {
+    			return store.state.loggeduser && store.state.loggeduser.isadmin
+    		});
 
-    		submitLabel() {
-    			return this.isAdmin
-    				? this.sending ? 'Inviting' : 'Invite'
-    				: this.sending ? 'Registering' : 'Register'
-    		},
-    	},
+    		const submitLabel = computed(() => {
+    			return isAdmin
+    				? sending ? 'Inviting' : 'Invite'
+    				: sending ? 'Registering' : 'Register'
+    		});
 
-    	methods: {
-    		async onSubmit() {
-    			this.sending = true;
+    		
+    		async function onSubmit() {
+    			sending = true;
 
-    			const success = await this.$api.users.registration.invite(this.form);
-
+    			const success = await api.users.registration.invite(form);
     			if (success) {
-    				this.$emit('success', success);
-
+    				emit('success', success);
     				this.$flashMessage.show({
     					type: 'success',
     					title: 'Invitation sent',
     					time: 5000,
     				});
     			}
-
-    			this.sending = false;
+    			sending = false;
     		}
-    	}
+
+    		return {
+    			store,
+    			sending,
+    			form,
+    			submitLabel,
+    			onSubmit
+    		}
+    	},
     };
 
-    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$8 = { key: 0 };
+    const _hoisted_2$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$6 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_3$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "username",
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
-    const _hoisted_3$6 = { key: 0 };
-    const _hoisted_4$5 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_4$5 = { key: 0 };
+    const _hoisted_5$3 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_plain",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_5$3 = { key: 1 };
-    const _hoisted_6$3 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_6$3 = { key: 1 };
+    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_confirmation",
       class: "form-label"
     }, "Repeat password", -1 /* HOISTED */);
-    const _hoisted_7$2 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
-    const _hoisted_8$2 = ["disabled"];
-    const _hoisted_9$1 = { key: 0 };
-    const _hoisted_10$1 = /*#__PURE__*/createTextVNode("Already a user? ");
-    const _hoisted_11$1 = /*#__PURE__*/createTextVNode("Log in");
+    const _hoisted_8$2 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
+    const _hoisted_9$1 = ["disabled"];
+    const _hoisted_10$1 = { key: 0 };
+    const _hoisted_11$1 = /*#__PURE__*/createTextVNode("Already a user? ");
+    const _hoisted_12$1 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19869,108 +19883,110 @@
       const _component_router_link = resolveComponent("router-link");
       const _component_VForm = resolveComponent("VForm");
 
-      return (openBlock(), createElementBlock("div", null, [
-        createVNode(_component_VForm, {
-          onSubmit: $options.onSubmit,
-          class: "vstack gap-2"
-        }, {
-          default: withCtx(({ errors }) => [
-            createBaseVNode("div", null, [
-              _hoisted_1$8,
-              createVNode(_component_VField, {
-                modelValue: $data.form.email,
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.email) = $event)),
-                rules: "required|email",
-                type: "email",
-                id: "email",
-                name: "email",
-                label: "Email",
-                "aria-label": "Email",
-                class: normalizeClass(["form-control", { "is-invalid": errors.email }])
-              }, null, 8 /* PROPS */, ["modelValue", "class"]),
-              createVNode(_component_ErrorMessage, {
-                name: "email",
-                class: "invalid-feedback shake"
-              })
-            ]),
-            createBaseVNode("div", null, [
-              _hoisted_2$6,
-              createVNode(_component_VField, {
-                modelValue: $data.form.username,
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($data.form.username) = $event)),
-                rules: "required",
-                type: "text",
-                id: "username",
-                name: "username",
-                label: "Username",
-                "aria-label": "Username",
-                class: normalizeClass(["form-control", { "is-invalid": errors.username }])
-              }, null, 8 /* PROPS */, ["modelValue", "class"]),
-              createVNode(_component_ErrorMessage, {
-                name: "username",
-                class: "invalid-feedback shake"
-              })
-            ]),
-            (!$options.isAdmin)
-              ? (openBlock(), createElementBlock("div", _hoisted_3$6, [
-                  _hoisted_4$5,
+      return ($setup.form)
+        ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
+            createVNode(_component_VForm, {
+              onSubmit: _ctx.onSubmit,
+              class: "vstack gap-2"
+            }, {
+              default: withCtx(({ errors }) => [
+                createBaseVNode("div", null, [
+                  _hoisted_2$6,
                   createVNode(_component_VField, {
-                    modelValue: $data.form.password_plain,
-                    "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($data.form.password_plain) = $event)),
-                    rules: "requiredNonAdmin",
-                    type: "password",
-                    id: "password_plain",
-                    name: "password_plain",
-                    label: "Password",
-                    "aria-label": "Password",
-                    class: normalizeClass(["form-control", { "is-invalid": errors.password_plain }])
+                    modelValue: $setup.form.email,
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.email) = $event)),
+                    rules: "required|email",
+                    type: "email",
+                    id: "email",
+                    name: "email",
+                    label: "Email",
+                    "aria-label": "Email",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.email }])
                   }, null, 8 /* PROPS */, ["modelValue", "class"]),
                   createVNode(_component_ErrorMessage, {
-                    name: "password_plain",
+                    name: "email",
                     class: "invalid-feedback shake"
                   })
-                ]))
-              : createCommentVNode("v-if", true),
-            (!$options.isAdmin)
-              ? (openBlock(), createElementBlock("div", _hoisted_5$3, [
-                  _hoisted_6$3,
+                ]),
+                createBaseVNode("div", null, [
+                  _hoisted_3$6,
                   createVNode(_component_VField, {
-                    rules: "confirmed:@password_plain",
-                    type: "password",
-                    id: "password_confirmation",
-                    name: "password_confirmation",
-                    label: "Password confirmation",
-                    "aria-label": "Password confirmation",
-                    class: normalizeClass(["form-control", { "is-invalid": errors.password_confirmation }])
-                  }, null, 8 /* PROPS */, ["class"]),
+                    modelValue: $setup.form.username,
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.username) = $event)),
+                    rules: "required",
+                    type: "text",
+                    id: "username",
+                    name: "username",
+                    label: "Username",
+                    "aria-label": "Username",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.username }])
+                  }, null, 8 /* PROPS */, ["modelValue", "class"]),
                   createVNode(_component_ErrorMessage, {
-                    name: "password_confirmation",
+                    name: "username",
                     class: "invalid-feedback shake"
                   })
-                ]))
-              : createCommentVNode("v-if", true),
-            createBaseVNode("div", _hoisted_7$2, [
-              createBaseVNode("button", {
-                type: "submit",
-                disabled: $data.sending,
-                class: "btn btn-primary gradient align-self-start"
-              }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_8$2),
-              (!$options.isAdmin)
-                ? (openBlock(), createElementBlock("div", _hoisted_9$1, [
-                    _hoisted_10$1,
-                    createVNode(_component_router_link, { to: { name: "login" } }, {
-                      default: withCtx(() => [
-                        _hoisted_11$1
-                      ]),
-                      _: 1 /* STABLE */
-                    })
-                  ]))
-                : createCommentVNode("v-if", true)
-            ])
-          ]),
-          _: 1 /* STABLE */
-        }, 8 /* PROPS */, ["onSubmit"])
-      ]))
+                ]),
+                (!_ctx.isAdmin)
+                  ? (openBlock(), createElementBlock("div", _hoisted_4$5, [
+                      _hoisted_5$3,
+                      createVNode(_component_VField, {
+                        modelValue: $setup.form.password_plain,
+                        "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.password_plain) = $event)),
+                        rules: "requiredNonAdmin",
+                        type: "password",
+                        id: "password_plain",
+                        name: "password_plain",
+                        label: "Password",
+                        "aria-label": "Password",
+                        class: normalizeClass(["form-control", { "is-invalid": errors.password_plain }])
+                      }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                      createVNode(_component_ErrorMessage, {
+                        name: "password_plain",
+                        class: "invalid-feedback shake"
+                      })
+                    ]))
+                  : createCommentVNode("v-if", true),
+                (!_ctx.isAdmin)
+                  ? (openBlock(), createElementBlock("div", _hoisted_6$3, [
+                      _hoisted_7$2,
+                      createVNode(_component_VField, {
+                        rules: "confirmed:@password_plain",
+                        type: "password",
+                        id: "password_confirmation",
+                        name: "password_confirmation",
+                        label: "Password confirmation",
+                        "aria-label": "Password confirmation",
+                        class: normalizeClass(["form-control", { "is-invalid": errors.password_confirmation }])
+                      }, null, 8 /* PROPS */, ["class"]),
+                      createVNode(_component_ErrorMessage, {
+                        name: "password_confirmation",
+                        class: "invalid-feedback shake"
+                      })
+                    ]))
+                  : createCommentVNode("v-if", true),
+                createBaseVNode("div", _hoisted_8$2, [
+                  createBaseVNode("button", {
+                    type: "submit",
+                    disabled: $setup.sending,
+                    class: "btn btn-primary gradient align-self-start"
+                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_9$1),
+                  (!_ctx.isAdmin)
+                    ? (openBlock(), createElementBlock("div", _hoisted_10$1, [
+                        _hoisted_11$1,
+                        createVNode(_component_router_link, { to: { name: "login" } }, {
+                          default: withCtx(() => [
+                            _hoisted_12$1
+                          ]),
+                          _: 1 /* STABLE */
+                        })
+                      ]))
+                    : createCommentVNode("v-if", true)
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }, 8 /* PROPS */, ["onSubmit"])
+          ]))
+        : createCommentVNode("v-if", true)
     }
 
     script$9.render = render$9;
@@ -20025,61 +20041,69 @@
     script$8.__file = "src/views/Register.vue";
 
     var script$7 = {
-    		name: 'FormResetPassword',
+    	name: 'FormResetPassword',
 
-    		props: {
-    			id: {
-    				type: String,
-    				required: true,
-    			},
-    			email: {
-    				type: String,
-    				required: true,
-    			},
+    	props: {
+    		id: {
+    			type: String,
+    			required: true,
     		},
-
-    		data() {
-    			return {
-    				sending: false,
-    				form: {
-    					...this.$props,
-    					password: '',
-    				}
-    			}
+    		email: {
+    			type: String,
+    			required: true,
     		},
+    	},
 
-    		computed: {
-    			submitLabel() {
-    				return this.sending ? 'Changing' : 'Change'
-    			},
-    		},
+    	setup(props, {emit}) {
+    		const store = inject('store');
+    		const api = inject('api');
+    		let sending = false;
+    		let form = { 
+    			...props,
+    			password: '' 
+    		};
 
-    		methods: {
-    			async onSubmit() {
-    				this.sending = true;
+    		async function onSubmit() {
+    			sending = true;
 
-    				for (const prop in this.form) if (this.form[prop] == '') this.form[prop] = undefined;
-    				const success = await this.$api.users.password.save(this.form);
-    				
-    				const message = success ? {
-    					type: 'success',
-    					title: 'Password changed',
-    				} : {
-    					type: 'error',
-    					title: 'Updating password failed',
-    				};
+    			for (const prop in form) if (form[prop] == '') form[prop] = undefined;
+    			const success = await api.users.password.save(form);
+    			
+    			const message = success ? {
+    				type: 'success',
+    				title: 'Password changed',
+    			} : {
+    				type: 'error',
+    				title: 'Updating password failed',
+    			};
 
-    				this.$flashMessage.show({
-    					...message,
-    					time: 5000,
-    				});
-    				
-    				if (success) this.$emit('success', success);
+    			m.show({
+    				...message,
+    				time: 5000,
+    			});
+    			
+    			if (success) emit('success', success);
 
-    				this.sending = false;
-    			}
+    			sending = false;
     		}
-    	};
+
+    		const submitLabel = computed(() => {
+    			return sending ? 'Changing' : 'Change'
+    		});
+
+    		onMounted(() => {
+    			console.log(props);
+    		});
+
+    		return {
+    			store,
+    			sending,
+    			submitLabel,
+    			form,
+    			onSubmit
+    		}
+    	},
+    };
 
     const _hoisted_1$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
@@ -20097,55 +20121,58 @@
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
 
-      return (openBlock(), createBlock(_component_VForm, {
-        onSubmit: $options.onSubmit,
-        class: "vstack gap-2"
-      }, {
-        default: withCtx(({ errors }) => [
-          createBaseVNode("div", null, [
-            _hoisted_1$6,
-            createVNode(_component_VField, {
-              modelValue: $data.form.password,
-              "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($data.form.password) = $event)),
-              rules: "required",
-              type: "password",
-              id: "password",
-              name: "password",
-              label: "Password",
-              "aria-label": "Password",
-              class: normalizeClass(["form-control", { "is-invalid": errors.password }])
-            }, null, 8 /* PROPS */, ["modelValue", "class"]),
-            createVNode(_component_ErrorMessage, {
-              name: "password",
-              class: "invalid-feedback shake"
-            })
-          ]),
-          createBaseVNode("div", null, [
-            _hoisted_2$4,
-            createVNode(_component_VField, {
-              rules: "confirmed:@password",
-              type: "password",
-              id: "password_confirmation",
-              name: "password_confirmation",
-              label: "Password confirmation",
-              "aria-label": "Password confirmation",
-              class: normalizeClass(["form-control", { "is-invalid": errors.password_confirmation }])
-            }, null, 8 /* PROPS */, ["class"]),
-            createVNode(_component_ErrorMessage, {
-              name: "password_confirmation",
-              class: "invalid-feedback shake"
-            })
-          ]),
-          createBaseVNode("div", _hoisted_3$4, [
-            createBaseVNode("button", {
-              type: "submit",
-              disabled: $data.sending,
-              class: "btn btn-primary gradient float-end"
-            }, toDisplayString($options.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$3)
-          ])
-        ]),
-        _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["onSubmit"]))
+      return ($setup.form)
+        ? (openBlock(), createBlock(_component_VForm, {
+            key: 0,
+            onSubmit: $setup.onSubmit,
+            class: "vstack gap-2"
+          }, {
+            default: withCtx(({ errors }) => [
+              createBaseVNode("div", null, [
+                _hoisted_1$6,
+                createVNode(_component_VField, {
+                  modelValue: $setup.form.password,
+                  "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.password) = $event)),
+                  rules: "required",
+                  type: "password",
+                  id: "password",
+                  name: "password",
+                  label: "Password",
+                  "aria-label": "Password",
+                  class: normalizeClass(["form-control", { "is-invalid": errors.password }])
+                }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                createVNode(_component_ErrorMessage, {
+                  name: "password",
+                  class: "invalid-feedback shake"
+                })
+              ]),
+              createBaseVNode("div", null, [
+                _hoisted_2$4,
+                createVNode(_component_VField, {
+                  rules: "confirmed:@password",
+                  type: "password",
+                  id: "password_confirmation",
+                  name: "password_confirmation",
+                  label: "Password confirmation",
+                  "aria-label": "Password confirmation",
+                  class: normalizeClass(["form-control", { "is-invalid": errors.password_confirmation }])
+                }, null, 8 /* PROPS */, ["class"]),
+                createVNode(_component_ErrorMessage, {
+                  name: "password_confirmation",
+                  class: "invalid-feedback shake"
+                })
+              ]),
+              createBaseVNode("div", _hoisted_3$4, [
+                createBaseVNode("button", {
+                  type: "submit",
+                  disabled: $setup.sending,
+                  class: "btn btn-primary gradient float-end"
+                }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$3)
+              ])
+            ]),
+            _: 1 /* STABLE */
+          }, 8 /* PROPS */, ["onSubmit"]))
+        : createCommentVNode("v-if", true)
     }
 
     script$7.render = render$7;
@@ -20155,6 +20182,7 @@
     	name: 'Confirm',
     	setup() {
     		const modal = inject('modal');
+    		const api = inject('api');
     		const route = useRoute();
     		const router = useRouter();
     		let confirmed = false;
@@ -20182,19 +20210,11 @@
 
     		async function confirmAccount(data) {
     			confirmed = await api.users.registration.confirm(data);
-
-    			const message = confirmed ? {
-    				type: 'success',
-    				title: 'Account confirmed',
-    			} : {
-    				type: 'error',
-    				title: 'Account confirmation failed',
-    			};
-
+    			/*
     			flashMessage.show({
     				...message,
     				time: 5000,
-    			});
+    			})*/
 
     			if (!confirmed) router.replace({
     				name: 'error',
@@ -20331,10 +20351,8 @@
     router$1.beforeEach((to, from, next) => {
     	const modal = document.querySelector('.modal.show');
     	if (!modal) {
-    		console.log(store.state.loggeduser);
     		next();
     	} else {
-    		console.log(store.state.loggeduser);
     		modal.addEventListener('hidden.bs.modal', () => next());
     		Modal.getInstance(modal).hide();
     	}
@@ -20498,12 +20516,7 @@
     	components: {
     		VModal: script$4,
     	},
-    	methods: {
-    		onSuccess(modal, e) {
-    			console.log(modal);
-    			console.log(e);
-    		}
-    	}
+    	// Even though onSuccess is called in template it doesn't need to be here because we're using plugin vue-modal.
     };
 
     function render$3(_ctx, _cache, $props, $setup, $data, $options) {
@@ -20527,7 +20540,7 @@
               }, {
                 default: withCtx(() => [
                   (openBlock(), createBlock(resolveDynamicComponent(modal.component), mergeProps(modal.props, {
-                    onSuccess: $event => (_ctx.onSuccess(modal, $event))
+                    onSuccess: $event => ($options.onSuccess(modal, $event))
                   }), null, 16 /* FULL_PROPS */, ["onSuccess"]))
                 ]),
                 _: 2 /* DYNAMIC */
@@ -20597,12 +20610,12 @@
     		switch (type) {	
     			case 'user':
     				title = 'profile';
-    				apiCall = api$1.users.delete.bind(null, data.id);
+    				apiCall = api.users.delete.bind(null, data.id);
     				break
     			
     			case 'userObject.character':
     				title = data.name;
-    				apiCall = api$1.users.characters.delete.bind(null, {
+    				apiCall = api.users.characters.delete.bind(null, {
     					id: data.id,
     					user_id: data.user_id,
     				});
@@ -20683,13 +20696,6 @@
     	},
     };
 
-    /*!
-      * @smartweb/vue-flash-message v1.0.0-alpha.12
-      * (c) 2020 Roman Privalov
-      * @license MIT
-      */
-    class i extends Error{constructor(t){super(t),this.name=this.constructor.name,this.stack=new Error(t).stack;}}class l{constructor(){this.groups={},this.nextMessageId=1;}registerGroup(e,n){const s=e in this.groups,{time:a,strategy:o}=n;if(s)throw new i(`FlashMessage group must be an unique key. Group with key "${e}" already exists`);this.groups[e]={timeoutId:void 0,messages:ref([]),strategy:ref(o),currentHeight:ref(20),defaultTime:a};}changeHeight(t,e,n,s){var a;const o=t.messages.value.findIndex((t=>t.id>e));o>=0&&(null===(a=t.messages.value.slice(o))||void 0===a||a.forEach((t=>t.yAxis+=n)));}setDimensions(t,e){const n=this.groups[t],{id:s,height:a,isImgLoaded:o}=e,r=n.strategy,i=n.currentHeight.value+a;this.changeHeight(n,s,a,o),"multiple"===r.value&&n.messages.value.length>0?i<0?setTimeout((()=>n.currentHeight.value=Math.abs(i)),500):n.currentHeight.value=i:n.currentHeight.value=20;}show(t){var e,n,s,a;const o=null!==(e=t.group)&&void 0!==e?e:"default",r=this.groups[o],i=r.currentHeight.value,l=r.strategy.value,m=r.messages.value.length,u=r.timeoutId,f=r.defaultTime,g=this.nextMessageId++,d=void 0===t.clickable||t.clickable,h=Object.assign(t,{id:g,clickable:d,time:null!==(n=t.time)&&void 0!==n?n:f,space:t.x&&t.y?0:null!==(s=t.space)&&void 0!==s?s:20,group:o,type:null!==(a=t.type)&&void 0!==a?a:"default",yAxis:i});return "single"===l&&m>0?(clearTimeout(u),r.messages.value=[],r.timeoutId=setTimeout((()=>{m>0&&(r.messages.value=[]),r.messages.value.push(h);}),600)):r.messages.value=[...r.messages.value,h],h}changeStrategy(t,e){this.groups[null!=e?e:"default"].strategy.value=t;}remove(t,e){const n=null!=e?e:"default";this.groups[n].messages.value=this.groups[n].messages.value.filter((e=>e.id!==t));}removeAll(t){if(t)this.groups[t].messages.value=[];else {const t=Object.keys(this.groups);for(const e of t)this.groups[e].messages.value=[];}}}const m=new l;function u(t,e){void 0===e&&(e={});var n=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css","top"===n&&s.firstChild?s.insertBefore(a,s.firstChild):s.appendChild(a),a.styleSheet?a.styleSheet.cssText=t:a.appendChild(document.createTextNode(t));}}u("/* FlashMessage animations of appear */\n._vue-flash-msg-container_right-bottom-enter-active,\n._vue-flash-msg-container_left-bottom-enter-active {\n\t-webkit-animation: fromBottom 0.5s forwards;\n\t        animation: fromBottom 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-top-enter-active,\n._vue-flash-msg-container_left-top-enter-active {\n\t-webkit-animation: fromTop 0.5s forwards;\n\t        animation: fromTop 0.5s forwards;\n}\n\n._vue-flash-msg-container_right-bottom-leave-active,\n._vue-flash-msg-container_right-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toRight 0.8s forwards;\n\t        animation: toRight 0.8s forwards;\n}\n\n._vue-flash-msg-container_left-bottom-leave-active,\n._vue-flash-msg-container_left-top-leave-active {\n\t-webkit-transform-origin: center center;\n\t        transform-origin: center center;\n\t-webkit-animation: toLeft 0.8s forwards;\n\t        animation: toLeft 0.8s forwards;\n}\n\n.flash-message-move {\n\t-webkit-transition: -webkit-transform 0.3s;\n\ttransition: -webkit-transform 0.3s;\n\ttransition: transform 0.3s;\n\ttransition: transform 0.3s, -webkit-transform 0.3s;\n}\n\n@-webkit-keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromBottom {\n\t0% {\n\t\t-webkit-transform: translateY(240px);\n\t\t        transform: translateY(240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(-20px);\n\t\t        transform: translateY(-20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@keyframes fromTop {\n\t0% {\n\t\t-webkit-transform: translateY(-240px);\n\t\t        transform: translateY(-240px);\n\t\topacity: 0;\n\t}\n\t70% {\n\t\t-webkit-transform: translateY(20px);\n\t\t        transform: translateY(20px);\n\t\topacity: 0.8;\n\t}\n\t100% {\n\t\t-webkit-transform: translateY(0);\n\t\t        transform: translateY(0);\n\t\topacity: 1;\n\t}\n}\n\n@-webkit-keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toRight {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(-20px);\n\t\t        transform: translateX(-20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(240px);\n\t\t        transform: translateX(240px);\n\t\topacity: 0;\n\t}\n}\n\n@-webkit-keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n\n@keyframes toLeft {\n\t0% {\n\t\t-webkit-transform: translateX(0);\n\t\t        transform: translateX(0);\n\t\topacity: 1;\n\t}\n\t30% {\n\t\t-webkit-transform: translateX(20px);\n\t\t        transform: translateX(20px);\n\t\topacity: 0.8;\n\t}\n\t70% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n\t100% {\n\t\t-webkit-transform: translateX(-240px);\n\t\t        transform: translateX(-240px);\n\t\topacity: 0;\n\t}\n}\n");var f;u("._vue-flash-msg-body {\n\tdisplay: -webkit-box;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\tposition: fixed;\n\twidth: 35%;\n\tborder-radius: 5px;\n\t-webkit-box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\t        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);\n\tbackground-color: #fff;\n\tcolor: #fff;\n\ttext-align: left;\n\tcursor: pointer;\n\toverflow: hidden;\n\t-webkit-transition: all 0.3s ease-in;\n\ttransition: all 0.3s ease-in\n\n\t/* If user set prop.unclickabe === true */\n}\n\n._vue-flash-msg-body._vue-flash-msg-body_unclickabe {\n\t\tcursor: auto;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\tright: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\tleft: 20px;\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image {\n\t\tdisplay: -webkit-box;\n\t\tdisplay: -ms-flexbox;\n\t\tdisplay: flex;\n\t\t-webkit-box-pack: center;\n\t\t    -ms-flex-pack: center;\n\t\t        justify-content: center;\n\t\tmax-width: 20%;\n\t\t-webkit-box-align: center;\n\t\t    -ms-flex-align: center;\n\t\t        align-items: center;\n\t\tpadding: 10px;\n\t\tbackground-color: #fff;\n\t\toverflow: hidden\n\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__image img {\n\t\t\twidth: 80%;\n\t\t\theight: auto;\n\t\t}\n\n._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\tpadding-left: 20px;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_default {\n\t\tcolor: #000;\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success {\n\t\tborder: 1px solid #01947a;\n\t\tbackground-color: rgba(1, 148, 122, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success:hover {\n\t\t\tbackground-color: rgba(1, 148, 122, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_success ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #01947a;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info {\n\t\tborder: 1px solid #1087c2;\n\t\tbackground-color: rgba(16, 135, 194, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info:hover {\n\t\t\tbackground-color: rgba(16, 135, 194, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_info ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #1087c2;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error {\n\t\tborder: 1px solid #f12222;\n\t\tbackground-color: rgba(241, 34, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error:hover {\n\t\t\tbackground-color: rgba(241, 34, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_error ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f12222;\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning {\n\t\tborder: 1px solid #f18b22;\n\t\tbackground-color: rgba(241, 139, 34, 0.68)\n\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning:hover {\n\t\t\tbackground-color: rgba(241, 139, 34, 1);\n\t\t}\n\n._vue-flash-msg-body._vue-flash-msg-body_warning ._vue-flash-msg-body__content {\n\t\t\tborder-left: 5px solid #f18b22;\n\t\t}\n\n/* Small Monitors */\n@media (min-width: 1024px) and (max-width: 1200px) {\n\t._vue-flash-msg-body {\n\t\twidth: 60%\n\t}\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 15px;\n\t\t}\n}\n\n/* Mobile devices */\n@media (min-width: 320px) and (max-width: 1023px) {\n\t._vue-flash-msg-body {\n\t\tfont-size: 0.9em;\n\t\twidth: 90%\n\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_right-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_right-top {\n\t\t\tright: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body._vue-flash-msg_left-bottom,\n\t\t._vue-flash-msg-body._vue-flash-msg_left-top {\n\t\t\tleft: 5%;\n\t\t}\n\n\t\t._vue-flash-msg-body ._vue-flash-msg-body__content {\n\t\t\tpadding: 10px;\n\t\t}\n}\n"),function(t){t[t.beforeCreate=0]="beforeCreate",t[t.created=1]="created",t[t.beforeMount=2]="beforeMount",t[t.mounted=3]="mounted",t[t.beforeUpdate=4]="beforeUpdate",t[t.updated=5]="updated",t[t.beforeUnmoutn=6]="beforeUnmoutn",t[t.unmounted=7]="unmounted";}(f||(f={}));let g=0,d=null;const h=defineComponent({props:{messageObj:{type:Object,required:!0},positionString:{type:String,default:"right bottom"}},setup(t){var e;const{messageObj:r,positionString:i}=toRefs(t),l=computed((()=>!!r.value.x&&!!r.value.y)),u=computed((()=>{const[t,e]=i.value.split(" ");return `_vue-flash-msg_${t}-${e}`})),f=computed((()=>{const t=[],[e,n]=i.value.split(" ");return l.value?t.push({[e]:r.value.x},{[n]:r.value.y}):t.push({[n]:r.value.yAxis+"px"}),t})),h=computed((()=>{var t;return ["_vue-flash-msg-body","_vue-flash-msg-body_"+r.value.type,r.value.clickable?"":"_vue-flash-msg-body_unclickabe",u.value,null!==(t=r.value.blockClass)&&void 0!==t?t:""]}));function b(t){if(!l.value){const e=t.target;m.setDimensions(r.value.group,{height:d?d.offsetHeight-g:e.offsetHeight,id:r.value.id,isImgLoaded:!0});}}if(t.messageObj.component){const n=toRaw(t.messageObj.component),s=Object.assign(null!==(e=r.value.props)&&void 0!==e?e:{},{messageObj:r.value});return ()=>h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1(n,toRaw(s))])}if(r.value.html){return ()=>h$1("div",{class:h.value,style:f.value,innerHTML:r.value.html,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}})}return ()=>{var t;return h$1("div",{class:h.value,style:f.value,onclick:()=>{r.value.clickable&&m.remove(r.value.id,r.value.group);}},[h$1("div",{class:["_vue-flash-msg-body__image",r.value.imageClass],style:[{display:null!==(t=r.value.image)&&void 0!==t?t:"none"}]},[h$1("img",{load:"lazy",src:r.value.image,onLoad:b})]),h$1("div",{class:["_vue-flash-msg-body__content",r.value.contentClass]},[h$1("p",{class:["_vue-flash-msg-body__title"],innerText:r.value.title}),h$1("p",{class:["_vue-flash-msg-body__text"],innerText:r.value.text})])])}},data:()=>({timeoutId:void 0}),computed:{isCustomPosition(){return !!this.messageObj.x&&!!this.messageObj.y}},methods:{deleteMessage(t=!0){this.timeoutId&&t&&clearTimeout(this.timeoutId),this.$flashMessage.remove(this.messageObj.id,this.messageObj.group);},clickHandler(){this.messageObj.clickable&&this.deleteMessage();},invokeCallback(t){var e;this.messageObj[t]&&"function"==typeof this.messageObj[t]&&(null===(e=this.messageObj[t])||void 0===e||e.call(this,this));}},created(){this.messageObj.time&&(this.timeoutId=setTimeout(this.deleteMessage.bind(this,!1),this.messageObj.time));},beforeMount(){const t=this.messageObj.beforeMount;t&&"function"==typeof t&&t(this,this.messageObj);},mounted(){d=this.$el,g=this.$el.offsetHeight;const t=this.messageObj.mounted;this.isCustomPosition||this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:this.$el.offsetHeight+this.messageObj.space,isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);},beforeUnmount(){const t=this.messageObj.beforeUnmount;t&&"function"==typeof t&&t(this,this.messageObj);},unmounted(){const t=this.messageObj.beforeUnmount;this.isCustomPosition||setTimeout((()=>{this.$flashMessage.setDimensions(this.messageObj.group,{id:this.messageObj.id,height:-(this.$el.offsetHeight+this.messageObj.space),isImgLoaded:!1}),t&&"function"==typeof t&&t(this,this.messageObj);}),500);}}),b=defineComponent({props:{tag:{type:String,default:"div"},transitionName:{type:String,default:void 0},position:{type:String,default:"right bottom",validator:t=>t.split(" ").every((t=>["top","left","right","bottom"].indexOf(t)>=0))},time:{type:Number,default:8e3},strategy:{type:String,default:"multiple"},group:{type:String,default:"default"}},setup(t){const{position:e,group:a,time:i,strategy:l,transitionName:u}=toRefs(t);m.registerGroup(a.value,{time:i.value,strategy:l.value,position:e.value});const f=m.groups[a.value],g=computed((()=>f.messages.value)),d=computed((()=>{const[t,n]=e.value.split(" ");return `_vue-flash-msg-container_${t}-${n}`}));return ()=>{var t;return h$1(TransitionGroup,{tag:"div",name:null!==(t=u.value)&&void 0!==t?t:d.value},(()=>g.value.map((t=>h$1(h,{positionString:e.value,messageObj:t,key:t.id+"-vfm"})))))}}});function c(t){if(c.installed)return;c.installed=!0;const e=m;t.config.globalProperties.$flashMessage=e,t.component("FlashMessage",b);}c.installed=!1;
-
     var script$1 = {
     	name: 'TheHeader',
     	setup() {
@@ -20702,8 +20708,6 @@
 
     		function logOut() {
     			const success = store.methods.logout();
-    			console.log(success);
-    			console.log(router);
     			if (success) {
     				m.show({
     					type: 'success',
@@ -23711,7 +23715,7 @@
     const app = createApp(script)
     	//.use(store)
     	.use(router$1)
-    	.use(api$2)
+    	.use(api$1)
     	.use(c)
     	.use(modal)
     	//app.provide('colorScheme', colorScheme)

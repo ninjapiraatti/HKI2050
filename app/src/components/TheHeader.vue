@@ -52,8 +52,6 @@ export default {
 
 		function logOut() {
 			const success = store.methods.logout()
-			console.log(success)
-			console.log(router)
 			if (success) {
 				flashMessage.show({
 					type: 'success',

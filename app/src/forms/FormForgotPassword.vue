@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="form">
 		<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 
 			<label for='email' class='form-label'>The email you used to register</label>
@@ -28,33 +28,48 @@
 </template>
 
 <script>
-	export default {
-		name: 'FormForgotPassword',
+import { flashMessage } from '@smartweb/vue-flash-message';
+import { inject, computed, onMounted } from 'vue'
+export default {
+	name: 'FormForgotPassword',
 
-		data() {
-			return {
-				sending: false,
-				form: {
-					email: '',
-				},
+	setup(_, {emit}) {
+		const api = inject('api')
+		let sending = false
+		let form = {email: ''}
+
+		const submitLabel = computed(() => {
+			return sending ? 'Requesting' : 'Request'
+		})
+
+		async function onSubmit() {
+			sending = true
+			const success = await api.users.password.requestReset(form)
+
+			const message = success ? {
+				type: 'success',
+				title: 'Reset request sent, check your email.',
+			} : {
+				type: 'error',
+				title: 'Reset request failed.',
 			}
-		},
 
-		computed: {
-			submitLabel() {
-				return this.sending ? 'Requesting' : 'Request'
-			},
-		},
+			flashMessage.show({
+				...message,
+				time: 5000,
+			})
 
-		methods: {
-			async onSubmit() {
-				this.sending = true
+			if (success) emit('success', success)
 
-				const success = await this.$api.users.password.requestReset(this.form)
-				if (success) this.$emit('success', success)
+			sending = false
+		}
 
-				this.sending = false
-			},
+		return {
+			sending,
+			submitLabel,
+			form,
+			onSubmit
 		}
 	}
+}
 </script>

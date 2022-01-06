@@ -137,6 +137,7 @@ export default {
 						getUser()
 						break
 				}
+				getCharacters()
 			}
 		}
 
@@ -146,7 +147,6 @@ export default {
 				console.log("lol")
 			}
 			*/
-			console.log(store.state.loggeduser)
 			//userObject = store.state.loggeduser // This fucked up everything. WHY?
 			await Promise.all([
 				getUser(),

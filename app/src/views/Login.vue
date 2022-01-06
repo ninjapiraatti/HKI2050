@@ -32,7 +32,6 @@ export default {
 					...message,
 					time: 5000,
 				})*/
-				console.log(router)
 				router.replace(route.query.redirect || { name: 'home' })
 			}
 		})

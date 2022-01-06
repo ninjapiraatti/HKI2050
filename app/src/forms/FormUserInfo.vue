@@ -93,10 +93,6 @@
 				sending = false
 			}
 
-			onMounted(() => {
-				console.log(props)
-			})
-
 			return {
 				store,
 				sending,

@@ -52,7 +52,6 @@ const methods = {
 		}
 		state.loggeduser = data
 		if (data) {
-			console.log(data)
 			localStorage.setItem('user', JSON.stringify(data))
 		} else {
 			localStorage.removeItem('user')

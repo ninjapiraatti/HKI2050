@@ -1,6 +1,5 @@
 <template>
-	<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
-
+	<VForm v-if="form" @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 		<div>
 			<label for='password' class='form-label'>Password</label>
 			<VField
@@ -39,60 +38,70 @@
 </template>
 
 <script>
-	export default {
-		name: 'FormResetPassword',
+import { flashMessage } from '@smartweb/vue-flash-message';
+import { inject, computed, onMounted } from 'vue'
+export default {
+	name: 'FormResetPassword',
 
-		props: {
-			id: {
-				type: String,
-				required: true,
-			},
-			email: {
-				type: String,
-				required: true,
-			},
+	props: {
+		id: {
+			type: String,
+			required: true,
 		},
-
-		data() {
-			return {
-				sending: false,
-				form: {
-					...this.$props,
-					password: '',
-				}
-			}
+		email: {
+			type: String,
+			required: true,
 		},
+	},
 
-		computed: {
-			submitLabel() {
-				return this.sending ? 'Changing' : 'Change'
-			},
-		},
-
-		methods: {
-			async onSubmit() {
-				this.sending = true
-
-				for (const prop in this.form) if (this.form[prop] == '') this.form[prop] = undefined
-				const success = await this.$api.users.password.save(this.form)
-				
-				const message = success ? {
-					type: 'success',
-					title: 'Password changed',
-				} : {
-					type: 'error',
-					title: 'Updating password failed',
-				}
-
-				this.$flashMessage.show({
-					...message,
-					time: 5000,
-				})
-				
-				if (success) this.$emit('success', success)
-
-				this.sending = false
-			}
+	setup(props, {emit}) {
+		const store = inject('store')
+		const api = inject('api')
+		let sending = false
+		let form = { 
+			...props,
+			password: '' 
 		}
-	}
+
+		async function onSubmit() {
+			sending = true
+
+			for (const prop in form) if (form[prop] == '') form[prop] = undefined
+			const success = await api.users.password.save(form)
+			
+			const message = success ? {
+				type: 'success',
+				title: 'Password changed',
+			} : {
+				type: 'error',
+				title: 'Updating password failed',
+			}
+
+			flashMessage.show({
+				...message,
+				time: 5000,
+			})
+			
+			if (success) emit('success', success)
+
+			sending = false
+		}
+
+		const submitLabel = computed(() => {
+			return sending ? 'Changing' : 'Change'
+		})
+
+		onMounted(() => {
+			console.log(props)
+		})
+
+		return {
+			store,
+			sending,
+			submitLabel,
+			form,
+			onSubmit
+		}
+	},
+}
 </script>

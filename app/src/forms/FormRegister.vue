@@ -1,7 +1,6 @@
 <template>
-	<div>
+	<div v-if="form">
 		<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
-
 			<div>
 				<label for='email' class='form-label'>Email</label>
 				<VField
@@ -74,56 +73,53 @@
 </template>
 
 <script>
-import { inject } from 'vue'
+import { flashMessage } from '@smartweb/vue-flash-message';
+import { inject, computed} from 'vue'
 	export default {
 	name: 'FormRegister',
-	setup() {
+	setup(props, {emit}) {
 		const store = inject('store')
-		return {
-			store
+		const api = inject('api')
+		let sending = false
+		let form = {
+			email: '',
+			username: '',
+			password_plain: '',
 		}
-	},
-	data() {
-		return {
-			sending: false,
-			form: {
-				email: '',
-				username: '',
-				password_plain: '',
-			}
-		}
-	},
 
-	computed: {
-		isAdmin() {
-			return this.store.state.loggeduser && this.store.state.loggeduser.isadmin
-		},
+		const isAdmin = computed(() => {
+			return store.state.loggeduser && store.state.loggeduser.isadmin
+		})
 
-		submitLabel() {
-			return this.isAdmin
-				? this.sending ? 'Inviting' : 'Invite'
-				: this.sending ? 'Registering' : 'Register'
-		},
-	},
+		const submitLabel = computed(() => {
+			return isAdmin
+				? sending ? 'Inviting' : 'Invite'
+				: sending ? 'Registering' : 'Register'
+		})
 
-	methods: {
-		async onSubmit() {
-			this.sending = true
+		
+		async function onSubmit() {
+			sending = true
 
-			const success = await this.$api.users.registration.invite(this.form)
-
+			const success = await api.users.registration.invite(form)
 			if (success) {
-				this.$emit('success', success)
-
+				emit('success', success)
 				this.$flashMessage.show({
 					type: 'success',
 					title: 'Invitation sent',
 					time: 5000,
 				})
 			}
-
-			this.sending = false
+			sending = false
 		}
-	}
+
+		return {
+			store,
+			sending,
+			form,
+			submitLabel,
+			onSubmit
+		}
+	},
 }
 </script>

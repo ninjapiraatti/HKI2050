@@ -19,6 +19,7 @@ export default {
 	name: 'Confirm',
 	setup() {
 		const modal = inject('modal')
+		const api = inject('api')
 		const route = useRoute()
 		const router = useRouter()
 		let confirmed = false
@@ -54,11 +55,11 @@ export default {
 				type: 'error',
 				title: 'Account confirmation failed',
 			}
-
+			/*
 			flashMessage.show({
 				...message,
 				time: 5000,
-			})
+			})*/
 
 			if (!confirmed) router.replace({
 				name: 'error',

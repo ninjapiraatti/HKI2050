@@ -21,11 +21,6 @@ export default {
 	components: {
 		VModal,
 	},
-	methods: {
-		onSuccess(modal, e) {
-			console.log(modal)
-			console.log(e)
-		}
-	}
+	// Even though onSuccess is called in template it doesn't need to be here because we're using plugin vue-modal.
 }
 </script>

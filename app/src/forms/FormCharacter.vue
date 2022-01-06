@@ -39,57 +39,57 @@
 </template>
 
 <script>
-	import { inject, computed, onMounted } from 'vue'
-	export default {
-		name: 'FormCharacter',
-		props: {
-			id: {
-				type: String,
-				default: undefined,
-			},
-			user_id: {
-				type: String,
-				required: true,
-			},
-			name: {
-				type: String,
-				default: undefined,
-			},
-			description: {
-				type: String,
-				default: undefined,
-			},
+import { inject, computed, onMounted } from 'vue'
+export default {
+	name: 'FormCharacter',
+	props: {
+		id: {
+			type: String,
+			default: undefined,
 		},
-
-		setup(props, {emit}) {
-			const store = inject('store')
-			const api = inject('api')
-			let sending = false
-			let form = { ...props }
-
-			async function onSubmit() {
-				sending = true
-				let character = await api.users.characters.save(form)
-				if (character) emit('success', character)
-
-				sending = false
-			}
-
-			const submitLabel = computed(() => {
-				return sending ? 'Saving' : 'Save'
-			})
-
-			onMounted(() => {
-				console.log(props)
-			})
-
-			return {
-				store,
-				sending,
-				submitLabel,
-				form,
-				onSubmit
-			}
+		user_id: {
+			type: String,
+			required: true,
 		},
-	}
+		name: {
+			type: String,
+			default: undefined,
+		},
+		description: {
+			type: String,
+			default: undefined,
+		},
+	},
+
+	setup(props, {emit}) {
+		const store = inject('store')
+		const api = inject('api')
+		let sending = false
+		let form = { ...props }
+
+		async function onSubmit() {
+			sending = true
+			let character = await api.users.characters.save(form)
+			if (character) emit('success', character)
+
+			sending = false
+		}
+
+		const submitLabel = computed(() => {
+			return sending ? 'Saving' : 'Save'
+		})
+
+		onMounted(() => {
+			console.log(props)
+		})
+
+		return {
+			store,
+			sending,
+			submitLabel,
+			form,
+			onSubmit
+		}
+	},
+}
 </script>

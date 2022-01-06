@@ -49,10 +49,8 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
 	const modal = document.querySelector('.modal.show')
 	if (!modal) {
-		console.log(state.state.loggeduser)
 		next()
 	} else {
-		console.log(state.state.loggeduser)
 		modal.addEventListener('hidden.bs.modal', () => next())
 		Modal.getInstance(modal).hide()
 	}
