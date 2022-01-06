@@ -1,5 +1,5 @@
 <template>
-	<div v-if="userObject" class="row gx-4">
+	<div class="row gx-4">
 		<div class="col">
 			<div class="card shadow p-2" :class='colorScheme.card'>
 				<div class="container">
@@ -23,8 +23,10 @@ export default {
 	name: 'Home',
 	setup() {
 		const store = inject('store')
+		const colorScheme = inject('colorScheme')
 		return {
-			store
+			store,
+			colorScheme
 		}
 	},
 }

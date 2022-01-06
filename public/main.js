@@ -20287,16 +20287,15 @@
     	name: 'Home',
     	setup() {
     		const store = inject('store');
+    		const colorScheme = inject('colorScheme');
     		return {
-    			store
+    			store,
+    			colorScheme
     		}
     	},
     };
 
-    const _hoisted_1$4 = {
-      key: 0,
-      class: "row gx-4"
-    };
+    const _hoisted_1$4 = { class: "row gx-4" };
     const _hoisted_2$2 = { class: "col" };
     const _hoisted_3$2 = { class: "container" };
     const _hoisted_4$2 = { class: "counter" };
@@ -20308,28 +20307,26 @@
     ], -1 /* HOISTED */);
 
     function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-      return (_ctx.userObject)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$4, [
-            createBaseVNode("div", _hoisted_2$2, [
-              createBaseVNode("div", {
-                class: normalizeClass(["card shadow p-2", _ctx.colorScheme.card])
-              }, [
-                createBaseVNode("div", _hoisted_3$2, [
-                  createBaseVNode("div", _hoisted_4$2, [
-                    createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
-                    createBaseVNode("button", {
-                      onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
-                    }, "-"),
-                    createBaseVNode("button", {
-                      onClick: _cache[1] || (_cache[1] = (...args) => ($setup.store.methods.increase && $setup.store.methods.increase(...args)))
-                    }, "+")
-                  ]),
-                  _hoisted_5$2
-                ])
-              ], 2 /* CLASS */)
+      return (openBlock(), createElementBlock("div", _hoisted_1$4, [
+        createBaseVNode("div", _hoisted_2$2, [
+          createBaseVNode("div", {
+            class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
+          }, [
+            createBaseVNode("div", _hoisted_3$2, [
+              createBaseVNode("div", _hoisted_4$2, [
+                createTextVNode(toDisplayString($setup.store.state.counter) + " ", 1 /* TEXT */),
+                createBaseVNode("button", {
+                  onClick: _cache[0] || (_cache[0] = (...args) => ($setup.store.methods.decrease && $setup.store.methods.decrease(...args)))
+                }, "-"),
+                createBaseVNode("button", {
+                  onClick: _cache[1] || (_cache[1] = (...args) => ($setup.store.methods.increase && $setup.store.methods.increase(...args)))
+                }, "+")
+              ]),
+              _hoisted_5$2
             ])
-          ]))
-        : createCommentVNode("v-if", true)
+          ], 2 /* CLASS */)
+        ])
+      ]))
     }
 
     script$5.render = render$5;
