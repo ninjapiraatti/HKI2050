@@ -1,5 +1,5 @@
 <template>
-	<nav class="navbar navbar-expand-sm shadow mb-4 mb-md-5" :class='$colorScheme.navbar'>
+	<nav class="navbar navbar-expand-sm shadow mb-4 mb-md-5" :class='colorScheme.navbar'>
 		<div class="container-fluid">
 			<router-link :to='{ name: "home" }' class="navbar-brand hki-logo py-0">
 				<img src="/public/assets/uusilogo04_nobg.png" alt="">
@@ -45,6 +45,7 @@ export default {
 	setup() {
 		const router = useRouter()
 		const store = inject('store')
+		const colorScheme = inject('colorScheme')
 
 		let loggedUser = computed(() => store.state.loggeduser)
 
@@ -69,6 +70,7 @@ export default {
 		return {
 			store,
 			loggedUser,
+			colorScheme,
 			logOut,
 			lol
 		}

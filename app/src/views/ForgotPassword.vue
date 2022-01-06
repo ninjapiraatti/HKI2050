@@ -1,6 +1,6 @@
 <template>
 	<div v-if='requested' class='container mt-5'>
-		<div class='card shadow' :class='$colorScheme.card'>
+		<div class='card shadow' :class='colorScheme.card'>
 			<div class='card-header'>
 				<h1 class='h3 mb-0'>Password reset requested</h1>
 			</div>
@@ -18,6 +18,7 @@ export default {
 	name: 'ForgotPassword',
 	setup() {
 		const modal = inject('modal')
+		const colorScheme = inject('colorScheme')
 		let requested = false
 
 		onMounted(async() => {
@@ -29,6 +30,7 @@ export default {
 		})
 
 		return {
+			colorScheme,
 			requested
 		}
 	},

@@ -16,18 +16,18 @@ $black: #000 !default;
 $blue: #0d6efd !default;
 $indigo: #9d00ff !default;
 $purple: #770043 !default;
-$pink: #e838b9 !default;
+$pink: #e8387b !default;
 $red: #dc3545 !default;
 $orange: #fd7e14 !default;
 $yellow: #ffc107 !default;
 $green: #00c8a3 !default;
 $teal: #97ffcb !default;
-$cyan: #0dcaf0 !default;
+$cyan: #6afaff !default;
 $darkblue: #071218 !default;
 
 $separator-color: #173244 !default;
 
-$primary: mix($green, $teal) !default;
+$primary: $cyan !default;
 $secondary: $gray-600 !default;
 $success: $green !default;
 $info: $cyan !default;

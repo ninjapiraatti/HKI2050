@@ -19104,7 +19104,7 @@
     function render$f(_ctx, _cache, $props, $setup, $data, $options) {
       return (openBlock(), createElementBlock("div", _hoisted_1$e, [
         createBaseVNode("div", {
-          class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+          class: normalizeClass(["card shadow", _ctx.colorScheme.card])
         }, _hoisted_3$c, 2 /* CLASS */)
       ]))
     }
@@ -19387,6 +19387,7 @@
     	setup() {
     		const store = inject('store');
     		const modal = inject('modal');
+    		const colorScheme = inject('colorScheme');
     		const confirm = inject('confirm');
     		const api = inject('api');
     		const route = useRoute();
@@ -19473,6 +19474,7 @@
     			userObject,
     			store,
     			characters,
+    			colorScheme,
     			getCharacters,
     			confirmDelete,
     			editUser,
@@ -19559,7 +19561,7 @@
           ? (openBlock(), createElementBlock("div", _hoisted_2$9, [
               createBaseVNode("div", _hoisted_3$9, [
                 createBaseVNode("div", {
-                  class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+                  class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
                 }, [
                   createBaseVNode("div", _hoisted_4$8, [
                     createBaseVNode("div", _hoisted_5$5, [
@@ -19583,7 +19585,7 @@
               ]),
               createBaseVNode("div", _hoisted_13, [
                 createBaseVNode("div", {
-                  class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+                  class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
                 }, [
                   createBaseVNode("div", _hoisted_14, [
                     createBaseVNode("div", _hoisted_15, [
@@ -19598,7 +19600,7 @@
                     ($setup.characters && $setup.characters.length)
                       ? (openBlock(), createElementBlock("div", _hoisted_18, [
                           createBaseVNode("table", {
-                            class: normalizeClass(["table table-striped mb-0", _ctx.$colorScheme.table])
+                            class: normalizeClass(["table table-striped mb-0", $setup.colorScheme.table])
                           }, [
                             _hoisted_19,
                             createBaseVNode("tbody", null, [
@@ -19760,6 +19762,7 @@
     	name: 'ForgotPassword',
     	setup() {
     		const modal = inject('modal');
+    		const colorScheme = inject('colorScheme');
     		let requested = false;
 
     		onMounted(async() => {
@@ -19771,6 +19774,7 @@
     		});
 
     		return {
+    			colorScheme,
     			requested
     		}
     	},
@@ -19792,10 +19796,10 @@
     ];
 
     function render$a(_ctx, _cache, $props, $setup, $data, $options) {
-      return ($data.requested)
+      return ($setup.requested)
         ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
             createBaseVNode("div", {
-              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+              class: normalizeClass(["card shadow", $setup.colorScheme.card])
             }, _hoisted_4$6, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
@@ -19996,6 +20000,7 @@
     	name: 'Register',
     	setup() {
     		const modal = inject('modal');
+    		const colorScheme = inject('colorScheme');
     		let registered = ref(false);
 
     		onMounted(async() => {
@@ -20007,6 +20012,7 @@
     		});
 
     		return {
+    			colorScheme,
     			registered
     		}
     	},
@@ -20031,7 +20037,7 @@
       return ($setup.registered)
         ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
             createBaseVNode("div", {
-              class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+              class: normalizeClass(["card shadow", $setup.colorScheme.card])
             }, _hoisted_4$4, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
@@ -20393,8 +20399,8 @@
     			document.body.classList.remove(previous);
     		}, { immediate: true });
 
-    		app.config.globalProperties.$colorScheme = colorScheme;
-    		//app.provide('colorScheme', colorScheme)
+    		//app.config.globalProperties.$colorScheme = colorScheme
+    		app.provide('colorScheme', colorScheme);
     	},
     };
 
@@ -20701,6 +20707,7 @@
     	setup() {
     		const router = useRouter();
     		const store = inject('store');
+    		const colorScheme = inject('colorScheme');
 
     		let loggedUser = computed(() => store.state.loggeduser);
 
@@ -20725,6 +20732,7 @@
     		return {
     			store,
     			loggedUser,
+    			colorScheme,
     			logOut,
     			lol
     		}
@@ -20763,7 +20771,7 @@
       const _component_router_link = resolveComponent("router-link");
 
       return (openBlock(), createElementBlock("nav", {
-        class: normalizeClass(["navbar navbar-expand-sm shadow mb-4 mb-md-5", _ctx.$colorScheme.navbar])
+        class: normalizeClass(["navbar navbar-expand-sm shadow mb-4 mb-md-5", _ctx.colorScheme.navbar])
       }, [
         createBaseVNode("div", _hoisted_1$1, [
           createVNode(_component_router_link, {
@@ -20847,6 +20855,10 @@
     	setup() {
     		provide('store', store);
     		//provide('modal', modal) // The store is not provided either, right?
+
+    		onMounted(() => {
+    			console.log(store);
+    		});
 
     		return {
     			store,
@@ -23720,6 +23732,7 @@
     	.use(modal)
     	//app.provide('colorScheme', colorScheme)
     	.use(colorScheme, { scheme: toRef(store.state, 'colorScheme') })
+    	//.use(colorScheme)
     	.component('VForm', Form)
     	.component('VField', Field)
     	.component('ErrorMessage', ErrorMessage);

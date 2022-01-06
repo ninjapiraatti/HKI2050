@@ -2,7 +2,7 @@
 	<div class="container">
 		<div v-if="userObject" class="row gx-4">
 			<div class="col-md-4">
-				<div class="card shadow" :class='$colorScheme.card'>
+				<div class="card shadow p-2" :class='colorScheme.card'>
 					<div class='context'>
 						<div class='card-header d-flex align-items-center'>
 							<h1 class="h3 mb-0 flex-grow-1">
@@ -20,7 +20,7 @@
 				</div>
 			</div>
 			<div class="mt-4 mt-md-0 col-md-8">
-				<div class="card shadow" :class='$colorScheme.card'>
+				<div class="card shadow p-2" :class='colorScheme.card'>
 					<div class='card-header'>
 						<div class="d-flex flex-wrap justify-content-between align-items-center">
 							<h3 class="h3 mb-0">Characters</h3>
@@ -29,7 +29,7 @@
 					</div>
 					<div class='card-body'>
 						<div v-if='characters && characters.length' class="table-responsive">
-							<table class="table table-striped mb-0" :class='$colorScheme.table'>
+							<table class="table table-striped mb-0" :class='colorScheme.table'>
 								<thead>
 									<tr>
 										<th scope="col">Character</th>
@@ -72,6 +72,7 @@ export default {
 	setup() {
 		const store = inject('store')
 		const modal = inject('modal')
+		const colorScheme = inject('colorScheme')
 		const confirm = inject('confirm')
 		const api = inject('api')
 		const route = useRoute()
@@ -158,6 +159,7 @@ export default {
 			userObject,
 			store,
 			characters,
+			colorScheme,
 			getCharacters,
 			confirmDelete,
 			editUser,

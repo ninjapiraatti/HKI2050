@@ -35,7 +35,7 @@ export default {
 			document.body.classList.remove(previous)
 		}, { immediate: true })
 
-		app.config.globalProperties.$colorScheme = colorScheme
-		//app.provide('colorScheme', colorScheme)
+		//app.config.globalProperties.$colorScheme = colorScheme
+		app.provide('colorScheme', colorScheme)
 	},
 }

@@ -1,6 +1,6 @@
 <template>
 	<div v-if='registered' class='container mt-5'>
-		<div class='card shadow' :class='$colorScheme.card'>
+		<div class='card shadow' :class='colorScheme.card'>
 			<div class='card-header'>
 				<h1 class='h3 mb-0'>Invitation sent</h1>
 			</div>
@@ -18,6 +18,7 @@ export default {
 	name: 'Register',
 	setup() {
 		const modal = inject('modal')
+		const colorScheme = inject('colorScheme')
 		let registered = ref(false)
 
 		onMounted(async() => {
@@ -29,6 +30,7 @@ export default {
 		})
 
 		return {
+			colorScheme,
 			registered
 		}
 	},

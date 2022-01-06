@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { provide, inject } from 'vue'
+import { provide, inject, onMounted } from 'vue'
 import store from '@root/store'
 //import modal from '@root/plugins/vue-modal'
 import TheHeader from '@components/TheHeader.vue'
@@ -19,6 +19,10 @@ export default {
 	setup() {
 		provide('store', store)
 		//provide('modal', modal) // The store is not provided either, right?
+
+		onMounted(() => {
+			console.log(store)
+		})
 
 		return {
 			store,
