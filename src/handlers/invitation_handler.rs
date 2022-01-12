@@ -81,27 +81,22 @@ fn query_invitation(
 	psw: Option<String>,
 	pool: web::Data<Pool>,
 ) -> Result<Invitation, ServiceError> {
-	let res = users_storage::get_by_email(eml.clone(), &pool);
+	let res_email = users_storage::get_by_email(eml.clone(), &pool);
+	let res_username = users_storage::get_by_username(username.clone(), &pool);
 	let password_hashed = psw.map(|s| hash_password(&s).unwrap());
-	match res {
-		Ok(user) => {
-			debug!("User {} already found. Cannot process invitation.", &user.email);
-			return Err(ServiceError::Unauthorized);
-		}
-		Err(NotFound) => {
-			let mut reset_request_id: Option<uuid::Uuid> = None;
-
-			let invitation = invitations_storage::create_invitation(
-				eml,
-				username,
-				password_hashed,
-				reset_request_id,
-				&pool,
-			)?;
-
-			Ok(invitation)
-		}
-		Err(error) => Err(error.into()),
+	if res_email.is_ok() || res_username.is_ok() {
+		debug!("User email or username already found. Cannot process invitation.");
+		return Err(ServiceError::Unauthorized);
+	} else {
+		let mut reset_request_id: Option<uuid::Uuid> = None;
+		let invitation = invitations_storage::create_invitation(
+			eml,
+			username,
+			password_hashed,
+			reset_request_id,
+			&pool,
+		)?;
+		return Ok(invitation);
 	}
 }
 

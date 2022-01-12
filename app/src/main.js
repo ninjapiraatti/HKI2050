@@ -1,8 +1,8 @@
 import '../scss/main.scss'
 
 import { createApp, toRef } from 'vue'
-import api from '@root/api.js'
 import store from '@store'
+import api from '@root/api.js'
 import router from '@root/router.js'
 import colorScheme from '@root/plugins/vue-color-scheme'
 import modal from '@root/plugins/vue-modal'
@@ -15,7 +15,7 @@ import '@root/validation.js'
 const app = createApp(App)
 	//.use(store)
 	.use(router)
-	.use(api)
+	.use(api, {storeApi: store, routerApi: router})
 	.use(FlashMessage)
 	.use(modal)
 	//app.provide('colorScheme', colorScheme)

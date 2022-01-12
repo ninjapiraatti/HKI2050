@@ -24,6 +24,15 @@ pub fn get_by_email(q_email: String, pool: &web::Data<Pool>) -> Result<User, Err
 	Ok(user)
 }
 
+pub fn get_by_username(q_username: String, pool: &web::Data<Pool>) -> Result<User, Error> {
+	use crate::schema::users::dsl::{username, users};
+	let conn: &PgConnection = &pool.get().unwrap();
+
+	let user = users.filter(username.eq(&q_username)).get_result::<User>(conn)?;
+	info!("USER by username: {}", user.username);
+	Ok(user)
+}
+
 pub fn get(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<User, Error> {
 	use crate::schema::users::dsl::{id, users};
 	let conn: &PgConnection = &pool.get().unwrap();

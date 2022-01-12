@@ -100,17 +100,18 @@ import { inject, computed} from 'vue'
 		
 		async function onSubmit() {
 			sending = true
-
 			const success = await api.users.registration.invite(form)
 			if (success) {
 				emit('success', success)
 				flashMessage.show({
 					type: 'success',
 					title: 'Invitation sent',
-					time: 5000,
+					time: 1000,
 				})
 			}
+			console.log(sending)
 			sending = false
+			console.log(sending)
 		}
 
 		return {

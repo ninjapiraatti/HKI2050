@@ -1,4 +1,6 @@
-let store, router, flashMessage
+import { flashMessage } from '@smartweb/vue-flash-message';
+let store, router
+
 
 const errorMessages = {
 	UniqueViolation: 'Item already exists',
@@ -24,6 +26,9 @@ function debounce(func, timeout = 300) {
 }
 
 async function handleHttpStatus(response) {
+	console.log(store)
+	console.log(router)
+	console.log(response)
 	if (response.ok) return response
 
 	let errorMessage = response.statusText
@@ -51,7 +56,7 @@ async function handleHttpStatus(response) {
 
 	switch (response.status) {
 		case 401:
-			store.dispatch('setUser', null)
+			store.methods.setUser(null)
 			if (router.currentRoute.value.name !== 'login') {
 				router.push({ name: 'login', query: {
 					redirect: router.currentRoute.value.fullPath,
@@ -90,7 +95,7 @@ const populateUrl = (url, data) => {
 
 const prepareBody = body => {
 	for (const key in body) {
-		// Back end want's YYYY-MM-DD dates
+		// Back end wants YYYY-MM-DD dates
 		if (body[key] instanceof Date) body[key] = [
 			body[key].getFullYear(),
 			body[key].getMonth() + 1,
@@ -226,7 +231,10 @@ export const api = {
 }
 
 export default {
-	install: (app, options) => {
+	install: (app, { storeApi, routerApi, flashMessageApi }) => {
+		store = storeApi
+		router = routerApi
+		console.log(store)
 		app.provide('api', api)
 	},
 }
