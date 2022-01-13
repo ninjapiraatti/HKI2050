@@ -2,19 +2,11 @@ import { reactive } from 'vue'
 import { api } from '@root/api.js'
 
 const state = reactive({
-	counter: 666,
 	loggeduser: JSON.parse(localStorage.getItem('user')),
 	colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
 })
 
 const methods = {
-	increase() {
-		state.counter++
-	},
-
-	decrease() {
-		state.counter--
-	},
 
 	async logout() {
 		try {

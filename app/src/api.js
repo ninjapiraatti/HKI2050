@@ -162,25 +162,6 @@ export const api = {
 		save: save('/api/users/{id}'),
 		delete: remove('/api/users/{id}'),
 
-		files: {
-			get: (data = {}) => {
-				if ('user_id' in data) return getArray('/api/users/{user_id}/uploads')(data)
-				return populateUrl('/api/users/uploads/{id}', data)
-			},
-
-			save: data => {
-				const body = new FormData()
-				body.append('user_id', data.user_id)
-				if (data.files.length) data.files.forEach(file => body.append('files[]', file))
-				return returnBoolean(request({
-					url: populateUrl('/api/users/{user_id}/uploads', data),
-					method: 'POST',
-					body,
-				}))
-			},
-
-			delete: remove('/api/users/uploads/{id}'),
-		},
 		characters: {
 			get: async (data = {}) => {
 				return await getArray('/api/users/{user_id}/characters')(data)
