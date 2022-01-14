@@ -22,7 +22,7 @@
 @import '../node_modules/bootstrap/scss/button-group';
 @import '../node_modules/bootstrap/scss/nav';
 @import '../node_modules/bootstrap/scss/navbar';
-// @import '../node_modules/bootstrap/scss/card';
+@import '../node_modules/bootstrap/scss/card';
 @import '../node_modules/bootstrap/scss/accordion';
 // @import '../node_modules/bootstrap/scss/breadcrumb';
 // @import '../node_modules/bootstrap/scss/pagination';
@@ -46,10 +46,16 @@
 
 // Extend Bootstrap
 
-:root {
+:root { // Bootstrap root styles
 	--color-scheme: #{$color-scheme};
+	--bs-dark-rgb: 0, 0, 0; // The main BG color
+	--bs-light-rgb: 210, 210, 210; // The main FG color
 	--#{$variable-prefix}component-active-bg: #{$component-active-bg};
 }
+
+// Override variables
+
+//$gray-800: #fff;
 
 .nav-tabs {
 	.nav-link:not(.active):hover {
@@ -122,6 +128,13 @@ body {
 	flex-direction: column;
 }
 
+#usermenu {
+	line-height: 0; // Fixes the user menu position but is this the right way?
+	&:focus {
+		box-shadow: none; // remove focus border which works for normal buttons but not here
+	}
+}
+
 #main {
 	flex: 1 0 auto;
 	display: flex;
@@ -138,37 +151,8 @@ body {
 .bigasslogo {
 	text-align: center;
 	img {
+		width: 280px;
 		margin: 0 auto;
-	}
-}
-
-.tier {
-	--tier-bg-color: #{$tier-bg-color};
-	--tier-text-color: #{$tier-text-color};
-
-	&-1 {
-		--#{$variable-prefix}table-accent-bg: #{$tier-1-row-bg-color} !important;
-		--#{$variable-prefix}table-bg: #{$tier-1-row-bg-color} !important;
-		--tier-bg-color: #{$tier-1-bg-color};
-		--tier-text-color: #{$tier-1-text-color};
-	}
-
-	&-2 {
-		--#{$variable-prefix}table-accent-bg: #{$tier-2-row-bg-color} !important;
-		--#{$variable-prefix}table-bg: #{$tier-2-row-bg-color} !important;
-		--tier-bg-color: #{$tier-2-bg-color};
-		--tier-text-color: #{$tier-2-text-color};
-	}
-
-	&-circle {
-		position: relative;
-		width: $tier-size;
-		margin: calc((#{$tier-size} - var(--bs-body-line-height) * 1rem) / -2) 0;
-		line-height: $tier-size;
-		text-align: center;
-		border-radius: 50%;
-		background-color: var(--tier-bg-color);
-		color: var(--tier-text-color);
 	}
 }
 
