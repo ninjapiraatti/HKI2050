@@ -17,6 +17,7 @@ $blue: #0d6efd !default;
 $indigo: #9d00ff !default;
 $purple: #770043 !default;
 $pink: #FF0A7D !default;
+$darkpink: #c9006f!default;
 $red: #dc3545 !default;
 $orange: #fd7e14 !default;
 $yellow: #ffc107 !default;
@@ -82,7 +83,7 @@ $input-btn-focus-color-opacity: 0.5 !default;
 $input-bg: hsl(hue($light), saturation($dark), lightness(lighten($dark, 5%))) !default;
 $input-border-color: $input-bg !default;
 
-$input-focus-bg: $gray-700 !default;
+$input-focus-bg: $darkpink;
 
 $input-disabled-bg: rgba($input-bg, 0.70) !default;
 $input-disabled-border-color: null !default;

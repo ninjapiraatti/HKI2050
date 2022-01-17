@@ -5,6 +5,7 @@
 				<img src="/public/assets/uusilogo04_nobg.png" alt="">
 			</router-link>
 			<ul class="navbar-nav">
+				<li><router-link :to='{ name: "hkibook" }' class='dropdown-item'>HKI Book</router-link></li>
 				<li class="nav-item dropdown">
 					<button id="usermenu" class='nav-link btn btn-unstyled fs-2 rounded-circle' data-bs-toggle="dropdown" aria-expanded="false">
 						<i class='bi-person-circle'></i>

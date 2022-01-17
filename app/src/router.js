@@ -7,6 +7,7 @@ import UserProfile from '@views/UserProfile.vue'
 import ForgotPassword from '@views/ForgotPassword.vue'
 import Register from '@views/Register.vue'
 import Confirm from '@views/Confirm.vue'
+import HKIbook from '@views/HKIbook.vue'
 
 import Home from './views/Home.vue'
 
@@ -34,6 +35,7 @@ const router = createRouter({
 		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
 		{ path: '/app/', component: Home, name: 'page-home' },
 		{ path: '/app/login', component: Login, name: 'login' },
+		{ path: '/app/hkibook', component: HKIbook, name: 'hkibook' },
 		{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
 		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
 		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },

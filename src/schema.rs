@@ -59,14 +59,58 @@ table! {
     }
 }
 
+table! {
+    articles (id) {
+        id -> Uuid,
+        character_id -> Uuid,
+        title -> Varchar,
+        ingress -> Varchar,
+        body -> Varchar,
+        inserted_by -> Varchar,
+        inserted_at -> Timestamp,
+        updated_by -> Varchar,
+        updated_at -> Timestamp,
+        updated_count -> Int2,
+    }
+}
+
+table! {
+    tags (id) {
+        id -> Uuid,
+        title -> Varchar,
+        inserted_by -> Varchar,
+        inserted_at -> Timestamp,
+        updated_by -> Varchar,
+        updated_at -> Timestamp,
+        updated_count -> Int2,
+    }
+}
+
+table! {
+    contenttags (id) {
+        id -> Uuid,
+        tag_id -> Uuid,
+        content_id -> Uuid,
+        inserted_by -> Varchar,
+        inserted_at -> Timestamp,
+        updated_by -> Varchar,
+        updated_at -> Timestamp,
+        updated_count -> Int2,
+    }
+}
+
+joinable!(articles -> characters (character_id));
+joinable!(characters -> users (user_id));
 joinable!(invitations -> reset_requests (reset_request_id));
 joinable!(sessions -> users (user_id));
-joinable!(characters -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
+    articles,
+    characters,
+    contenttags,
     invitations,
     reset_requests,
     sessions,
+    tags,
     users,
-    characters,
 );
