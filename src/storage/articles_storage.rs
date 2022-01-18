@@ -37,8 +37,6 @@ pub fn create_article(
 	Ok(article)
 }
 
-
-
 pub fn query_articles_by_article_uuid(
 	q_user_id: uuid::Uuid,
 	pool: &web::Data<Pool>,
