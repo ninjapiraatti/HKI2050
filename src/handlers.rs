@@ -5,4 +5,4 @@ pub mod register_handler;
 pub mod users_handler;
 pub mod character_handler;
 pub mod article_handler;
-pub mod tag_handler;
+// pub mod tag_handler;

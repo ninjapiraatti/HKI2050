@@ -63,14 +63,12 @@ table! {
     articles (id) {
         id -> Uuid,
         character_id -> Uuid,
+        user_id -> Uuid,
         title -> Varchar,
         ingress -> Varchar,
         body -> Varchar,
-        inserted_by -> Varchar,
         inserted_at -> Timestamp,
         updated_by -> Varchar,
-        updated_at -> Timestamp,
-        updated_count -> Int2,
     }
 }
 
@@ -78,11 +76,8 @@ table! {
     tags (id) {
         id -> Uuid,
         title -> Varchar,
-        inserted_by -> Varchar,
         inserted_at -> Timestamp,
         updated_by -> Varchar,
-        updated_at -> Timestamp,
-        updated_count -> Int2,
     }
 }
 
@@ -91,11 +86,8 @@ table! {
         id -> Uuid,
         tag_id -> Uuid,
         content_id -> Uuid,
-        inserted_by -> Varchar,
         inserted_at -> Timestamp,
         updated_by -> Varchar,
-        updated_at -> Timestamp,
-        updated_count -> Int2,
     }
 }
 

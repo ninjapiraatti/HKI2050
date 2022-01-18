@@ -8,9 +8,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
 pub struct ArticleData {
+	pub user_id: uuid::Uuid,
 	pub title: String,
 	pub ingress: String,
 	pub body: String,
+	pub character_id: uuid::Uuid,
 }
 
 #[derive(Deserialize, Debug)]
@@ -32,24 +34,19 @@ pub async fn add_article(
 		&logged_user
 	);
 
-	let res = web::block(move || articles_storage::article_auth(&logged_user.into(), character_id, &pool)).await;
-	match res {
-		Ok(project) => Ok(HttpResponse::Ok().json(&project)), // Don't return yet
-		Err(err) => match err {
-			BlockingError::Error(service_error) => Err(service_error.into()),
-			BlockingError::Canceled => Err(ServiceError::InternalServerError),
-		},
-	}
+	let user_id = logged_user.id;
+	let id = uuid::Uuid::parse_str(&character_id.into_inner())?;
 
 	let res = web::block(move || {
 		articles_storage::create_article(
-      article_data.title.clone(), 
-      article_data.ingress.clone(), 
-      article_data.body.clone(), 
-      user_id, 
+			user_id, 
+			article_data.title.clone(), 
+			article_data.ingress.clone(), 
+			article_data.body.clone(), 
+			id,
 			logged_user.email,
-      &pool,
-    )
+			&pool,
+		)
 	})
 	.await;
 	match res {
@@ -163,8 +160,10 @@ pub async fn update_article(
 	let res = web::block(move || {
 		articles_storage::update_article(
 			article_id,
-			payload.name.clone(),
-			payload.description.clone(),
+			payload.title.clone(),
+			payload.ingress.clone(),
+			payload.body.clone(),
+			payload.character_id,
 			logged_user.email,
 			&pool,
 		)
@@ -179,6 +178,7 @@ pub async fn update_article(
 	}
 }
 
+/*
 pub fn delete_article(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
 	let conn: &PgConnection = &pool.get().unwrap();
 	use crate::schema::characters::dsl::*;
@@ -190,3 +190,4 @@ pub fn delete_article(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Er
 	}
 	Err(NotFound)
 }
+*/
