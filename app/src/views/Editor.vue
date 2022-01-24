@@ -53,6 +53,22 @@
 				/>
 				<ErrorMessage name='body' class='invalid-feedback shake' />
 			</div>
+			<div>
+				<VField
+					v-model="form.character_id"
+					rules='required'
+					as="select"
+					name="author"
+					class="form-select"
+					id="character_id"
+					aria-label="Pick author character"
+				>
+					<option :value="null" disabled selected>Pick author character</option>
+					<option v-for="character in characters" :key="character" :value="character.id">
+						{{ character.name }}
+					</option>
+				</VField>
+			</div>
 
 			<div class='mt-label'>
 				<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
@@ -62,17 +78,13 @@
 </template>
 
 <script>
-import { inject } from 'vue'
+import { inject, ref, computed, onMounted } from 'vue'
 export default {
 	name: 'Editor',
 	props: {
 		id: {
 			type: String,
 			default: undefined,
-		},
-		user_id: {
-			type: String,
-			required: true,
 		},
 		title: {
 			type: String,
@@ -89,14 +101,42 @@ export default {
 	},
 	setup(props, {emit}) {
 		const store = inject('store')
+		const api = inject('api')
 		const colorScheme = inject('colorScheme')
 		let sending = false
-		let form = { ...props }
+		let form = { ...props, user_id: store.state.loggeduser.id }
+		let characters = ref([])
+
+		onMounted(async () => {
+			getCharacters()
+		})
+
+		async function onSubmit() {
+			sending = true
+			let article = await api.users.articles.save(form)
+			if (article) emit('success', article)
+
+			sending = false
+		}
+
+		async function getCharacters() {
+			characters.value = await api.users.characters.get({ user_id: store.state.loggeduser.id })
+			console.log(characters.value)
+		}
+
+		const submitLabel = computed(() => {
+			return sending ? 'Saving' : 'Save'
+		})
+
 		return {
 			store,
 			colorScheme,
 			sending,
 			form,
+			submitLabel,
+			characters,
+			getCharacters,
+			onSubmit,
 		}
 	},
 }

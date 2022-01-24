@@ -74,7 +74,7 @@ pub fn delete_character(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), 
 }
 
 pub fn update_character(
-	q_uuid_data: uuid::Uuid,
+	q_uuid_path: uuid::Uuid,
 	q_name: String,
 	q_description: String,
 	q_email: String,
@@ -85,7 +85,7 @@ pub fn update_character(
 	let conn: &PgConnection = &pool.get().unwrap();
 
 	let user_character = diesel::update(characters)
-		.filter(id.eq(q_uuid_data))
+		.filter(id.eq(q_uuid_path))
 		.set((
 			name.eq(q_name),
 			description.eq(q_description),

@@ -63,18 +63,18 @@ pub async fn get_all(
 }
 
 pub async fn update_user(
-	uuid_data: web::Path<String>,
+	uuid_path: web::Path<String>,
 	payload: web::Json<QueryData>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
 ) -> Result<HttpResponse, ServiceError> {
 	trace!(
-		"Updating a user: uuid_data = {:#?} logged_user = {:#?}",
-		&uuid_data,
+		"Updating a user: uuid_path = {:#?} logged_user = {:#?}",
+		&uuid_path,
 		&logged_user
 	);
 
-	let id = uuid::Uuid::parse_str(&uuid_data.into_inner())?;
+	let id = uuid::Uuid::parse_str(&uuid_path.into_inner())?;
 
 	if logged_user.isadmin == false && logged_user.id != id {
 		return Err(ServiceError::AdminRequired);
@@ -100,17 +100,17 @@ pub async fn update_user(
 }
 
 pub async fn get_by_uuid(
-	uuid_data: web::Path<String>,
+	uuid_path: web::Path<String>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
 ) -> Result<HttpResponse, ServiceError> {
 	trace!(
-		"Getting a user by uuid: uuid_data = {:#?} logged_user = {:#?}",
-		&uuid_data,
+		"Getting a user by uuid: uuid_path = {:#?} logged_user = {:#?}",
+		&uuid_path,
 		&logged_user
 	);
 
-	let id = uuid::Uuid::parse_str(&uuid_data.into_inner())?;
+	let id = uuid::Uuid::parse_str(&uuid_path.into_inner())?;
 
 	if logged_user.isadmin == false && logged_user.id != id {
 		return Err(ServiceError::AdminRequired);
@@ -127,8 +127,8 @@ pub async fn get_by_uuid(
 	}
 }
 
-fn query_one(uuid_data: String, pool: web::Data<Pool>) -> Result<UserDTO, ServiceError> {
-	let uuid_query = uuid::Uuid::parse_str(&uuid_data)?;
+fn query_one(uuid_path: String, pool: web::Data<Pool>) -> Result<UserDTO, ServiceError> {
+	let uuid_query = uuid::Uuid::parse_str(&uuid_path)?;
 	let user = users_storage::get(uuid_query, &pool)?;
 	let data = UserDTO {
 		id: user.id,
@@ -143,17 +143,17 @@ fn query_one(uuid_data: String, pool: web::Data<Pool>) -> Result<UserDTO, Servic
 }
 
 pub async fn delete_user(
-	uuid_data: web::Path<String>,
+	uuid_path: web::Path<String>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
 ) -> Result<HttpResponse, ServiceError> {
 	trace!(
-		"Deleting a user: uuid_data = {:#?} logged_user = {:#?}",
-		&uuid_data,
+		"Deleting a user: uuid_path = {:#?} logged_user = {:#?}",
+		&uuid_path,
 		&logged_user
 	);
 
-	let id = uuid::Uuid::parse_str(&uuid_data.into_inner())?;
+	let id = uuid::Uuid::parse_str(&uuid_path.into_inner())?;
 
 	if logged_user.isadmin == false && logged_user.id != id {
 		return Err(ServiceError::AdminRequired);

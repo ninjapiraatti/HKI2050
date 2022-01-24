@@ -26,7 +26,7 @@ pub fn create_article(
 		title: q_title,
 		ingress: q_ingress,
 		body: q_body,
-		inserted_at: chrono::Local::now().naive_local(),
+		created_at: chrono::Local::now().naive_local(),
 		updated_by: q_email,
 	};
 
@@ -78,7 +78,7 @@ pub fn delete_article(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Er
 }
 
 pub fn update_article(
-	q_uuid_data: uuid::Uuid,
+	q_uuid_path: uuid::Uuid,
 	q_title: String,
 	q_ingress: String,
 	q_body: String,
@@ -91,7 +91,7 @@ pub fn update_article(
 	let conn: &PgConnection = &pool.get().unwrap();
 
 	let user_article = diesel::update(articles)
-		.filter(id.eq(q_uuid_data))
+		.filter(id.eq(q_uuid_path))
 		.set((
 			character_id.eq(q_character_id),
 			title.eq(q_title),

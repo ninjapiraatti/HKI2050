@@ -14,6 +14,10 @@ import { provide, onMounted } from 'vue'
 import store from '@root/store'
 import TheHeader from '@components/TheHeader.vue'
 export default {
+	name: 'App',
+	components: {
+		TheHeader,
+	},
 	setup() {
 		provide('store', store)
 
@@ -24,10 +28,6 @@ export default {
 		return {
 			store,
 		}
-	},
-	name: 'App',
-	components: {
-		TheHeader,
 	},
 }
 </script>

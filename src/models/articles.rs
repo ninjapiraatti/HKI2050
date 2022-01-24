@@ -14,6 +14,6 @@ pub struct Article {
 	pub title: String,
   pub ingress: String,
   pub body: String,
-  pub inserted_at: chrono::NaiveDateTime,
+  pub created_at: chrono::NaiveDateTime,
   pub updated_by: String,
 }

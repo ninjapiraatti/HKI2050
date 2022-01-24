@@ -55,7 +55,7 @@ pub fn create(q_email: String, q_username: String, q_password: String, pool: &we
 }
 
 pub fn update(
-	uuid_data: uuid::Uuid,
+	uuid_path: uuid::Uuid,
 	q_username: String,
 	q_user_is_admin: bool,
 	q_email: String,
@@ -65,7 +65,7 @@ pub fn update(
 	let conn: &PgConnection = &pool.get().unwrap();
 
 	let user = diesel::update(users)
-		.filter(id.eq(uuid_data))
+		.filter(id.eq(uuid_path))
 		.set((username.eq(q_username), isadmin.eq(q_user_is_admin)))
 		.get_result::<User>(conn)?;
 
@@ -85,12 +85,12 @@ pub fn set_password(q_email: String, q_password: String, pool: &web::Data<Pool>)
 	Ok(user)
 }
 
-pub fn delete_user(uuid_data: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
+pub fn delete_user(uuid_path: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
 	let conn: &PgConnection = &pool.get().unwrap();
 	use crate::schema::users::dsl::id;
 	use crate::schema::users::dsl::*;
 
-	let deleted = diesel::delete(users.filter(id.eq(uuid_data))).execute(conn)?;
+	let deleted = diesel::delete(users.filter(id.eq(uuid_path))).execute(conn)?;
 
 	if deleted > 0 {
 		return Ok(());

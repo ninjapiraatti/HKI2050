@@ -23,7 +23,7 @@ pub struct ArticleDeleteData {
 }
 
 pub async fn add_article(
-	character_id: web::Path<String>,
+	uuid_path: web::Path<String>,
 	article_data: web::Json<ArticleData>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
@@ -34,16 +34,19 @@ pub async fn add_article(
 		&logged_user
 	);
 
-	let user_id = logged_user.id;
-	let id = uuid::Uuid::parse_str(&character_id.into_inner())?;
+	let id = uuid::Uuid::parse_str(&uuid_path.into_inner())?;
+
+	if logged_user.isadmin == false && logged_user.id != id {
+		return Err(ServiceError::AdminRequired);
+	}
 
 	let res = web::block(move || {
 		articles_storage::create_article(
-			user_id, 
+			id, 
 			article_data.title.clone(), 
 			article_data.ingress.clone(), 
 			article_data.body.clone(), 
-			id,
+			article_data.character_id.clone(),
 			logged_user.email,
 			&pool,
 		)
@@ -85,7 +88,7 @@ pub async fn get_by_uuid(
 	}
 }
 
-pub async fn get_by_character_uuid(
+pub async fn get_by_user_uuid(
 	article_data: web::Path<String>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,

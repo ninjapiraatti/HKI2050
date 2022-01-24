@@ -175,6 +175,19 @@ export const api = {
 			delete: remove('/api/users/characters/{id}'),
 		},
 
+		articles: {
+			get: async (data = {}) => {
+				return await getArray('/api/users/{user_id}/articles')(data)
+			},
+	
+			save: save({
+				create: '/api/users/{user_id}/articles',
+				update: '/api/users/articles/{id}',
+			}),
+
+			delete: remove('/api/users/articles/{id}'),
+		},
+
 		password: {
 			requestReset: body => returnBoolean(sendJson({ url: '/api/resetpassword', body })),
 			save: body => returnBoolean(sendJson({ url: '/api/updatepassword', method: 'PUT', body })),

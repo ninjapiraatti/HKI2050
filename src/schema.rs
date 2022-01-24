@@ -67,7 +67,7 @@ table! {
         title -> Varchar,
         ingress -> Varchar,
         body -> Varchar,
-        inserted_at -> Timestamp,
+        created_at -> Timestamp,
         updated_by -> Varchar,
     }
 }
@@ -76,7 +76,7 @@ table! {
     tags (id) {
         id -> Uuid,
         title -> Varchar,
-        inserted_at -> Timestamp,
+        created_at -> Timestamp,
         updated_by -> Varchar,
     }
 }
@@ -86,7 +86,7 @@ table! {
         id -> Uuid,
         tag_id -> Uuid,
         content_id -> Uuid,
-        inserted_at -> Timestamp,
+        created_at -> Timestamp,
         updated_by -> Varchar,
     }
 }

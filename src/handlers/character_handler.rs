@@ -19,6 +19,7 @@ pub struct CharacterDeleteData {
 }
 
 pub async fn add_character(
+	uuid_path: web::Path<String>,
 	character_data: web::Json<CharacterData>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
@@ -29,11 +30,15 @@ pub async fn add_character(
 		&logged_user
 	);
 
-	let user_id = logged_user.id;
+	let id = uuid::Uuid::parse_str(&uuid_path.into_inner())?;
+
+	if logged_user.isadmin == false && logged_user.id != id {
+		return Err(ServiceError::AdminRequired);
+	}
 
 	let res = web::block(move || {
 		characters_storage::create_character(
-      user_id, 
+      id, 
       character_data.name.clone(), 
       character_data.description.clone(), 
 			logged_user.email,

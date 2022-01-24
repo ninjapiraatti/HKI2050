@@ -34,11 +34,11 @@ pub fn create_session(q_user_id: uuid::Uuid, q_user_email: String, pool: &web::D
 	Ok(session)
 }
 
-pub fn delete_session(uuid_data: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
+pub fn delete_session(uuid_path: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
 	let conn: &PgConnection = &pool.get().unwrap();
 	use crate::schema::sessions::dsl::*;
 
-	let deleted = diesel::delete(sessions.filter(user_id.eq(uuid_data))).execute(conn)?;
+	let deleted = diesel::delete(sessions.filter(user_id.eq(uuid_path))).execute(conn)?;
 
 	if deleted > 0 {
 		return Ok(());

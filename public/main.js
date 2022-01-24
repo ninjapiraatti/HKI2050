@@ -8408,6 +8408,19 @@
     			delete: remove('/api/users/characters/{id}'),
     		},
 
+    		articles: {
+    			get: async (data = {}) => {
+    				return await getArray('/api/users/{user_id}/articles')(data)
+    			},
+    	
+    			save: save({
+    				create: '/api/users/{user_id}/articles',
+    				update: '/api/users/articles/{id}',
+    			}),
+
+    			delete: remove('/api/users/articles/{id}'),
+    		},
+
     		password: {
     			requestReset: body => returnBoolean(sendJson({ url: '/api/resetpassword', body })),
     			save: body => returnBoolean(sendJson({ url: '/api/updatepassword', method: 'PUT', body })),
@@ -18930,7 +18943,7 @@
     const _hoisted_6$9 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$6 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$6 = /*#__PURE__*/createTextVNode("No account? ");
-    const _hoisted_9$3 = /*#__PURE__*/createTextVNode("Sign up");
+    const _hoisted_9$4 = /*#__PURE__*/createTextVNode("Sign up");
 
     function render$j(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -19000,7 +19013,7 @@
                   _hoisted_8$6,
                   createVNode(_component_router_link, { to: { name: "register" } }, {
                     default: withCtx(() => [
-                      _hoisted_9$3
+                      _hoisted_9$4
                     ]),
                     _: 1 /* STABLE */
                   })
@@ -19462,12 +19475,12 @@
     const _hoisted_6$7 = { class: "h3 mb-0 flex-grow-1" };
     const _hoisted_7$5 = { class: "card-body" };
     const _hoisted_8$5 = { class: "context-actions hstack gap-1 justify-content-end" };
-    const _hoisted_9$2 = /*#__PURE__*/createBaseVNode("i", {
+    const _hoisted_9$3 = /*#__PURE__*/createBaseVNode("i", {
       class: "bi-pencil-fill",
       title: "Edit profile"
     }, null, -1 /* HOISTED */);
-    const _hoisted_10$2 = [
-      _hoisted_9$2
+    const _hoisted_10$3 = [
+      _hoisted_9$3
     ];
     const _hoisted_11$2 = /*#__PURE__*/createBaseVNode("i", {
       class: "bi-trash-fill",
@@ -19541,7 +19554,7 @@
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
                           onClick: _cache[0] || (_cache[0] = $event => ($setup.editUser($setup.userObject)))
-                        }, _hoisted_10$2),
+                        }, _hoisted_10$3),
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
                           onClick: _cache[1] || (_cache[1] = $event => ($setup.confirmDelete('user', $setup.userObject)))
@@ -19838,8 +19851,8 @@
       class: "form-label"
     }, "Repeat password", -1 /* HOISTED */);
     const _hoisted_8$4 = { class: "mt-label d-flex gap-3 flex-row-reverse align-items-center justify-content-between" };
-    const _hoisted_9$1 = ["disabled"];
-    const _hoisted_10$1 = { key: 0 };
+    const _hoisted_9$2 = ["disabled"];
+    const _hoisted_10$2 = { key: 0 };
     const _hoisted_11$1 = /*#__PURE__*/createTextVNode("Already a user? ");
     const _hoisted_12$1 = /*#__PURE__*/createTextVNode("Log in");
 
@@ -19935,9 +19948,9 @@
                     type: "submit",
                     disabled: $setup.sending,
                     class: "btn btn-primary gradient align-self-start"
-                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_9$1),
+                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_9$2),
                   (!_ctx.isAdmin)
-                    ? (openBlock(), createElementBlock("div", _hoisted_10$1, [
+                    ? (openBlock(), createElementBlock("div", _hoisted_10$2, [
                         _hoisted_11$1,
                         createVNode(_component_router_link, { to: { name: "login" } }, {
                           default: withCtx(() => [
@@ -20290,10 +20303,6 @@
     			type: String,
     			default: undefined,
     		},
-    		user_id: {
-    			type: String,
-    			required: true,
-    		},
     		title: {
     			type: String,
     			default: undefined,
@@ -20309,14 +20318,42 @@
     	},
     	setup(props, {emit}) {
     		const store = inject('store');
+    		const api = inject('api');
     		const colorScheme = inject('colorScheme');
     		let sending = false;
-    		let form = { ...props };
+    		let form = { ...props, user_id: store.state.loggeduser.id };
+    		let characters = ref([]);
+
+    		onMounted(async () => {
+    			getCharacters();
+    		});
+
+    		async function onSubmit() {
+    			sending = true;
+    			let article = await api.users.articles.save(form);
+    			if (article) emit('success', article);
+
+    			sending = false;
+    		}
+
+    		async function getCharacters() {
+    			characters.value = await api.users.characters.get({ user_id: store.state.loggeduser.id });
+    			console.log(characters.value);
+    		}
+
+    		const submitLabel = computed(() => {
+    			return sending ? 'Saving' : 'Save'
+    		});
+
     		return {
     			store,
     			colorScheme,
     			sending,
     			form,
+    			submitLabel,
+    			characters,
+    			getCharacters,
+    			onSubmit,
     		}
     	},
     };
@@ -20336,8 +20373,14 @@
       for: "body",
       class: "form-label"
     }, "Content", -1 /* HOISTED */);
-    const _hoisted_7$2 = { class: "mt-label" };
-    const _hoisted_8$2 = ["disabled"];
+    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("option", {
+      value: null,
+      disabled: "",
+      selected: ""
+    }, "Pick author character", -1 /* HOISTED */);
+    const _hoisted_8$2 = ["value"];
+    const _hoisted_9$1 = { class: "mt-label" };
+    const _hoisted_10$1 = ["disabled"];
 
     function render$6(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -20353,7 +20396,7 @@
           ])
         ], 2 /* CLASS */),
         createVNode(_component_VForm, {
-          onSubmit: _ctx.onSubmit,
+          onSubmit: $setup.onSubmit,
           class: "vstack gap-2"
         }, {
           default: withCtx(({ errors }) => [
@@ -20411,12 +20454,35 @@
                 class: "invalid-feedback shake"
               })
             ]),
-            createBaseVNode("div", _hoisted_7$2, [
+            createBaseVNode("div", null, [
+              createVNode(_component_VField, {
+                modelValue: $setup.form.character_id,
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($setup.form.character_id) = $event)),
+                rules: "required",
+                as: "select",
+                name: "author",
+                class: "form-select",
+                id: "character_id",
+                "aria-label": "Pick author character"
+              }, {
+                default: withCtx(() => [
+                  _hoisted_7$2,
+                  (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
+                    return (openBlock(), createElementBlock("option", {
+                      key: character,
+                      value: character.id
+                    }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_8$2))
+                  }), 128 /* KEYED_FRAGMENT */))
+                ]),
+                _: 1 /* STABLE */
+              }, 8 /* PROPS */, ["modelValue"])
+            ]),
+            createBaseVNode("div", _hoisted_9$1, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $setup.sending,
                 class: "btn btn-primary gradient float-end"
-              }, toDisplayString(_ctx.submitLabel), 9 /* TEXT, PROPS */, _hoisted_8$2)
+              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_10$1)
             ])
           ]),
           _: 1 /* STABLE */
@@ -21014,6 +21080,10 @@
     script$1.__file = "src/components/TheHeader.vue";
 
     var script = {
+    	name: 'App',
+    	components: {
+    		TheHeader: script$1,
+    	},
     	setup() {
     		provide('store', store);
 
@@ -21024,10 +21094,6 @@
     		return {
     			store,
     		}
-    	},
-    	name: 'App',
-    	components: {
-    		TheHeader: script$1,
     	},
     };
 

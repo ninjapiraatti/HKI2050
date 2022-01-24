@@ -10,7 +10,7 @@ pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 pub struct Tag {
   pub id: uuid::Uuid,
   pub title: String,
-  pub inserted_at: chrono::NaiveDateTime,
+  pub created_at: chrono::NaiveDateTime,
   pub updated_by: String,
 }
 
