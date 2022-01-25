@@ -37,7 +37,7 @@ const router = createRouter({
 		{ path: '/app/', component: Home, name: 'page-home' },
 		{ path: '/app/login', component: Login, name: 'login' },
 		{ path: '/app/hkibook', component: HKIbook, name: 'hkibook' },
-		{ path: '/app/editor', component: Editor, name: 'editor', beforeEnter: [needLogin] },
+		{ path: '/app/editor', component: Editor, name: 'editor', beforeEnter: [needLogin, needAdmin] },
 		{ path: '/app/user/:id', component: UserProfile, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
 		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
 		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },

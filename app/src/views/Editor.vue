@@ -43,7 +43,8 @@
 				<VField
 					v-model='form.body'
 					rules='required'
-					type='text'
+					as='textarea'
+					rows='10'
 					id='body'
 					name='body'
 					label='body'
@@ -69,16 +70,18 @@
 					</option>
 				</VField>
 			</div>
-
 			<div class='mt-label'>
 				<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
 			</div>
 		</VForm>
+		<div v-html="compiledMarkdown">
+		</div>
 	</div>
 </template>
 
 <script>
-import { inject, ref, computed, onMounted } from 'vue'
+import { inject, ref, computed, onMounted, watch } from 'vue'
+import { marked } from 'marked'
 export default {
 	name: 'Editor',
 	props: {
@@ -96,7 +99,7 @@ export default {
 		},
 		body: {
 			type: String,
-			default: undefined,
+			default: "Say your piece.",
 		},
 	},
 	setup(props, {emit}) {
@@ -104,7 +107,7 @@ export default {
 		const api = inject('api')
 		const colorScheme = inject('colorScheme')
 		let sending = false
-		let form = { ...props, user_id: store.state.loggeduser.id }
+		let form = ref({ ...props, user_id: store.state.loggeduser.id })
 		let characters = ref([])
 
 		onMounted(async () => {
@@ -128,6 +131,10 @@ export default {
 			return sending ? 'Saving' : 'Save'
 		})
 
+    const compiledMarkdown = computed(() => {
+      return marked(form.value.body, { sanitize: true })
+    })
+
 		return {
 			store,
 			colorScheme,
@@ -137,6 +144,7 @@ export default {
 			characters,
 			getCharacters,
 			onSubmit,
+			compiledMarkdown,
 		}
 	},
 }

@@ -24,8 +24,11 @@
 		"@vee-validate/rules": "^4.4.7",
 		"bootstrap": "^5.1.0",
 		"bootstrap-icons": "^1.5.0",
+		"marked": "^4.0.10",
+		"rollup-plugin-commonjs": "^10.1.0",
 		"vee-validate": "^4.4.5",
 		"vue": "^3.0.5",
-		"vue-router": "^4.0.2"
+		"vue-router": "^4.0.2",
+		"vue3-markdown-it": "^1.0.10"
 	}
 }
