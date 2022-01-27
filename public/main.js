@@ -8481,20 +8481,34 @@
     			out: () => request({ url: '/api/auth', method: 'DELETE' }),
     		},
     	},
+    	/*
     	characters: {
     		get: async (data = {}) => {
-    			const characters = await getArray('/api/users/{id}/characters')(data);
+    			const characters = await getArray('/api/users/{id}/characters')(data)
 
     			characters.forEach(reservation => {
-    				if (reservation.begin_time) reservation.begin_time = new Date(reservation.begin_time);
-    				if (reservation.end_time) reservation.end_time = new Date(reservation.end_time);
-    			});
+    				if (reservation.begin_time) reservation.begin_time = new Date(reservation.begin_time)
+    				if (reservation.end_time) reservation.end_time = new Date(reservation.end_time)
+    			})
 
     			return characters
     		},
 
     		save: save('/api/characters/{id}'),
     		delete: remove('/api/characters/{id}'),
+    	},
+    	*/
+    	tags: {
+    		get: async (data = {}) => {
+    			return await getArray('/api/tags')(data)
+    		},
+
+    		save: save({
+    			create: '/api/tags',
+    			update: '/api/tags/{id}',
+    		}),
+
+    		delete: remove('/api/tags/{id}'),
     	},
     };
 
@@ -18953,7 +18967,7 @@
 
     defineJQueryPlugin(Toast);
 
-    var script$j = {
+    var script$k = {
     	name: 'FormLogin',
     	setup(props, { emit }) {
     		const store = inject('store');
@@ -18989,23 +19003,23 @@
     	}
     };
 
-    const _hoisted_1$h = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$i = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_2$f = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$g = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label me-3"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_3$f = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
-    const _hoisted_4$d = ["disabled"];
-    const _hoisted_5$9 = { class: "d-flex gap-3 mt-3 mt-sm-0" };
+    const _hoisted_3$g = { class: "mt-label d-flex gap-3 align-items-center justify-content-between flex-wrap" };
+    const _hoisted_4$e = ["disabled"];
+    const _hoisted_5$a = { class: "d-flex gap-3 mt-3 mt-sm-0" };
     const _hoisted_6$9 = /*#__PURE__*/createTextVNode("Forgot password?");
     const _hoisted_7$6 = /*#__PURE__*/createBaseVNode("div", { class: "vr" }, null, -1 /* HOISTED */);
     const _hoisted_8$6 = /*#__PURE__*/createTextVNode("No account? ");
     const _hoisted_9$4 = /*#__PURE__*/createTextVNode("Sign up");
 
-    function render$j(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$k(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
@@ -19018,7 +19032,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_1$h,
+              _hoisted_1$i,
               createVNode(_component_VField, {
                 modelValue: $setup.form.email,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.email) = $event)),
@@ -19036,7 +19050,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_2$f,
+              _hoisted_2$g,
               createVNode(_component_VField, {
                 modelValue: $setup.form.password,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.password) = $event)),
@@ -19053,13 +19067,13 @@
                 class: "invalid-feedback shake"
               })
             ]),
-            createBaseVNode("div", _hoisted_3$f, [
+            createBaseVNode("div", _hoisted_3$g, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $setup.sending,
                 class: "btn btn-primary gradient align-self-start w-100 w-sm-auto order-sm-last"
-              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$d),
-              createBaseVNode("div", _hoisted_5$9, [
+              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$e),
+              createBaseVNode("div", _hoisted_5$a, [
                 createBaseVNode("div", null, [
                   createVNode(_component_router_link, { to: { name: "forgot-password" } }, {
                     default: withCtx(() => [
@@ -19086,11 +19100,11 @@
       ]))
     }
 
-    script$j.render = render$j;
-    script$j.__file = "src/forms/FormLogin.vue";
+    script$k.render = render$k;
+    script$k.__file = "src/forms/FormLogin.vue";
 
     //import modal from '@root/plugins/vue-modal'
-    var script$i = {
+    var script$j = {
     	name: 'Login',
     	setup() {
     		const router = useRouter();
@@ -19100,7 +19114,7 @@
     		onMounted(async() => {
     			const success = await modal({
     				title: 'Log in',
-    				component: script$j,
+    				component: script$k,
     				backdrop: 'static',
     			});
     			if (success) {
@@ -19123,37 +19137,37 @@
     	},
     };
 
-    function render$i(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$j(_ctx, _cache, $props, $setup, $data, $options) {
       return null
     }
 
-    script$i.render = render$i;
-    script$i.__file = "src/views/Login.vue";
+    script$j.render = render$j;
+    script$j.__file = "src/views/Login.vue";
 
-    var script$h = {
+    var script$i = {
     	name: 'HomeUser',
     };
 
-    const _hoisted_1$g = { class: "container" };
-    const _hoisted_2$e = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_1$h = { class: "container" };
+    const _hoisted_2$f = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
-    const _hoisted_3$e = [
-      _hoisted_2$e
+    const _hoisted_3$f = [
+      _hoisted_2$f
     ];
 
-    function render$h(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$g, [
+    function render$i(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$h, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", _ctx.colorScheme.card])
-        }, _hoisted_3$e, 2 /* CLASS */)
+        }, _hoisted_3$f, 2 /* CLASS */)
       ]))
     }
 
-    script$h.render = render$h;
-    script$h.__file = "src/views/UserHome.vue";
+    script$i.render = render$i;
+    script$i.__file = "src/views/UserHome.vue";
 
-    var script$g = {
+    var script$h = {
     		name: 'FormUserInfo',
     		props: {	
     			id: {
@@ -19203,26 +19217,26 @@
     		},
     	};
 
-    const _hoisted_1$f = {
+    const _hoisted_1$g = {
       key: 0,
       class: "form-check"
     };
-    const _hoisted_2$d = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$e = /*#__PURE__*/createBaseVNode("label", {
       for: "isadmin",
       class: "form-label"
     }, "Admin", -1 /* HOISTED */);
-    const _hoisted_3$d = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_3$e = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_4$c = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_4$d = /*#__PURE__*/createBaseVNode("label", {
       for: "username",
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
-    const _hoisted_5$8 = { class: "mt-label" };
+    const _hoisted_5$9 = { class: "mt-label" };
     const _hoisted_6$8 = ["disabled"];
 
-    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$h(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19233,8 +19247,8 @@
       }, {
         default: withCtx(({ errors }) => [
           ($setup.loggedUser.isadmin)
-            ? (openBlock(), createElementBlock("div", _hoisted_1$f, [
-                _hoisted_2$d,
+            ? (openBlock(), createElementBlock("div", _hoisted_1$g, [
+                _hoisted_2$e,
                 createVNode(_component_VField, {
                   modelValue: $setup.form.isadmin,
                   "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.isadmin) = $event)),
@@ -19248,7 +19262,7 @@
               ]))
             : createCommentVNode("v-if", true),
           createBaseVNode("div", null, [
-            _hoisted_3$d,
+            _hoisted_3$e,
             createVNode(_component_VField, {
               modelValue: $setup.form.email,
               "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.email) = $event)),
@@ -19266,7 +19280,7 @@
             })
           ]),
           createBaseVNode("div", null, [
-            _hoisted_4$c,
+            _hoisted_4$d,
             createVNode(_component_VField, {
               modelValue: $setup.form.username,
               "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.username) = $event)),
@@ -19283,7 +19297,7 @@
               class: "invalid-feedback shake"
             })
           ]),
-          createBaseVNode("div", _hoisted_5$8, [
+          createBaseVNode("div", _hoisted_5$9, [
             createBaseVNode("button", {
               type: "submit",
               disabled: $setup.sending,
@@ -19295,10 +19309,10 @@
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$g.render = render$g;
-    script$g.__file = "src/forms/FormUserInfo.vue";
+    script$h.render = render$h;
+    script$h.__file = "src/forms/FormUserInfo.vue";
 
-    var script$f = {
+    var script$g = {
     	name: 'FormCharacter',
     	props: {
     		id: {
@@ -19351,18 +19365,18 @@
     	},
     };
 
-    const _hoisted_1$e = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$f = /*#__PURE__*/createBaseVNode("label", {
       for: "label",
       class: "form-label"
     }, "Name", -1 /* HOISTED */);
-    const _hoisted_2$c = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$d = /*#__PURE__*/createBaseVNode("label", {
       for: "description",
       class: "form-label"
     }, "Description", -1 /* HOISTED */);
-    const _hoisted_3$c = { class: "mt-label" };
-    const _hoisted_4$b = ["disabled"];
+    const _hoisted_3$d = { class: "mt-label" };
+    const _hoisted_4$c = ["disabled"];
 
-    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$g(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -19373,7 +19387,7 @@
       }, {
         default: withCtx(({ errors }) => [
           createBaseVNode("div", null, [
-            _hoisted_1$e,
+            _hoisted_1$f,
             createVNode(_component_VField, {
               modelValue: $setup.form.name,
               "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.name) = $event)),
@@ -19391,7 +19405,7 @@
             })
           ]),
           createBaseVNode("div", null, [
-            _hoisted_2$c,
+            _hoisted_2$d,
             createVNode(_component_VField, {
               modelValue: $setup.form.description,
               "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.description) = $event)),
@@ -19408,22 +19422,22 @@
               class: "invalid-feedback shake"
             })
           ]),
-          createBaseVNode("div", _hoisted_3$c, [
+          createBaseVNode("div", _hoisted_3$d, [
             createBaseVNode("button", {
               type: "submit",
               disabled: $setup.sending,
               class: "btn btn-primary gradient float-end"
-            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$b)
+            }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$c)
           ])
         ]),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onSubmit"]))
     }
 
-    script$f.render = render$f;
-    script$f.__file = "src/forms/FormCharacter.vue";
+    script$g.render = render$g;
+    script$g.__file = "src/forms/FormCharacter.vue";
 
-    var script$e = {
+    var script$f = {
     	name: 'UserProfile',
     	setup() {
     		const store = inject('store');
@@ -19459,7 +19473,7 @@
     			//props = userObject.value // This doesn't account for admin wanting to edit another user
     			const result = await modal({
     				title: 'Edit user info',
-    				component: script$g,
+    				component: script$h,
     				props,
     			});
 
@@ -19472,7 +19486,7 @@
     			props.user_id = userObject.value.id;
     			const result = await modal({
     				title: props.id ? `Edit character: ${props.name}` : 'Add character',
-    				component: script$f,
+    				component: script$g,
     				props,
     			});
 
@@ -19524,14 +19538,14 @@
     	},
     };
 
-    const _hoisted_1$d = { class: "container" };
-    const _hoisted_2$b = {
+    const _hoisted_1$e = { class: "container" };
+    const _hoisted_2$c = {
       key: 0,
       class: "row gx-4"
     };
-    const _hoisted_3$b = { class: "col-md-4" };
-    const _hoisted_4$a = { class: "context" };
-    const _hoisted_5$7 = { class: "card-header d-flex align-items-center" };
+    const _hoisted_3$c = { class: "col-md-4" };
+    const _hoisted_4$b = { class: "context" };
+    const _hoisted_5$8 = { class: "card-header d-flex align-items-center" };
     const _hoisted_6$7 = { class: "h3 mb-0 flex-grow-1" };
     const _hoisted_7$5 = { class: "card-body" };
     const _hoisted_8$5 = { class: "context-actions hstack gap-1 justify-content-end" };
@@ -19596,16 +19610,16 @@
       class: "fs-3 fw-light text-muted text-center p-4"
     };
 
-    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$d, [
+    function render$f(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$e, [
         ($setup.userObject)
-          ? (openBlock(), createElementBlock("div", _hoisted_2$b, [
-              createBaseVNode("div", _hoisted_3$b, [
+          ? (openBlock(), createElementBlock("div", _hoisted_2$c, [
+              createBaseVNode("div", _hoisted_3$c, [
                 createBaseVNode("div", {
                   class: normalizeClass(["card shadow p-2", $setup.colorScheme.card])
                 }, [
-                  createBaseVNode("div", _hoisted_4$a, [
-                    createBaseVNode("div", _hoisted_5$7, [
+                  createBaseVNode("div", _hoisted_4$b, [
+                    createBaseVNode("div", _hoisted_5$8, [
                       createBaseVNode("h1", _hoisted_6$7, toDisplayString($setup.userObject.username), 1 /* TEXT */)
                     ]),
                     createBaseVNode("div", _hoisted_7$5, [
@@ -19679,10 +19693,10 @@
       ]))
     }
 
-    script$e.render = render$e;
-    script$e.__file = "src/views/UserProfile.vue";
+    script$f.render = render$f;
+    script$f.__file = "src/views/UserProfile.vue";
 
-    var script$d = {
+    var script$e = {
     	name: 'FormForgotPassword',
 
     	setup(_, {emit}) {
@@ -19725,30 +19739,30 @@
     	}
     };
 
-    const _hoisted_1$c = { key: 0 };
-    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$d = { key: 0 };
+    const _hoisted_2$b = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "The email you used to register", -1 /* HOISTED */);
-    const _hoisted_3$a = ["disabled"];
-    const _hoisted_4$9 = { class: "mt-label" };
-    const _hoisted_5$6 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
+    const _hoisted_3$b = ["disabled"];
+    const _hoisted_4$a = { class: "mt-label" };
+    const _hoisted_5$7 = /*#__PURE__*/createTextVNode(" Suddenly remember? ");
     const _hoisted_6$6 = /*#__PURE__*/createTextVNode("Log in");
 
-    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
       const _component_router_link = resolveComponent("router-link");
 
       return ($setup.form)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$c, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$d, [
             createVNode(_component_VForm, {
               onSubmit: $setup.onSubmit,
               class: "vstack gap-2"
             }, {
               default: withCtx(({ errors }) => [
-                _hoisted_2$a,
+                _hoisted_2$b,
                 createBaseVNode("div", {
                   class: normalizeClass(["input-group", { "has-validation": errors.email }])
                 }, [
@@ -19767,7 +19781,7 @@
                     type: "submit",
                     disabled: $setup.sending,
                     class: "btn btn-primary gradient"
-                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_3$a),
+                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_3$b),
                   createVNode(_component_ErrorMessage, {
                     name: "email",
                     class: "invalid-feedback shake"
@@ -19776,8 +19790,8 @@
               ]),
               _: 1 /* STABLE */
             }, 8 /* PROPS */, ["onSubmit"]),
-            createBaseVNode("div", _hoisted_4$9, [
-              _hoisted_5$6,
+            createBaseVNode("div", _hoisted_4$a, [
+              _hoisted_5$7,
               createVNode(_component_router_link, { to: { name: "login" } }, {
                 default: withCtx(() => [
                   _hoisted_6$6
@@ -19789,10 +19803,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$d.render = render$d;
-    script$d.__file = "src/forms/FormForgotPassword.vue";
+    script$e.render = render$e;
+    script$e.__file = "src/forms/FormForgotPassword.vue";
 
-    var script$c = {
+    var script$d = {
     	name: 'ForgotPassword',
     	setup() {
     		const modal = inject('modal');
@@ -19802,7 +19816,7 @@
     		onMounted(async() => {
     			requested = await modal({
     				title: 'Request a password reset',
-    				component: script$d,
+    				component: script$e,
     				backdrop: 'static',
     			});
     		});
@@ -19814,35 +19828,35 @@
     	},
     };
 
-    const _hoisted_1$b = {
+    const _hoisted_1$c = {
       key: 0,
       class: "container mt-5"
     };
-    const _hoisted_2$9 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_2$a = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Password reset requested")
     ], -1 /* HOISTED */);
-    const _hoisted_3$9 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
+    const _hoisted_3$a = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
       /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Password reset requested successfully, check your email.")
     ], -1 /* HOISTED */);
-    const _hoisted_4$8 = [
-      _hoisted_2$9,
-      _hoisted_3$9
+    const _hoisted_4$9 = [
+      _hoisted_2$a,
+      _hoisted_3$a
     ];
 
-    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$d(_ctx, _cache, $props, $setup, $data, $options) {
       return ($setup.requested)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$b, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$c, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", $setup.colorScheme.card])
-            }, _hoisted_4$8, 2 /* CLASS */)
+            }, _hoisted_4$9, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
     }
 
-    script$c.render = render$c;
-    script$c.__file = "src/views/ForgotPassword.vue";
+    script$d.render = render$d;
+    script$d.__file = "src/views/ForgotPassword.vue";
 
-    var script$b = {
+    var script$c = {
     	name: 'FormRegister',
     	setup(_, {emit}) {
     		const store = inject('store');
@@ -19891,17 +19905,17 @@
     	},
     };
 
-    const _hoisted_1$a = { key: 0 };
-    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$b = { key: 0 };
+    const _hoisted_2$9 = /*#__PURE__*/createBaseVNode("label", {
       for: "email",
       class: "form-label"
     }, "Email", -1 /* HOISTED */);
-    const _hoisted_3$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_3$9 = /*#__PURE__*/createBaseVNode("label", {
       for: "username",
       class: "form-label"
     }, "Username", -1 /* HOISTED */);
-    const _hoisted_4$7 = { key: 0 };
-    const _hoisted_5$5 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_4$8 = { key: 0 };
+    const _hoisted_5$6 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_plain",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
@@ -19916,21 +19930,21 @@
     const _hoisted_11$2 = /*#__PURE__*/createTextVNode("Already a user? ");
     const _hoisted_12$1 = /*#__PURE__*/createTextVNode("Log in");
 
-    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$c(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_router_link = resolveComponent("router-link");
       const _component_VForm = resolveComponent("VForm");
 
       return ($setup.form)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$a, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$b, [
             createVNode(_component_VForm, {
               onSubmit: $setup.onSubmit,
               class: "vstack gap-2"
             }, {
               default: withCtx(({ errors }) => [
                 createBaseVNode("div", null, [
-                  _hoisted_2$8,
+                  _hoisted_2$9,
                   createVNode(_component_VField, {
                     modelValue: $setup.form.email,
                     "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.email) = $event)),
@@ -19948,7 +19962,7 @@
                   })
                 ]),
                 createBaseVNode("div", null, [
-                  _hoisted_3$8,
+                  _hoisted_3$9,
                   createVNode(_component_VField, {
                     modelValue: $setup.form.username,
                     "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.username) = $event)),
@@ -19966,8 +19980,8 @@
                   })
                 ]),
                 (!_ctx.isAdmin)
-                  ? (openBlock(), createElementBlock("div", _hoisted_4$7, [
-                      _hoisted_5$5,
+                  ? (openBlock(), createElementBlock("div", _hoisted_4$8, [
+                      _hoisted_5$6,
                       createVNode(_component_VField, {
                         modelValue: $setup.form.password_plain,
                         "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.password_plain) = $event)),
@@ -20028,10 +20042,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$b.render = render$b;
-    script$b.__file = "src/forms/FormRegister.vue";
+    script$c.render = render$c;
+    script$c.__file = "src/forms/FormRegister.vue";
 
-    var script$a = {
+    var script$b = {
     	name: 'Register',
     	setup() {
     		const modal = inject('modal');
@@ -20041,7 +20055,7 @@
     		onMounted(async() => {
     			registered.value = await modal({
     				title: 'Sign up',
-    				component: script$b,
+    				component: script$c,
     				backdrop: 'static',
     			});
     		});
@@ -20053,35 +20067,35 @@
     	},
     };
 
-    const _hoisted_1$9 = {
+    const _hoisted_1$a = {
       key: 0,
       class: "container mt-5"
     };
-    const _hoisted_2$7 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_2$8 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Invitation sent")
     ], -1 /* HOISTED */);
-    const _hoisted_3$7 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
+    const _hoisted_3$8 = /*#__PURE__*/createBaseVNode("div", { class: "card-body" }, [
       /*#__PURE__*/createBaseVNode("p", { class: "mb-0" }, "Please check your email and follow the confirmation link to activate your account.")
     ], -1 /* HOISTED */);
-    const _hoisted_4$6 = [
-      _hoisted_2$7,
-      _hoisted_3$7
+    const _hoisted_4$7 = [
+      _hoisted_2$8,
+      _hoisted_3$8
     ];
 
-    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$b(_ctx, _cache, $props, $setup, $data, $options) {
       return ($setup.registered)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$9, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$a, [
             createBaseVNode("div", {
               class: normalizeClass(["card shadow", $setup.colorScheme.card])
-            }, _hoisted_4$6, 2 /* CLASS */)
+            }, _hoisted_4$7, 2 /* CLASS */)
           ]))
         : createCommentVNode("v-if", true)
     }
 
-    script$a.render = render$a;
-    script$a.__file = "src/views/Register.vue";
+    script$b.render = render$b;
+    script$b.__file = "src/views/Register.vue";
 
-    var script$9 = {
+    var script$a = {
     	name: 'FormResetPassword',
 
     	props: {
@@ -20146,18 +20160,18 @@
     	},
     };
 
-    const _hoisted_1$8 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$9 = /*#__PURE__*/createBaseVNode("label", {
       for: "password",
       class: "form-label"
     }, "Password", -1 /* HOISTED */);
-    const _hoisted_2$6 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_2$7 = /*#__PURE__*/createBaseVNode("label", {
       for: "password_confirmation",
       class: "form-label"
     }, "Repeat password", -1 /* HOISTED */);
-    const _hoisted_3$6 = { class: "mt-label" };
-    const _hoisted_4$5 = ["disabled"];
+    const _hoisted_3$7 = { class: "mt-label" };
+    const _hoisted_4$6 = ["disabled"];
 
-    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$a(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
@@ -20170,7 +20184,7 @@
           }, {
             default: withCtx(({ errors }) => [
               createBaseVNode("div", null, [
-                _hoisted_1$8,
+                _hoisted_1$9,
                 createVNode(_component_VField, {
                   modelValue: $setup.form.password,
                   "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.password) = $event)),
@@ -20188,7 +20202,7 @@
                 })
               ]),
               createBaseVNode("div", null, [
-                _hoisted_2$6,
+                _hoisted_2$7,
                 createVNode(_component_VField, {
                   rules: "confirmed:@password",
                   type: "password",
@@ -20203,12 +20217,12 @@
                   class: "invalid-feedback shake"
                 })
               ]),
-              createBaseVNode("div", _hoisted_3$6, [
+              createBaseVNode("div", _hoisted_3$7, [
                 createBaseVNode("button", {
                   type: "submit",
                   disabled: $setup.sending,
                   class: "btn btn-primary gradient float-end"
-                }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$5)
+                }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_4$6)
               ])
             ]),
             _: 1 /* STABLE */
@@ -20216,10 +20230,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$9.render = render$9;
-    script$9.__file = "src/forms/FormResetPassword.vue";
+    script$a.render = render$a;
+    script$a.__file = "src/forms/FormResetPassword.vue";
 
-    var script$8 = {
+    var script$9 = {
     	name: 'Confirm',
     	setup() {
     		const modal = inject('modal');
@@ -20241,7 +20255,7 @@
     		async function resetPassword(data) {
     			await modal({
     				title: 'Enter new password',
-    				component: script$9,
+    				component: script$a,
     				props: data,
     				backdrop: 'static',
     			});
@@ -20284,29 +20298,29 @@
     	}
     };
 
-    const _hoisted_1$7 = {
+    const _hoisted_1$8 = {
       key: 0,
       class: "container mt-5"
     };
-    const _hoisted_2$5 = { class: "card shadow" };
-    const _hoisted_3$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_2$6 = { class: "card shadow" };
+    const _hoisted_3$6 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Account confirmed")
     ], -1 /* HOISTED */);
-    const _hoisted_4$4 = { class: "card-body" };
-    const _hoisted_5$4 = { class: "mb-0" };
+    const _hoisted_4$5 = { class: "card-body" };
+    const _hoisted_5$5 = { class: "mb-0" };
     const _hoisted_6$4 = /*#__PURE__*/createTextVNode("Your account has been confirmed. You can now ");
     const _hoisted_7$3 = /*#__PURE__*/createTextVNode("log in");
     const _hoisted_8$3 = /*#__PURE__*/createTextVNode(".");
 
-    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_router_link = resolveComponent("router-link");
 
       return (_ctx.confirmed)
-        ? (openBlock(), createElementBlock("div", _hoisted_1$7, [
-            createBaseVNode("div", _hoisted_2$5, [
-              _hoisted_3$5,
-              createBaseVNode("div", _hoisted_4$4, [
-                createBaseVNode("p", _hoisted_5$4, [
+        ? (openBlock(), createElementBlock("div", _hoisted_1$8, [
+            createBaseVNode("div", _hoisted_2$6, [
+              _hoisted_3$6,
+              createBaseVNode("div", _hoisted_4$5, [
+                createBaseVNode("p", _hoisted_5$5, [
                   _hoisted_6$4,
                   createVNode(_component_router_link, { to: { name: "login" } }, {
                     default: withCtx(() => [
@@ -20322,10 +20336,10 @@
         : createCommentVNode("v-if", true)
     }
 
-    script$8.render = render$8;
-    script$8.__file = "src/views/Confirm.vue";
+    script$9.render = render$9;
+    script$9.__file = "src/views/Confirm.vue";
 
-    var script$7 = {
+    var script$8 = {
     	name: 'HKIbook',
     	setup() {
     		const store = inject('store');
@@ -20337,24 +20351,24 @@
     	},
     };
 
-    const _hoisted_1$6 = { class: "container" };
-    const _hoisted_2$4 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
+    const _hoisted_1$7 = { class: "container" };
+    const _hoisted_2$5 = /*#__PURE__*/createBaseVNode("div", { class: "card-header" }, [
       /*#__PURE__*/createBaseVNode("h1", { class: "h3 mb-0" }, "Odd jobs")
     ], -1 /* HOISTED */);
-    const _hoisted_3$4 = [
-      _hoisted_2$4
+    const _hoisted_3$5 = [
+      _hoisted_2$5
     ];
 
-    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
-      return (openBlock(), createElementBlock("div", _hoisted_1$6, [
+    function render$8(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$7, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", $setup.colorScheme.card])
-        }, _hoisted_3$4, 2 /* CLASS */)
+        }, _hoisted_3$5, 2 /* CLASS */)
       ]))
     }
 
-    script$7.render = render$7;
-    script$7.__file = "src/views/HKIbook.vue";
+    script$8.render = render$8;
+    script$8.__file = "src/views/HKIbook.vue";
 
     /**
      * marked - a markdown parser
@@ -23049,7 +23063,7 @@
     Parser.parse;
     Lexer.lex;
 
-    var script$6 = {
+    var script$7 = {
     	name: 'Editor',
     	props: {
     		id: {
@@ -23116,14 +23130,14 @@
     	},
     };
 
-    const _hoisted_1$5 = { class: "container" };
-    const _hoisted_2$3 = { class: "card-header" };
-    const _hoisted_3$3 = { class: "h3 mb-0" };
-    const _hoisted_4$3 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_1$6 = { class: "container" };
+    const _hoisted_2$4 = { class: "card-header" };
+    const _hoisted_3$4 = { class: "h3 mb-0" };
+    const _hoisted_4$4 = /*#__PURE__*/createBaseVNode("label", {
       for: "title",
       class: "form-label"
     }, "Title", -1 /* HOISTED */);
-    const _hoisted_5$3 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_5$4 = /*#__PURE__*/createBaseVNode("label", {
       for: "ingress",
       class: "form-label"
     }, "Ingress", -1 /* HOISTED */);
@@ -23141,17 +23155,17 @@
     const _hoisted_10$1 = ["disabled"];
     const _hoisted_11$1 = ["innerHTML"];
 
-    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
+    function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
       const _component_ErrorMessage = resolveComponent("ErrorMessage");
       const _component_VForm = resolveComponent("VForm");
 
-      return (openBlock(), createElementBlock("div", _hoisted_1$5, [
+      return (openBlock(), createElementBlock("div", _hoisted_1$6, [
         createBaseVNode("div", {
           class: normalizeClass(["card shadow", $setup.colorScheme.card])
         }, [
-          createBaseVNode("div", _hoisted_2$3, [
-            createBaseVNode("h1", _hoisted_3$3, toDisplayString($setup.form.title), 1 /* TEXT */)
+          createBaseVNode("div", _hoisted_2$4, [
+            createBaseVNode("h1", _hoisted_3$4, toDisplayString($setup.form.title), 1 /* TEXT */)
           ])
         ], 2 /* CLASS */),
         createVNode(_component_VForm, {
@@ -23160,7 +23174,7 @@
         }, {
           default: withCtx(({ errors }) => [
             createBaseVNode("div", null, [
-              _hoisted_4$3,
+              _hoisted_4$4,
               createVNode(_component_VField, {
                 modelValue: $setup.form.title,
                 "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.title) = $event)),
@@ -23178,7 +23192,7 @@
               })
             ]),
             createBaseVNode("div", null, [
-              _hoisted_5$3,
+              _hoisted_5$4,
               createVNode(_component_VField, {
                 modelValue: $setup.form.ingress,
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.ingress) = $event)),
@@ -23251,8 +23265,47 @@
       ]))
     }
 
+    script$7.render = render$7;
+    script$7.__file = "src/views/Editor.vue";
+
+    var script$6 = {
+    		name: 'Error',
+
+    		props: {
+    			title: {
+    				type: String,
+    				default: 'Page not found',
+    			},
+    			message: {
+    				type: String,
+    				default: 'Try the navigation',
+    			},
+    		},
+    	};
+
+    const _hoisted_1$5 = { class: "container mt-5" };
+    const _hoisted_2$3 = { class: "card-header" };
+    const _hoisted_3$3 = { class: "h3 mb-0" };
+    const _hoisted_4$3 = { class: "card-body" };
+    const _hoisted_5$3 = { class: "mb-0" };
+
+    function render$6(_ctx, _cache, $props, $setup, $data, $options) {
+      return (openBlock(), createElementBlock("div", _hoisted_1$5, [
+        createBaseVNode("div", {
+          class: normalizeClass(["card shadow", _ctx.$colorScheme.card])
+        }, [
+          createBaseVNode("div", _hoisted_2$3, [
+            createBaseVNode("h1", _hoisted_3$3, toDisplayString($props.title), 1 /* TEXT */)
+          ]),
+          createBaseVNode("div", _hoisted_4$3, [
+            createBaseVNode("p", _hoisted_5$3, toDisplayString($props.message), 1 /* TEXT */)
+          ])
+        ], 2 /* CLASS */)
+      ]))
+    }
+
     script$6.render = render$6;
-    script$6.__file = "src/views/Editor.vue";
+    script$6.__file = "src/views/Error.vue";
 
     var script$5 = {
     	name: 'Home',
@@ -23318,20 +23371,20 @@
     const router$1 = createRouter({
     	routes: [
     		{ path: '/', name: 'home', redirect: () => ({ name: store.state.loggeduser && store.state.loggeduser.isadmin ? 'admin-home' : 'user-home' }) },
-    		{ path: '/app/confirm', component: script$8, name: 'confirm' },
-    		{ path: '/app/forgotpassword', component: script$c, name: 'forgot-password' },
-    		{ path: '/app/register', component: script$a, name: 'register' },
-    		{ path: '/app/user', component: script$h, name: 'user-home', beforeEnter: [needLogin] },
+    		{ path: '/app/confirm', component: script$9, name: 'confirm' },
+    		{ path: '/app/forgotpassword', component: script$d, name: 'forgot-password' },
+    		{ path: '/app/register', component: script$b, name: 'register' },
+    		{ path: '/app/user', component: script$i, name: 'user-home', beforeEnter: [needLogin] },
     		{ path: '/', name: 'home', redirect: () => ({name: 'page-home'}) },
     		{ path: '/app/', component: script$5, name: 'page-home' },
-    		{ path: '/app/login', component: script$i, name: 'login' },
-    		{ path: '/app/hkibook', component: script$7, name: 'hkibook' },
-    		{ path: '/app/editor', component: script$6, name: 'editor', beforeEnter: [needLogin, needAdmin] },
-    		{ path: '/app/user/:id', component: script$e, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
+    		{ path: '/app/login', component: script$j, name: 'login' },
+    		{ path: '/app/hkibook', component: script$8, name: 'hkibook' },
+    		{ path: '/app/editor', component: script$7, name: 'editor', beforeEnter: [needLogin, needAdmin] },
+    		{ path: '/app/user/:id', component: script$f, name: 'user', beforeEnter: [needLogin, needAdminOrSelf] },
     		//{ path: '/app/admin', component: Admin, beforeEnter: [needLogin, needAdmin], children: [
     		//	{ path: 'projects', component: AdminProjects, name: 'admin-projects' },
     		//] },
-    		{ path: '/:pathMatch(.*)*', component: Error, name: 'error', props: true },
+    		{ path: '/:pathMatch(.*)*', component: script$6, name: 'error', props: true },
     	],
     	history: createWebHistory(),
     	linkActiveClass: 'active',

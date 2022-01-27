@@ -9,6 +9,7 @@ import Register from '@views/Register.vue'
 import Confirm from '@views/Confirm.vue'
 import HKIbook from '@views/HKIbook.vue'
 import Editor from '@views/Editor.vue'
+import Error from '@views/Error.vue'
 
 import Home from './views/Home.vue'
 

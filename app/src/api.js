@@ -207,6 +207,7 @@ export const api = {
 			out: () => request({ url: '/api/auth', method: 'DELETE' }),
 		},
 	},
+	/*
 	characters: {
 		get: async (data = {}) => {
 			const characters = await getArray('/api/users/{id}/characters')(data)
@@ -221,6 +222,19 @@ export const api = {
 
 		save: save('/api/characters/{id}'),
 		delete: remove('/api/characters/{id}'),
+	},
+	*/
+	tags: {
+		get: async (data = {}) => {
+			return await getArray('/api/tags')(data)
+		},
+
+		save: save({
+			create: '/api/tags',
+			update: '/api/tags/{id}',
+		}),
+
+		delete: remove('/api/tags/{id}'),
 	},
 }
 

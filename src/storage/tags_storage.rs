@@ -3,65 +3,45 @@ use diesel::prelude::*;
 use diesel::result::Error::NotFound;
 use diesel::PgConnection;
 
-use crate::models::articles::Article;
+use crate::models::tags::Tag;
 use crate::models::users::Pool;
 use diesel::result::Error;
 
-pub fn create_article(
-	q_user_id: uuid::Uuid,
-	q_name: String,
-	q_description: String,
+pub fn query_tags(
+	pool: &web::Data<Pool>,
+) -> Result<Vec<Tag>, Error> {
+	use crate::schema::tags::dsl::{tags};
+	let conn: &PgConnection = &pool.get().unwrap();
+
+	let tags_res = tags
+		.load::<Tag>(conn)?;
+
+	Ok(tags_res)
+}
+
+pub fn create_tag(
+	q_title: String,
 	q_email: String,
 	pool: &web::Data<Pool>,
-) -> Result<article, Error> {
-	use crate::schema::articles::dsl::articles;
+) -> Result<Tag, Error> {
+	use crate::schema::tags::dsl::tags;
 	let conn: &PgConnection = &pool.get().unwrap();
 
-	let new_article = article {
+	let new_tag = Tag {
 		id: uuid::Uuid::new_v4(),
-		user_id: q_user_id,
-		name: q_name,
-		description: q_description,
-		created_at: chrono::Local::now().naive_local(),
+		title: q_title,
 		updated_by: q_email,
+		created_at: chrono::Local::now().naive_local(),
 	};
 
-	let article = diesel::insert_into(articles)
-		.values(&new_article)
-		.get_result::<article>(conn)?;
+	let tag = diesel::insert_into(tags)
+		.values(&new_tag)
+		.get_result::<Tag>(conn)?;
 
-	Ok(article)
+	Ok(tag)
 }
 
-pub fn query_articles_by_article_uuid(
-	q_user_id: uuid::Uuid,
-	pool: &web::Data<Pool>,
-) -> Result<Vec<article>, Error> {
-	use crate::schema::articles::dsl::{user_id, articles};
-	let conn: &PgConnection = &pool.get().unwrap();
-
-	let articles_res = articles
-		.filter(user_id.eq(&q_user_id))
-		.load::<article>(conn)?;
-
-	Ok(articles_res)
-}
-
-pub fn query_articles_by_user_uuid(
-	q_user_id: uuid::Uuid,
-	pool: &web::Data<Pool>,
-) -> Result<Vec<article>, Error> {
-	use crate::schema::articles::dsl::{user_id, articles};
-	let conn: &PgConnection = &pool.get().unwrap();
-
-	let articles_res = articles
-		.filter(user_id.eq(&q_user_id))
-		.load::<article>(conn)?;
-
-	Ok(articles_res)
-}
-
-pub fn delete_article(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
+pub fn delete_tag(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
 	let conn: &PgConnection = &pool.get().unwrap();
 	use crate::schema::articles::dsl::*;
 
@@ -73,25 +53,23 @@ pub fn delete_article(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Er
 	Err(NotFound)
 }
 
-pub fn update_article(
-	q_uuid_path: uuid::Uuid,
-	q_name: String,
-	q_description: String,
+pub fn update_tag(
+	q_uuid: uuid::Uuid,
+	q_title: String,
 	q_email: String,
 	pool: &web::Data<Pool>,
-) -> Result<article, Error> {
-	use crate::schema::articles::dsl::*;
-	use crate::schema::articles::dsl::{id, updated_by};
+) -> Result<Tag, Error> {
+	use crate::schema::tags::dsl::*;
+	use crate::schema::tags::dsl::{id, updated_by};
 	let conn: &PgConnection = &pool.get().unwrap();
 
-	let user_article = diesel::update(articles)
-		.filter(id.eq(q_uuid_path))
+	let tag = diesel::update(tags)
+		.filter(id.eq(q_uuid))
 		.set((
-			name.eq(q_name),
-			description.eq(q_description),
+			title.eq(q_title),
 			updated_by.eq(q_email),
 		))
-		.get_result::<article>(conn)?;
+		.get_result::<Tag>(conn)?;
 
-	Ok(user_article)
+	Ok(tag)
 }

@@ -65,6 +65,23 @@ pub fn query_articles_by_user_uuid(
 	Ok(articles_res)
 }
 
+/*
+pub fn query_articles_by_tag_uuid(
+	q_tag_id: uuid::Uuid,
+	pool: &web::Data<Pool>,
+) -> Result<Vec<Article>, Error> {
+	use crate::schema::contenttags::dsl::{id, tag_id, contenttags};
+	use crate::schema::articles::dsl::{id as article_id, articles};
+	let conn: &PgConnection = &pool.get().unwrap();
+
+	let articles_res = articles
+		.filter(tag_id.eq(&q_tag_id))
+		.load::<Article>(conn)?;
+
+	Ok(articles_res)
+}
+*/
+
 pub fn delete_article(q_id: uuid::Uuid, pool: &web::Data<Pool>) -> Result<(), Error> {
 	let conn: &PgConnection = &pool.get().unwrap();
 	use crate::schema::articles::dsl::*;

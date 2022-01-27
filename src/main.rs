@@ -159,6 +159,23 @@ async fn main() -> std::io::Result<()> {
 							.route(web::put().to(handlers::article_handler::update_article))
 							.route(web::delete().to(handlers::article_handler::delete_article)),
 					)
+
+					// Tags
+
+					.service(
+						web::resource("/tags")
+							.route(web::get().to(handlers::tag_handler::get_tags))
+							.route(web::post().to(handlers::tag_handler::add_tag))
+					)
+					.service(
+						web::resource("/tags/{tag_id}")
+							//.route(web::get().to(handlers::tag_handler::get_articles_by_tag))
+							.route(web::put().to(handlers::tag_handler::update_tag))
+							.route(web::delete().to(handlers::tag_handler::delete_tag)),
+					)
+
+					// Auth
+
 					.service(
 						web::resource("/auth")
 							.route(web::post().to(handlers::auth_handler::login))
