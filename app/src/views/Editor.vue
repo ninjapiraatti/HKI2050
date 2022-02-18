@@ -70,6 +70,7 @@
 					</option>
 				</VField>
 			</div>
+			<TagTool></TagTool>
 			<div class='mt-label'>
 				<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
 			</div>
@@ -82,6 +83,7 @@
 <script>
 import { inject, ref, computed, onMounted, watch } from 'vue'
 import { marked } from 'marked'
+import TagTool from '@components/TagTool.vue'
 export default {
 	name: 'Editor',
 	props: {
@@ -101,6 +103,9 @@ export default {
 			type: String,
 			default: "Say your piece.",
 		},
+	},
+	components: {
+		TagTool,
 	},
 	setup(props, {emit}) {
 		const store = inject('store')
