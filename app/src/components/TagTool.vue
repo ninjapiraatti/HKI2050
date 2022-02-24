@@ -2,7 +2,7 @@
 	<div>
 		<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 			<div>
-				<label for='tag' class='form-label'>Tags</label>
+				<label for='tag' class='form-label'>Tags (comma separated)</label>
 				<VField
 					v-model="tagInput"
 					rules='required'
@@ -15,21 +15,24 @@
 					:class='{ "is-invalid": errors.tags }'
 				/>
 				<ErrorMessage name='tag' class='invalid-feedback shake' />
+			</div>	
+			<div>
 				<VField
 					v-if='matchedTags.length > 0'
 					v-model='matchedTags'
-					type='select'
-					id='taglist'
 					name='taglist'
+					as='select'
+					id='taglist'
 					class='form-select'
 					@change="onTagChange"
 				>
-					<option v-for="tag in matchedTags" :key="tag" :value="tag.id">
-						{{ tag.id }}
+					<option v-for="tag in matchedTags" :key="tag" :value="tag.title">
+						{{ tag.title }}
 					</option>
 				</VField>
 			</div>
 		</VForm>
+		{{ chosenTags }}
 	</div>
 </template>
 
@@ -53,6 +56,7 @@ export default {
 
 		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
 		let tags = ref([ ...props.contentTags])
+		let chosenTags = ref([])
 
 		onMounted(async () => {
 			getTags()
@@ -66,21 +70,28 @@ export default {
 		}
 
 		async function onTagChange(e) {
-			console.log(e.target.value)
-			tagInput.value = e.target.value
+			chosenTags.value.push(e.target.value)
 		}
 
 		const matchedTags = computed(() => {
+			if (tagInput.value.includes(',')) {
+				let tagTitle = tagInput.value.split(',')[0].trim()
+				console.log(chosenTags.value)
+				if (!chosenTags.value.includes(tagTitle)) {
+					chosenTags.value.push(tagTitle)
+				}
+				tagInput.value = ''
+				return []
+			}
 			if (tagInput.value.length > 1) {
-				console.log(tagInput.value)
-				console.log()
-				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()))
+				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
 			}
 			return []
 		})
 
 		return {
 			tags,
+			chosenTags,
 			matchedTags,
 			getTags,
 			onTagChange,

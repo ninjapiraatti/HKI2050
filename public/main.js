@@ -23080,6 +23080,7 @@
 
     		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
     		let tags = ref([ ...props.contentTags]);
+    		let chosenTags = ref([]);
 
     		onMounted(async () => {
     			getTags();
@@ -23093,21 +23094,28 @@
     		}
 
     		async function onTagChange(e) {
-    			console.log(e.target.value);
-    			tagInput.value = e.target.value;
+    			chosenTags.value.push(e.target.value);
     		}
 
     		const matchedTags = computed(() => {
+    			if (tagInput.value.includes(',')) {
+    				let tagTitle = tagInput.value.split(',')[0].trim();
+    				console.log(chosenTags.value);
+    				if (!chosenTags.value.includes(tagTitle)) {
+    					chosenTags.value.push(tagTitle);
+    				}
+    				tagInput.value = '';
+    				return []
+    			}
     			if (tagInput.value.length > 1) {
-    				console.log(tagInput.value);
-    				console.log();
-    				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()))
+    				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
     			}
     			return []
     		});
 
     		return {
     			tags,
+    			chosenTags,
     			matchedTags,
     			getTags,
     			onTagChange,
@@ -23119,7 +23127,7 @@
     const _hoisted_1$7 = /*#__PURE__*/createBaseVNode("label", {
       for: "tag",
       class: "form-label"
-    }, "Tags", -1 /* HOISTED */);
+    }, "Tags (comma separated)", -1 /* HOISTED */);
     const _hoisted_2$5 = ["value"];
 
     function render$8(_ctx, _cache, $props, $setup, $data, $options) {
@@ -23149,15 +23157,17 @@
               createVNode(_component_ErrorMessage, {
                 name: "tag",
                 class: "invalid-feedback shake"
-              }),
+              })
+            ]),
+            createBaseVNode("div", null, [
               ($setup.matchedTags.length > 0)
                 ? (openBlock(), createBlock(_component_VField, {
                     key: 0,
                     modelValue: $setup.matchedTags,
                     "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.matchedTags) = $event)),
-                    type: "select",
-                    id: "taglist",
                     name: "taglist",
+                    as: "select",
+                    id: "taglist",
                     class: "form-select",
                     onChange: $setup.onTagChange
                   }, {
@@ -23165,8 +23175,8 @@
                       (openBlock(true), createElementBlock(Fragment, null, renderList($setup.matchedTags, (tag) => {
                         return (openBlock(), createElementBlock("option", {
                           key: tag,
-                          value: tag.id
-                        }, toDisplayString(tag.id), 9 /* TEXT, PROPS */, _hoisted_2$5))
+                          value: tag.title
+                        }, toDisplayString(tag.title), 9 /* TEXT, PROPS */, _hoisted_2$5))
                       }), 128 /* KEYED_FRAGMENT */))
                     ]),
                     _: 1 /* STABLE */
@@ -23175,7 +23185,8 @@
             ])
           ]),
           _: 1 /* STABLE */
-        }, 8 /* PROPS */, ["onSubmit"])
+        }, 8 /* PROPS */, ["onSubmit"]),
+        createTextVNode(" " + toDisplayString($setup.chosenTags), 1 /* TEXT */)
       ]))
     }
 
