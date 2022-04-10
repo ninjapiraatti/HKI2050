@@ -55,12 +55,14 @@
 				<ErrorMessage name='body' class='invalid-feedback shake' />
 			</div>
 			<div>
+				<label for='author' class='form-label'>Author</label>
 				<VField
 					v-model="form.character_id"
 					rules='required'
 					as="select"
 					name="author"
 					class="form-select"
+					:class='{ "is-invalid": errors.author }'
 					id="character_id"
 					aria-label="Pick author character"
 				>
@@ -69,6 +71,7 @@
 						{{ character.name }}
 					</option>
 				</VField>
+				<ErrorMessage name='author' class='invalid-feedback shake' />
 			</div>
 			<TagTool></TagTool>
 			<div class='mt-label'>
@@ -120,6 +123,7 @@ export default {
 		})
 
 		async function onSubmit() {
+			console.log("lol")
 			sending = true
 			let article = await api.users.articles.save(form)
 			if (article) emit('success', article)
@@ -133,7 +137,7 @@ export default {
 		}
 
 		const submitLabel = computed(() => {
-			return sending ? 'Saving' : 'Save'
+			return sending ? 'Saving' : 'Saveee'
 		})
 
     const compiledMarkdown = computed(() => {

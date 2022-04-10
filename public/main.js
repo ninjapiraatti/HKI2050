@@ -19560,7 +19560,7 @@
       class: "bi-trash-fill",
       title: "Delete profile"
     }, null, -1 /* HOISTED */);
-    const _hoisted_12$2 = [
+    const _hoisted_12$3 = [
       _hoisted_11$3
     ];
     const _hoisted_13$1 = { class: "mt-4 mt-md-0 col-md-8" };
@@ -19632,7 +19632,7 @@
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
                           onClick: _cache[1] || (_cache[1] = $event => ($setup.confirmDelete('user', $setup.userObject)))
-                        }, _hoisted_12$2)
+                        }, _hoisted_12$3)
                       ])
                     ])
                   ])
@@ -19928,7 +19928,7 @@
     const _hoisted_9$2 = ["disabled"];
     const _hoisted_10$2 = { key: 0 };
     const _hoisted_11$2 = /*#__PURE__*/createTextVNode("Already a user? ");
-    const _hoisted_12$1 = /*#__PURE__*/createTextVNode("Log in");
+    const _hoisted_12$2 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$d(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -20028,7 +20028,7 @@
                         _hoisted_11$2,
                         createVNode(_component_router_link, { to: { name: "login" } }, {
                           default: withCtx(() => [
-                            _hoisted_12$1
+                            _hoisted_12$2
                           ]),
                           _: 1 /* STABLE */
                         })
@@ -23229,6 +23229,7 @@
     		});
 
     		async function onSubmit() {
+    			console.log("lol");
     			sending = true;
     			let article = await api.users.articles.save(form);
     			if (article) emit('success', article);
@@ -23242,7 +23243,7 @@
     		}
 
     		const submitLabel = computed(() => {
-    			return sending ? 'Saving' : 'Save'
+    			return sending ? 'Saving' : 'Saveee'
     		});
 
         const compiledMarkdown = computed(() => {
@@ -23278,15 +23279,19 @@
       for: "body",
       class: "form-label"
     }, "Content", -1 /* HOISTED */);
-    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("option", {
+    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("label", {
+      for: "author",
+      class: "form-label"
+    }, "Author", -1 /* HOISTED */);
+    const _hoisted_8$2 = /*#__PURE__*/createBaseVNode("option", {
       value: null,
       disabled: "",
       selected: ""
     }, "Pick author character", -1 /* HOISTED */);
-    const _hoisted_8$2 = ["value"];
-    const _hoisted_9$1 = { class: "mt-label" };
-    const _hoisted_10$1 = ["disabled"];
-    const _hoisted_11$1 = ["innerHTML"];
+    const _hoisted_9$1 = ["value"];
+    const _hoisted_10$1 = { class: "mt-label" };
+    const _hoisted_11$1 = ["disabled"];
+    const _hoisted_12$1 = ["innerHTML"];
 
     function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -23363,40 +23368,45 @@
               })
             ]),
             createBaseVNode("div", null, [
+              _hoisted_7$2,
               createVNode(_component_VField, {
                 modelValue: $setup.form.character_id,
                 "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($setup.form.character_id) = $event)),
                 rules: "required",
                 as: "select",
                 name: "author",
-                class: "form-select",
+                class: normalizeClass(["form-select", { "is-invalid": errors.author }]),
                 id: "character_id",
                 "aria-label": "Pick author character"
               }, {
                 default: withCtx(() => [
-                  _hoisted_7$2,
+                  _hoisted_8$2,
                   (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
                     return (openBlock(), createElementBlock("option", {
                       key: character,
                       value: character.id
-                    }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_8$2))
+                    }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_9$1))
                   }), 128 /* KEYED_FRAGMENT */))
                 ]),
-                _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["modelValue"])
+                _: 2 /* DYNAMIC */
+              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["modelValue", "class"]),
+              createVNode(_component_ErrorMessage, {
+                name: "author",
+                class: "invalid-feedback shake"
+              })
             ]),
             createVNode(_component_TagTool),
-            createBaseVNode("div", _hoisted_9$1, [
+            createBaseVNode("div", _hoisted_10$1, [
               createBaseVNode("button", {
                 type: "submit",
                 disabled: $setup.sending,
                 class: "btn btn-primary gradient float-end"
-              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_10$1)
+              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_11$1)
             ])
           ]),
           _: 1 /* STABLE */
         }, 8 /* PROPS */, ["onSubmit"]),
-        createBaseVNode("div", { innerHTML: $setup.compiledMarkdown }, null, 8 /* PROPS */, _hoisted_11$1)
+        createBaseVNode("div", { innerHTML: $setup.compiledMarkdown }, null, 8 /* PROPS */, _hoisted_12$1)
       ]))
     }
 
