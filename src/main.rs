@@ -159,6 +159,10 @@ async fn main() -> std::io::Result<()> {
 							.route(web::put().to(handlers::article_handler::update_article))
 							.route(web::delete().to(handlers::article_handler::delete_article)),
 					)
+					.service(
+						web::resource("/articles")
+							.route(web::get().to(handlers::article_handler::get_articles)),
+					)
 
 					// Tags
 

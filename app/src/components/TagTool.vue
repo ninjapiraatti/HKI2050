@@ -32,7 +32,9 @@
 				</VField>
 			</div>
 		</VForm>
-		{{ chosenTags }}
+		<ul>
+			<li v-for="tag in chosenTags" :key="tag">{{ tag }}</li>
+		</ul>
 	</div>
 </template>
 

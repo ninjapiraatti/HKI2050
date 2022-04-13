@@ -60,6 +60,20 @@ pub async fn add_article(
 		},
 	}
 }
+pub async fn get_articles(
+	pool: web::Data<Pool>,
+) -> Result<HttpResponse, ServiceError> {
+	trace!("Getting articles");
+
+	let res = web::block(move || articles_storage::query_articles(&pool)).await;
+	match res {
+		Ok(articles) => Ok(HttpResponse::Ok().json(&articles)),
+		Err(err) => match err {
+			BlockingError::Error(service_error) => Err(service_error.into()),
+			BlockingError::Canceled => Err(ServiceError::InternalServerError),
+		},
+	}
+}
 
 pub async fn get_by_uuid(
 	article_data: web::Path<String>,

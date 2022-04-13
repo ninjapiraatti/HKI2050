@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import { inject, ref, computed, onMounted, watch } from 'vue'
+import { inject, ref, computed, onMounted, watch, reactive } from 'vue'
 import { marked } from 'marked'
 import TagTool from '@components/TagTool.vue'
 export default {
@@ -115,7 +115,7 @@ export default {
 		const api = inject('api')
 		const colorScheme = inject('colorScheme')
 		let sending = false
-		let form = ref({ ...props, user_id: store.state.loggeduser.id })
+		let form = reactive({ ...props, user_id: store.state.loggeduser.id })
 		let characters = ref([])
 
 		onMounted(async () => {
@@ -123,7 +123,6 @@ export default {
 		})
 
 		async function onSubmit() {
-			console.log("lol")
 			sending = true
 			let article = await api.users.articles.save(form)
 			if (article) emit('success', article)
@@ -137,12 +136,12 @@ export default {
 		}
 
 		const submitLabel = computed(() => {
-			return sending ? 'Saving' : 'Saveee'
+			return sending ? 'Saving' : 'Save'
 		})
 
-    const compiledMarkdown = computed(() => {
-      return marked(form.value.body, { sanitize: true })
-    })
+		const compiledMarkdown = computed(() => {
+			return marked(form.body, { sanitize: true })
+		})
 
 		return {
 			store,

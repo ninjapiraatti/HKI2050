@@ -207,23 +207,21 @@ export const api = {
 			out: () => request({ url: '/api/auth', method: 'DELETE' }),
 		},
 	},
-	/*
+
 	characters: {
 		get: async (data = {}) => {
-			const characters = await getArray('/api/users/{id}/characters')(data)
-
-			characters.forEach(reservation => {
-				if (reservation.begin_time) reservation.begin_time = new Date(reservation.begin_time)
-				if (reservation.end_time) reservation.end_time = new Date(reservation.end_time)
-			})
-
+			const characters = await getArray('/api/characters')(data)
 			return characters
 		},
-
-		save: save('/api/characters/{id}'),
-		delete: remove('/api/characters/{id}'),
 	},
-	*/
+
+	articles: {
+		get: async (data = {}) => {
+			const articles = await getArray('/api/articles')(data)
+			return articles
+		},
+	},
+
 	tags: {
 		get: async (data = {}) => {
 			return await getArray('/api/tags')(data)

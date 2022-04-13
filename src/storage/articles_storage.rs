@@ -37,6 +37,18 @@ pub fn create_article(
 	Ok(article)
 }
 
+pub fn query_articles(
+	pool: &web::Data<Pool>,
+) -> Result<Vec<Article>, Error> {
+	use crate::schema::articles::dsl::{articles};
+	let conn: &PgConnection = &pool.get().unwrap();
+
+	let articles_res = articles
+		.load::<Article>(conn)?;
+
+	Ok(articles_res)
+}
+
 pub fn query_articles_by_article_uuid(
 	q_user_id: uuid::Uuid,
 	pool: &web::Data<Pool>,
