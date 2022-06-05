@@ -22,7 +22,7 @@ export default {
 		provide('store', store)
 
 		onMounted(() => {
-			console.log(store)
+			//console.log(store)
 		})
 
 		return {

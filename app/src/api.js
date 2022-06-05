@@ -26,9 +26,9 @@ function debounce(func, timeout = 300) {
 }
 
 async function handleHttpStatus(response) {
-	console.log(store)
-	console.log(router)
-	console.log(response)
+	//console.log(store)
+	//console.log(router)
+	//console.log(response)
 	if (response.ok) return response
 
 	let errorMessage = response.statusText
@@ -39,7 +39,7 @@ async function handleHttpStatus(response) {
 		switch (error) {
 			default:
 				errorMessage = errorMessages[error] || splitPascalCase(error)
-				console.error(error)
+				//console.error(error)
 		}
 	}
 
@@ -217,7 +217,7 @@ export const api = {
 
 	articles: {
 		get: async (data = {}) => {
-			console.log(data)
+			//console.log(data)
 			if (!data.id) return getArray('/api/articles')()
 			return getObject('/api/articles/{id}')(data)
 		},
@@ -241,7 +241,7 @@ export default {
 	install: (app, { storeApi, routerApi, flashMessageApi }) => {
 		store = storeApi
 		router = routerApi
-		console.log(store)
+		//console.log(store)
 		app.provide('api', api)
 	},
 }
