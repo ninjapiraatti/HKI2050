@@ -50,14 +50,14 @@ pub fn query_articles(
 }
 
 pub fn query_articles_by_article_uuid(
-	q_user_id: uuid::Uuid,
+	q_article_id: uuid::Uuid,
 	pool: &web::Data<Pool>,
 ) -> Result<Vec<Article>, Error> {
-	use crate::schema::articles::dsl::{user_id, articles};
+	use crate::schema::articles::dsl::{id, articles};
 	let conn: &PgConnection = &pool.get().unwrap();
 
 	let articles_res = articles
-		.filter(user_id.eq(&q_user_id))
+		.filter(id.eq(&q_article_id))
 		.load::<Article>(conn)?;
 
 	Ok(articles_res)

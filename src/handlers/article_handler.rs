@@ -76,25 +76,26 @@ pub async fn get_articles(
 }
 
 pub async fn get_by_uuid(
-	article_data: web::Path<String>,
+	id: web::Path<String>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
 ) -> Result<HttpResponse, ServiceError> {
 	trace!(
-		"Adding a favorite project: article_data = {:#?} logged_user = {:#?}",
-		&article_data,
+		"Getting article: article_data = {:#?} logged_user = {:#?}",
+		&id,
 		&logged_user
 	);
 
 	let user_id = logged_user.id;
+	let article_id = uuid::Uuid::parse_str(&id.into_inner())?;
 
 	if logged_user.isadmin == false && logged_user.id != user_id {
 		return Err(ServiceError::AdminRequired);
 	}
 
-	let res = web::block(move || articles_storage::query_articles_by_article_uuid(user_id, &pool)).await;
+	let res = web::block(move || articles_storage::query_articles_by_article_uuid(article_id, &pool)).await;
 	match res {
-		Ok(project) => Ok(HttpResponse::Ok().json(&project)),
+		Ok(article) => Ok(HttpResponse::Ok().json(&article)),
 		Err(err) => match err {
 			BlockingError::Error(service_error) => Err(service_error.into()),
 			BlockingError::Canceled => Err(ServiceError::InternalServerError),
@@ -120,7 +121,7 @@ pub async fn get_by_user_uuid(
 
 	let res = web::block(move || articles_storage::query_articles_by_user_uuid(user_id, &pool)).await;
 	match res {
-		Ok(project) => Ok(HttpResponse::Ok().json(&project)),
+		Ok(article) => Ok(HttpResponse::Ok().json(&article)),
 		Err(err) => match err {
 			BlockingError::Error(service_error) => Err(service_error.into()),
 			BlockingError::Canceled => Err(ServiceError::InternalServerError),
@@ -135,7 +136,7 @@ pub async fn delete_article(
 	logged_user: LoggedUser,
 ) -> Result<HttpResponse, ServiceError> {
 	trace!(
-		"Delete a favorite project: article_data = {:#?} logged_user = {:#?}",
+		"Delete article: article_data = {:#?} logged_user = {:#?}",
 		&payload,
 		&logged_user
 	);

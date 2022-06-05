@@ -2,14 +2,14 @@
 	<div class="container">
 		<div class="card shadow" :class='colorScheme.card'>
 			<div class='card-header'>
-				<h1 class="h3 mb-0">{{ form.title }}</h1>
+				<h1 class="h3 mb-0">{{ title }}</h1>
 			</div>
 		</div>
 		<VForm @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 			<div>
 				<label for='title' class='form-label'>Title</label>
 				<VField
-					v-model='form.title'
+					v-model='title'
 					rules='required'
 					type='text'
 					id='title'
@@ -25,7 +25,7 @@
 			<div>
 				<label for='ingress' class='form-label'>Ingress</label>
 				<VField
-					v-model='form.ingress'
+					v-model='ingress'
 					rules='required'
 					type='text'
 					id='ingress'
@@ -41,7 +41,7 @@
 			<div>
 				<label for='body' class='form-label'>Content</label>
 				<VField
-					v-model='form.body'
+					v-model='body'
 					rules='required'
 					as='textarea'
 					rows='10'
@@ -57,7 +57,7 @@
 			<div>
 				<label for='author' class='form-label'>Author</label>
 				<VField
-					v-model="form.character_id"
+					v-model="character_id"
 					rules='required'
 					as="select"
 					name="author"
@@ -84,42 +84,36 @@
 </template>
 
 <script>
-import { inject, ref, computed, onMounted, watch, reactive } from 'vue'
+import { inject, ref, computed, onMounted, watch, reactive, toRefs } from 'vue'
 import { marked } from 'marked'
+import { useRoute } from 'vue-router'
 import TagTool from '@components/TagTool.vue'
 export default {
 	name: 'Editor',
-	props: {
-		id: {
-			type: String,
-			default: undefined,
-		},
-		title: {
-			type: String,
-			default: undefined,
-		},
-		ingress: {
-			type: String,
-			default: undefined,
-		},
-		body: {
-			type: String,
-			default: "Say your piece.",
-		},
-	},
 	components: {
 		TagTool,
 	},
-	setup(props, {emit}) {
+	setup(_, {emit}) {
 		const store = inject('store')
 		const api = inject('api')
+		const route = useRoute()
 		const colorScheme = inject('colorScheme')
 		let sending = false
-		let form = reactive({ ...props, user_id: store.state.loggeduser.id })
+		let form = reactive({
+			id: '',
+			character_id: '',
+			title: '',
+			ingress: '',
+			body: '',
+			user_id: store.state.loggeduser.id,
+		})
 		let characters = ref([])
 
 		onMounted(async () => {
 			getCharacters()
+			if (route.params.id) {
+				getArticle()
+			}
 		})
 
 		async function onSubmit() {
@@ -128,6 +122,15 @@ export default {
 			if (article) emit('success', article)
 
 			sending = false
+		}
+
+		async function getArticle() {
+			console.log(route.params.id)
+			let article = await api.articles.get({id: route.params.id})
+			if (article) {
+				form = article[0]
+			}
+			console.log(form.title)
 		}
 
 		async function getCharacters() {
@@ -147,10 +150,11 @@ export default {
 			store,
 			colorScheme,
 			sending,
-			form,
+			...toRefs(form),
 			submitLabel,
 			characters,
 			getCharacters,
+			getArticle,
 			onSubmit,
 			compiledMarkdown,
 		}

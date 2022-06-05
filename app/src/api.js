@@ -217,8 +217,9 @@ export const api = {
 
 	articles: {
 		get: async (data = {}) => {
-			const articles = await getArray('/api/articles')(data)
-			return articles
+			console.log(data)
+			if (!data.id) return getArray('/api/articles')()
+			return getObject('/api/articles/{id}')(data)
 		},
 	},
 

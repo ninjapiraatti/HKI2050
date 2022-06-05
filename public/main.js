@@ -8491,8 +8491,9 @@
 
     	articles: {
     		get: async (data = {}) => {
-    			const articles = await getArray('/api/articles')(data);
-    			return articles
+    			console.log(data);
+    			if (!data.id) return getArray('/api/articles')()
+    			return getObject('/api/articles/{id}')(data)
     		},
     	},
 
@@ -23228,37 +23229,30 @@
 
     var script$7 = {
     	name: 'Editor',
-    	props: {
-    		id: {
-    			type: String,
-    			default: undefined,
-    		},
-    		title: {
-    			type: String,
-    			default: undefined,
-    		},
-    		ingress: {
-    			type: String,
-    			default: undefined,
-    		},
-    		body: {
-    			type: String,
-    			default: "Say your piece.",
-    		},
-    	},
     	components: {
     		TagTool: script$8,
     	},
-    	setup(props, {emit}) {
+    	setup(_, {emit}) {
     		const store = inject('store');
     		const api = inject('api');
+    		const route = useRoute();
     		const colorScheme = inject('colorScheme');
     		let sending = false;
-    		let form = reactive({ ...props, user_id: store.state.loggeduser.id });
+    		let form = reactive({
+    			id: '',
+    			character_id: '',
+    			title: '',
+    			ingress: '',
+    			body: '',
+    			user_id: store.state.loggeduser.id,
+    		});
     		let characters = ref([]);
 
     		onMounted(async () => {
     			getCharacters();
+    			if (route.params.id) {
+    				getArticle();
+    			}
     		});
 
     		async function onSubmit() {
@@ -23267,6 +23261,15 @@
     			if (article) emit('success', article);
 
     			sending = false;
+    		}
+
+    		async function getArticle() {
+    			console.log(route.params.id);
+    			let article = await api.articles.get({id: route.params.id});
+    			if (article) {
+    				form = article[0];
+    			}
+    			console.log(form.title);
     		}
 
     		async function getCharacters() {
@@ -23286,10 +23289,11 @@
     			store,
     			colorScheme,
     			sending,
-    			form,
+    			...toRefs(form),
     			submitLabel,
     			characters,
     			getCharacters,
+    			getArticle,
     			onSubmit,
     			compiledMarkdown,
     		}
@@ -23336,7 +23340,7 @@
           class: normalizeClass(["card shadow", $setup.colorScheme.card])
         }, [
           createBaseVNode("div", _hoisted_2$4, [
-            createBaseVNode("h1", _hoisted_3$4, toDisplayString($setup.form.title), 1 /* TEXT */)
+            createBaseVNode("h1", _hoisted_3$4, toDisplayString(_ctx.title), 1 /* TEXT */)
           ])
         ], 2 /* CLASS */),
         createVNode(_component_VForm, {
@@ -23347,8 +23351,8 @@
             createBaseVNode("div", null, [
               _hoisted_4$4,
               createVNode(_component_VField, {
-                modelValue: $setup.form.title,
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.title) = $event)),
+                modelValue: _ctx.title,
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ((_ctx.title) = $event)),
                 rules: "required",
                 type: "text",
                 id: "title",
@@ -23365,8 +23369,8 @@
             createBaseVNode("div", null, [
               _hoisted_5$4,
               createVNode(_component_VField, {
-                modelValue: $setup.form.ingress,
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.ingress) = $event)),
+                modelValue: _ctx.ingress,
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ((_ctx.ingress) = $event)),
                 rules: "required",
                 type: "text",
                 id: "ingress",
@@ -23383,8 +23387,8 @@
             createBaseVNode("div", null, [
               _hoisted_6$3,
               createVNode(_component_VField, {
-                modelValue: $setup.form.body,
-                "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.body) = $event)),
+                modelValue: _ctx.body,
+                "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => ((_ctx.body) = $event)),
                 rules: "required",
                 as: "textarea",
                 rows: "10",
@@ -23402,8 +23406,8 @@
             createBaseVNode("div", null, [
               _hoisted_7$2,
               createVNode(_component_VField, {
-                modelValue: $setup.form.character_id,
-                "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($setup.form.character_id) = $event)),
+                modelValue: _ctx.character_id,
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => ((_ctx.character_id) = $event)),
                 rules: "required",
                 as: "select",
                 name: "author",
