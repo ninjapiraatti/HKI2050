@@ -19559,7 +19559,7 @@
       class: "bi-trash-fill",
       title: "Delete profile"
     }, null, -1 /* HOISTED */);
-    const _hoisted_12$2 = [
+    const _hoisted_12$3 = [
       _hoisted_11$3
     ];
     const _hoisted_13$1 = { class: "mt-4 mt-md-0 col-md-8" };
@@ -19631,7 +19631,7 @@
                         createBaseVNode("button", {
                           class: "btn btn-unstyled px-1 rounded",
                           onClick: _cache[1] || (_cache[1] = $event => ($setup.confirmDelete('user', $setup.userObject)))
-                        }, _hoisted_12$2)
+                        }, _hoisted_12$3)
                       ])
                     ])
                   ])
@@ -19927,7 +19927,7 @@
     const _hoisted_9$2 = ["disabled"];
     const _hoisted_10$2 = { key: 0 };
     const _hoisted_11$2 = /*#__PURE__*/createTextVNode("Already a user? ");
-    const _hoisted_12$1 = /*#__PURE__*/createTextVNode("Log in");
+    const _hoisted_12$2 = /*#__PURE__*/createTextVNode("Log in");
 
     function render$e(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -20027,7 +20027,7 @@
                         _hoisted_11$2,
                         createVNode(_component_router_link, { to: { name: "login" } }, {
                           default: withCtx(() => [
-                            _hoisted_12$1
+                            _hoisted_12$2
                           ]),
                           _: 1 /* STABLE */
                         })
@@ -23230,7 +23230,7 @@
     var script$8 = {
     	name: 'FormArticle',
     	props: {
-        /*
+    		/*
     		id: {
     			type: String,
     			default: undefined,
@@ -23254,12 +23254,11 @@
     		body: {
     			type: String,
     			default: undefined,
+    		},*/
+    		article: {
+    			type: Object,
+    			default: undefined,
     		},
-        */
-        article: {
-          type: Object,
-          default: undefined,
-        },
     	},
     	components: {
     		TagTool: script$9,
@@ -23271,15 +23270,13 @@
     		const colorScheme = inject('colorScheme');
     		let sending = false;
     		let form = reactive({
-    			id: '',
-    			character_id: '',
-    			title: '',
-    			ingress: '',
-    			body: '',
-    			user_id: store.state.loggeduser.id,
+    			id: props.article.id || '',
+    			character_id: props.article.character_id || '',
+    			title: props.article.title || '',
+    			ingress: props.article.ingress || '',
+    			body: props.article.body || '',
+    			//user_id: store.state.loggeduser.id,
     		});
-    		//let form2 = { ...props }
-        let form2 = { ...props.article };
     		let characters = ref([]);
 
     		async function onSubmit() {
@@ -23295,26 +23292,27 @@
     		});
 
     		const compiledMarkdown = computed(() => {
-          if (props.article.body) {
-            return marked(props.article.body, { sanitize: true })
-          }
+    			if (form.body) {
+    				return marked(form.body, { sanitize: true })
+    			}
     		});
 
-        onMounted(async () => {
-        });
+    		async function getCharacters() {
+    			characters.value = await api.users.characters.get({ user_id: store.state.loggeduser.id });
+    		}
 
-        watch(() => {
-          console.log(`article is: ` + props.article.title);
-        });
+    		onMounted(async () => {
+    			getCharacters();
+    		});
 
     		return {
     			store,
     			colorScheme,
     			sending,
-    			...toRefs(form),
-    			form2,
+    			form,
     			submitLabel,
     			characters,
+    			getCharacters,
     			onSubmit,
     			compiledMarkdown,
     		}
@@ -23335,19 +23333,20 @@
       for: "body",
       class: "form-label"
     }, "Content", -1 /* HOISTED */);
-    const _hoisted_6$3 = /*#__PURE__*/createBaseVNode("label", {
+    const _hoisted_6$3 = { key: 0 };
+    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("label", {
       for: "author",
       class: "form-label"
     }, "Author", -1 /* HOISTED */);
-    const _hoisted_7$2 = /*#__PURE__*/createBaseVNode("option", {
+    const _hoisted_8$2 = /*#__PURE__*/createBaseVNode("option", {
       value: null,
       disabled: "",
       selected: ""
     }, "Pick author character", -1 /* HOISTED */);
-    const _hoisted_8$2 = ["value"];
-    const _hoisted_9$1 = { class: "mt-label" };
-    const _hoisted_10$1 = ["disabled"];
-    const _hoisted_11$1 = ["innerHTML"];
+    const _hoisted_9$1 = ["value"];
+    const _hoisted_10$1 = { class: "mt-label" };
+    const _hoisted_11$1 = ["disabled"];
+    const _hoisted_12$1 = ["innerHTML"];
 
     function render$8(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_VField = resolveComponent("VField");
@@ -23359,108 +23358,113 @@
         class: normalizeClass(["card shadow", $setup.colorScheme.card])
       }, [
         createBaseVNode("div", _hoisted_1$7, [
-          createBaseVNode("h1", _hoisted_2$4, toDisplayString($props.article.title), 1 /* TEXT */)
+          createBaseVNode("h1", _hoisted_2$4, toDisplayString($setup.form.title), 1 /* TEXT */)
         ]),
-        createVNode(_component_VForm, {
-          onSubmit: $setup.onSubmit,
-          class: "vstack gap-2"
-        }, {
-          default: withCtx(({ errors }) => [
-            createBaseVNode("div", null, [
-              _hoisted_3$4,
-              createVNode(_component_VField, {
-                modelValue: $props.article.title,
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($props.article.title) = $event)),
-                rules: "required",
-                type: "text",
-                id: "title",
-                name: "title",
-                label: "Name",
-                "aria-label": "Name",
-                class: normalizeClass(["form-control", { "is-invalid": errors.title }])
-              }, null, 8 /* PROPS */, ["modelValue", "class"]),
-              createVNode(_component_ErrorMessage, {
-                name: "title",
-                class: "invalid-feedback shake"
-              })
-            ]),
-            createBaseVNode("div", null, [
-              _hoisted_4$4,
-              createVNode(_component_VField, {
-                modelValue: $props.article.ingress,
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($props.article.ingress) = $event)),
-                rules: "required",
-                type: "text",
-                id: "ingress",
-                name: "ingress",
-                label: "ingress",
-                "aria-label": "ingress",
-                class: normalizeClass(["form-control", { "is-invalid": errors.ingress }])
-              }, null, 8 /* PROPS */, ["modelValue", "class"]),
-              createVNode(_component_ErrorMessage, {
-                name: "ingress",
-                class: "invalid-feedback shake"
-              })
-            ]),
-            createBaseVNode("div", null, [
-              _hoisted_5$4,
-              createVNode(_component_VField, {
-                modelValue: $props.article.body,
-                "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($props.article.body) = $event)),
-                rules: "required",
-                as: "textarea",
-                rows: "10",
-                id: "body",
-                name: "body",
-                label: "body",
-                "aria-label": "body",
-                class: normalizeClass(["form-control", { "is-invalid": errors.body }])
-              }, null, 8 /* PROPS */, ["modelValue", "class"]),
-              createVNode(_component_ErrorMessage, {
-                name: "body",
-                class: "invalid-feedback shake"
-              })
-            ]),
-            createBaseVNode("div", null, [
-              _hoisted_6$3,
-              createVNode(_component_VField, {
-                modelValue: $props.article.character_id,
-                "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($props.article.character_id) = $event)),
-                rules: "required",
-                as: "select",
-                name: "author",
-                class: normalizeClass(["form-select", { "is-invalid": errors.author }]),
-                id: "character_id",
-                "aria-label": "Pick author character"
-              }, {
-                default: withCtx(() => [
-                  _hoisted_7$2,
-                  (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
-                    return (openBlock(), createElementBlock("option", {
-                      key: character,
-                      value: $props.article.character.id
-                    }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_8$2))
-                  }), 128 /* KEYED_FRAGMENT */))
+        ($setup.form.title)
+          ? (openBlock(), createBlock(_component_VForm, {
+              key: 0,
+              onSubmit: $setup.onSubmit,
+              class: "vstack gap-2"
+            }, {
+              default: withCtx(({ errors }) => [
+                createBaseVNode("div", null, [
+                  _hoisted_3$4,
+                  createVNode(_component_VField, {
+                    modelValue: $setup.form.title,
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => (($setup.form.title) = $event)),
+                    rules: "required",
+                    type: "text",
+                    id: "title",
+                    name: "title",
+                    label: "Name",
+                    "aria-label": "Name",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.title }])
+                  }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                  createVNode(_component_ErrorMessage, {
+                    name: "title",
+                    class: "invalid-feedback shake"
+                  })
                 ]),
-                _: 2 /* DYNAMIC */
-              }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["modelValue", "class"]),
-              createVNode(_component_ErrorMessage, {
-                name: "author",
-                class: "invalid-feedback shake"
-              })
-            ]),
-            createVNode(_component_TagTool),
-            createBaseVNode("div", _hoisted_9$1, [
-              createBaseVNode("button", {
-                type: "submit",
-                disabled: $setup.sending,
-                class: "btn btn-primary gradient float-end"
-              }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_10$1)
-            ])
-          ]),
-          _: 1 /* STABLE */
-        }, 8 /* PROPS */, ["onSubmit"]),
-        createBaseVNode("div", { innerHTML: $setup.compiledMarkdown }, null, 8 /* PROPS */, _hoisted_11$1)
+                createBaseVNode("div", null, [
+                  _hoisted_4$4,
+                  createVNode(_component_VField, {
+                    modelValue: $setup.form.ingress,
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => (($setup.form.ingress) = $event)),
+                    rules: "required",
+                    type: "text",
+                    id: "ingress",
+                    name: "ingress",
+                    label: "ingress",
+                    "aria-label": "ingress",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.ingress }])
+                  }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                  createVNode(_component_ErrorMessage, {
+                    name: "ingress",
+                    class: "invalid-feedback shake"
+                  })
+                ]),
+                createBaseVNode("div", null, [
+                  _hoisted_5$4,
+                  createVNode(_component_VField, {
+                    modelValue: $setup.form.body,
+                    "onUpdate:modelValue": _cache[2] || (_cache[2] = $event => (($setup.form.body) = $event)),
+                    rules: "required",
+                    as: "textarea",
+                    rows: "10",
+                    id: "body",
+                    name: "body",
+                    label: "body",
+                    "aria-label": "body",
+                    class: normalizeClass(["form-control", { "is-invalid": errors.body }])
+                  }, null, 8 /* PROPS */, ["modelValue", "class"]),
+                  createVNode(_component_ErrorMessage, {
+                    name: "body",
+                    class: "invalid-feedback shake"
+                  })
+                ]),
+                ($setup.characters && $setup.characters.length)
+                  ? (openBlock(), createElementBlock("div", _hoisted_6$3, [
+                      _hoisted_7$2,
+                      createVNode(_component_VField, {
+                        modelValue: $setup.form.character_id,
+                        "onUpdate:modelValue": _cache[3] || (_cache[3] = $event => (($setup.form.character_id) = $event)),
+                        rules: "required",
+                        as: "select",
+                        name: "author",
+                        class: normalizeClass(["form-select", { "is-invalid": errors.author }]),
+                        id: "character_id",
+                        "aria-label": "Pick author character"
+                      }, {
+                        default: withCtx(() => [
+                          _hoisted_8$2,
+                          (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
+                            return (openBlock(), createElementBlock("option", {
+                              key: character,
+                              value: character.id
+                            }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_9$1))
+                          }), 128 /* KEYED_FRAGMENT */))
+                        ]),
+                        _: 2 /* DYNAMIC */
+                      }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["modelValue", "class"]),
+                      createVNode(_component_ErrorMessage, {
+                        name: "author",
+                        class: "invalid-feedback shake"
+                      })
+                    ]))
+                  : createCommentVNode("v-if", true),
+                createVNode(_component_TagTool),
+                createBaseVNode("div", _hoisted_10$1, [
+                  createBaseVNode("button", {
+                    type: "submit",
+                    disabled: $setup.sending,
+                    class: "btn btn-primary gradient float-end"
+                  }, toDisplayString($setup.submitLabel), 9 /* TEXT, PROPS */, _hoisted_11$1)
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }, 8 /* PROPS */, ["onSubmit"]))
+          : createCommentVNode("v-if", true),
+        createBaseVNode("div", { innerHTML: $setup.compiledMarkdown }, null, 8 /* PROPS */, _hoisted_12$1)
       ], 2 /* CLASS */))
     }
 
@@ -23468,14 +23472,13 @@
     script$8.__file = "src/forms/FormArticle.vue";
 
     var script$7 = {
-        name: "Editor",
-        setup() {
+    		name: "Editor",
+    		setup() {
     			const api = inject('api');
     			const route = useRoute();
-    			const store = inject('store');
+    			inject('store');
 
     			let articleObject = ref({});
-    			let characters = ref([]);
 
     			async function getArticle() {
     				console.log(route.params.id);
@@ -23485,25 +23488,23 @@
     				}
     			}
 
-    			async function getCharacters() {
-    				characters.value = await api.users.characters.get({ user_id: store.state.loggeduser.id });
-    				console.log(characters.value);
-    			}
-
-          onMounted(async () => {
-    				getCharacters();
+    			onMounted(async () => {
     				if (route.params.id) {
     					getArticle();
     				}
     			});
 
+    			const articleProp = computed(() => {
+    				return articleObject.value
+    			});
+
     			return {
     				articleObject,
+    				articleProp,
     				getArticle,
-    				getCharacters,
     			};
-        },
-        components: { FormArticle: script$8 }
+    		},
+    		components: { FormArticle: script$8 }
     };
 
     const _hoisted_1$6 = {
@@ -23514,9 +23515,9 @@
     function render$7(_ctx, _cache, $props, $setup, $data, $options) {
       const _component_FormArticle = resolveComponent("FormArticle");
 
-      return ($setup.articleObject)
+      return ($setup.articleProp.user_id)
         ? (openBlock(), createElementBlock("div", _hoisted_1$6, [
-            createVNode(_component_FormArticle, { article: $setup.articleObject }, null, 8 /* PROPS */, ["article"])
+            createVNode(_component_FormArticle, { article: $setup.articleProp }, null, 8 /* PROPS */, ["article"])
           ]))
         : createCommentVNode("v-if", true)
     }

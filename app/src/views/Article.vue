@@ -1,22 +1,21 @@
 <template>
-	<div v-if="articleObject" class="container">
-		<FormArticle :article='articleObject' />
+	<div v-if="articleProp.user_id" class="container">
+		<FormArticle :article='articleProp' />
 	</div>
 </template>
 
 <script>
 import FormArticle from '@forms/FormArticle.vue'
 import { useRoute } from 'vue-router'
-import { inject, ref, onMounted } from 'vue'
+import { inject, ref, onMounted, computed } from 'vue'
 export default {
-    name: "Editor",
-    setup() {
+		name: "Editor",
+		setup() {
 			const api = inject('api')
 			const route = useRoute()
 			const store = inject('store')
 
 			let articleObject = ref({})
-			let characters = ref([])
 
 			async function getArticle() {
 				console.log(route.params.id)
@@ -26,24 +25,22 @@ export default {
 				}
 			}
 
-			async function getCharacters() {
-				characters.value = await api.users.characters.get({ user_id: store.state.loggeduser.id })
-				console.log(characters.value)
-			}
-
-      onMounted(async () => {
-				getCharacters()
+			onMounted(async () => {
 				if (route.params.id) {
 					getArticle()
 				}
 			})
 
+			const articleProp = computed(() => {
+				return articleObject.value
+			})
+
 			return {
 				articleObject,
+				articleProp,
 				getArticle,
-				getCharacters,
 			};
-    },
-    components: { FormArticle }
+		},
+		components: { FormArticle }
 }
 </script>
