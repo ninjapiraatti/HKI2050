@@ -28,6 +28,12 @@ export default {
 			onMounted(async () => {
 				if (route.params.id) {
 					getArticle()
+				} else {
+					articleObject.value = {
+						user_id: store.state.loggeduser.id,
+						title: "Fancy new article",
+					}
+					console.log(articleObject.value)
 				}
 			})
 

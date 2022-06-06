@@ -23476,7 +23476,7 @@
     		setup() {
     			const api = inject('api');
     			const route = useRoute();
-    			inject('store');
+    			const store = inject('store');
 
     			let articleObject = ref({});
 
@@ -23491,6 +23491,12 @@
     			onMounted(async () => {
     				if (route.params.id) {
     					getArticle();
+    				} else {
+    					articleObject.value = {
+    						user_id: store.state.loggeduser.id,
+    						title: "Fancy new article",
+    					};
+    					console.log(articleObject.value);
     				}
     			});
 
