@@ -138,12 +138,6 @@ async fn main() -> std::io::Result<()> {
 					.service(
 						web::resource("/characters/{character_id}")
 							.route(web::get().to(handlers::character_handler::get_by_character_uuid))
-							.route(web::post().to(handlers::character_handler::add_character)),		
-					)
-					.service(
-						web::resource("/characters/{character_id}")
-							.route(web::get().to(handlers::character_handler::get_by_character_uuid))
-							.route(web::post().to(handlers::character_handler::add_character)),
 					)
 
 					// Articles
@@ -154,10 +148,13 @@ async fn main() -> std::io::Result<()> {
 							.route(web::post().to(handlers::article_handler::add_article)),
 					)
 					.service(
-						web::resource("/articles/{article_id}")
-							.route(web::get().to(handlers::article_handler::get_by_uuid))
+						web::resource("/users/articles/{article_id}")
 							.route(web::put().to(handlers::article_handler::update_article))
 							.route(web::delete().to(handlers::article_handler::delete_article)),
+					)
+					.service(
+						web::resource("/articles/{article_id}")
+							.route(web::get().to(handlers::article_handler::get_by_uuid))
 					)
 					.service(
 						web::resource("/articles")

@@ -134,7 +134,7 @@ export default {
 			title: props.article.title || '',
 			ingress: props.article.ingress || '',
 			body: props.article.body || '',
-			//user_id: store.state.loggeduser.id,
+			user_id: store.state.loggeduser.id, // This won't do in long run
 		})
 		let characters = ref([])
 
