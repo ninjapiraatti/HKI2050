@@ -23120,11 +23120,11 @@
     			tags = await api.tags.get();
     			// console.log(tags.value)
     			// tags.value = tagObjects.map(tag => tag.title)
-    			emit('tags', tags);
     		}
 
     		async function onTagChange(e) {
     			chosenTags.value.push(e.target.value);
+    			emit('tagsUpdated', chosenTags);
     		}
 
     		const matchedTags = computed(() => {
@@ -23282,7 +23282,13 @@
     		async function onSubmit() {
     			sending = true;
     			let article = await api.users.articles.save(form);
-    			if (article) emit('success', article);
+    			if (article) {
+    				m.show({
+    					type: 'success',
+    					title: 'Article saved.',
+    					time: 500,
+    				});
+    			}
 
     			sending = false;
     		}
@@ -23452,7 +23458,7 @@
                       })
                     ]))
                   : createCommentVNode("v-if", true),
-                createVNode(_component_TagTool),
+                createVNode(_component_TagTool, { onTagsUpdated: _ctx.updateTags }, null, 8 /* PROPS */, ["onTagsUpdated"]),
                 createBaseVNode("div", _hoisted_10$1, [
                   createBaseVNode("button", {
                     type: "submit",
@@ -23472,45 +23478,45 @@
     script$8.__file = "src/forms/FormArticle.vue";
 
     var script$7 = {
-    		name: "Editor",
-    		setup() {
-    			const api = inject('api');
-    			const route = useRoute();
-    			const store = inject('store');
+    	name: "Editor",
+    	setup() {
+    		const api = inject('api');
+    		const route = useRoute();
+    		const store = inject('store');
 
-    			let articleObject = ref({});
+    		let articleObject = ref({});
 
-    			async function getArticle() {
-    				console.log(route.params.id);
-    				let article = await api.articles.get({id: route.params.id});
-    				if (article) {
-    					articleObject.value = article[0];
-    				}
+    		async function getArticle() {
+    			console.log(route.params.id);
+    			let article = await api.articles.get({id: route.params.id});
+    			if (article) {
+    				articleObject.value = article[0];
     			}
+    		}
 
-    			onMounted(async () => {
-    				if (route.params.id) {
-    					getArticle();
-    				} else {
-    					articleObject.value = {
-    						user_id: store.state.loggeduser.id,
-    						title: "Fancy new article",
-    					};
-    					console.log(articleObject.value);
-    				}
-    			});
+    		onMounted(async () => {
+    			if (route.params.id) {
+    				getArticle();
+    			} else {
+    				articleObject.value = {
+    					user_id: store.state.loggeduser.id,
+    					title: "Fancy new article",
+    				};
+    				console.log(articleObject.value);
+    			}
+    		});
 
-    			const articleProp = computed(() => {
-    				return articleObject.value
-    			});
+    		const articleProp = computed(() => {
+    			return articleObject.value
+    		});
 
-    			return {
-    				articleObject,
-    				articleProp,
-    				getArticle,
-    			};
-    		},
-    		components: { FormArticle: script$8 }
+    		return {
+    			articleObject,
+    			articleProp,
+    			getArticle,
+    		};
+    	},
+    	components: { FormArticle: script$8 }
     };
 
     const _hoisted_1$6 = {

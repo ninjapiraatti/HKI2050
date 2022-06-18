@@ -71,7 +71,7 @@
 				</VField>
 				<ErrorMessage name='author' class='invalid-feedback shake' />
 			</div>
-			<TagTool></TagTool>
+			<TagTool @tagsUpdated='updateTags'></TagTool>
 			<div class='mt-label'>
 				<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
 			</div>
@@ -85,6 +85,7 @@
 import { inject, ref, computed, onMounted, watch, reactive, toRefs } from 'vue'
 import { marked } from 'marked'
 import { useRoute } from 'vue-router'
+import { flashMessage } from '@smartweb/vue-flash-message';
 import TagTool from '@components/TagTool.vue'
 export default {
 	name: 'FormArticle',
@@ -141,9 +142,20 @@ export default {
 		async function onSubmit() {
 			sending = true
 			let article = await api.users.articles.save(form)
-			if (article) emit('success', article)
+			if (article) {
+				flashMessage.show({
+					type: 'success',
+					title: 'Article saved.',
+					time: 500,
+				})
+			}
 
 			sending = false
+		}
+
+		async function updateTags(tags) {
+			console.log(tags)
+			//form.tags = tags
 		}
 
 		const submitLabel = computed(() => {

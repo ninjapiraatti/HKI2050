@@ -68,11 +68,11 @@ export default {
 			tags = await api.tags.get()
 			// console.log(tags.value)
 			// tags.value = tagObjects.map(tag => tag.title)
-			emit('tags', tags)
 		}
 
 		async function onTagChange(e) {
 			chosenTags.value.push(e.target.value)
+			emit('tagsUpdated', chosenTags)
 		}
 
 		const matchedTags = computed(() => {
