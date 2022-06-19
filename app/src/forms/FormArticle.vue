@@ -3,7 +3,7 @@
 		<div class='card-header'>
 			<h1 class="h3 mb-0">{{ form.title }}</h1>
 		</div>
-		<VForm v-if="form.title" @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
+		<VForm v-if='showFormBool == true' @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 			<div>
 				<label for='title' class='form-label'>Title</label>
 				<VField
@@ -138,6 +138,8 @@ export default {
 			user_id: store.state.loggeduser.id, // This won't do in long run
 		})
 		let characters = ref([])
+		let articles = ref([])
+		let showFormBool = ref(false)
 
 		async function onSubmit() {
 			sending = true
@@ -158,6 +160,20 @@ export default {
 			//form.tags = tags
 		}
 
+		const showForm = computed(async() => {
+			console.log("Fetching user articles")
+			articles.value = await api.users.articles.get({ user_id: store.state.loggeduser.id })
+			if (articles.value.length) {
+				console.log("returning true", articles.value)
+				showFormBool.value = true
+				return true
+			} else {
+				console.log("returning false", articles.value)
+				showFormBool.value = false
+				return false
+			}
+		})
+
 		const submitLabel = computed(() => {
 			return sending ? 'Saving' : 'Save'
 		})
@@ -174,6 +190,7 @@ export default {
 
 		onMounted(async () => {
 			getCharacters()
+			showForm.value
 		})
 
 		return {
@@ -186,6 +203,8 @@ export default {
 			getCharacters,
 			onSubmit,
 			compiledMarkdown,
+			showForm,
+			showFormBool,
 		}
 	},
 }

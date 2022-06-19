@@ -23278,6 +23278,8 @@
     			user_id: store.state.loggeduser.id, // This won't do in long run
     		});
     		let characters = ref([]);
+    		let articles = ref([]);
+    		let showFormBool = ref(false);
 
     		async function onSubmit() {
     			sending = true;
@@ -23292,6 +23294,20 @@
 
     			sending = false;
     		}
+
+    		const showForm = computed(async() => {
+    			console.log("Fetching user articles");
+    			articles.value = await api.users.articles.get({ user_id: store.state.loggeduser.id });
+    			if (articles.value.length) {
+    				console.log("returning true", articles.value);
+    				showFormBool.value = true;
+    				return true
+    			} else {
+    				console.log("returning false", articles.value);
+    				showFormBool.value = false;
+    				return false
+    			}
+    		});
 
     		const submitLabel = computed(() => {
     			return sending ? 'Saving' : 'Save'
@@ -23309,6 +23325,7 @@
 
     		onMounted(async () => {
     			getCharacters();
+    			showForm.value;
     		});
 
     		return {
@@ -23321,6 +23338,8 @@
     			getCharacters,
     			onSubmit,
     			compiledMarkdown,
+    			showForm,
+    			showFormBool,
     		}
     	},
     };
@@ -23366,7 +23385,7 @@
         createBaseVNode("div", _hoisted_1$7, [
           createBaseVNode("h1", _hoisted_2$4, toDisplayString($setup.form.title), 1 /* TEXT */)
         ]),
-        ($setup.form.title)
+        ($setup.showFormBool == true)
           ? (openBlock(), createBlock(_component_VForm, {
               key: 0,
               onSubmit: $setup.onSubmit,
