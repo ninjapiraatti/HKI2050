@@ -1,4 +1,4 @@
-(function () {
+(function (marked) {
     'use strict';
 
     /**
@@ -118,15 +118,7 @@
         'mesh,meshgradient,meshpatch,meshrow,metadata,mpath,path,pattern,' +
         'polygon,polyline,radialGradient,rect,set,solidcolor,stop,switch,symbol,' +
         'text,textPath,title,tspan,unknown,use,view';
-    /**
-     * Compiler only.
-     * Do NOT use in runtime code paths unless behind `("development" !== 'production')` flag.
-     */
     const isHTMLTag$1 = /*#__PURE__*/ makeMap(HTML_TAGS);
-    /**
-     * Compiler only.
-     * Do NOT use in runtime code paths unless behind `("development" !== 'production')` flag.
-     */
     const isSVGTag = /*#__PURE__*/ makeMap(SVG_TAGS);
 
     /**
@@ -404,7 +396,7 @@
             if (!this.active) {
                 return this.fn();
             }
-            if (!effectStack.length || !effectStack.includes(this)) {
+            if (!effectStack.includes(this)) {
                 try {
                     effectStack.push((activeEffect = this));
                     enableTracking();
@@ -640,9 +632,6 @@
             else if (key === "__v_isReadonly" /* IS_READONLY */) {
                 return isReadonly;
             }
-            else if (key === "__v_isShallow" /* IS_SHALLOW */) {
-                return shallow;
-            }
             else if (key === "__v_raw" /* RAW */ &&
                 receiver ===
                     (isReadonly
@@ -687,14 +676,9 @@
     function createSetter(shallow = false) {
         return function set(target, key, value, receiver) {
             let oldValue = target[key];
-            if (isReadonly(oldValue) && isRef(oldValue) && !isRef(value)) {
-                return false;
-            }
             if (!shallow && !isReadonly(value)) {
-                if (!isShallow$1(value)) {
-                    value = toRaw(value);
-                    oldValue = toRaw(oldValue);
-                }
+                value = toRaw(value);
+                oldValue = toRaw(oldValue);
                 if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
                     oldValue.value = value;
                     return true;
@@ -1081,7 +1065,7 @@
     }
     function reactive(target) {
         // if trying to observe a readonly proxy, return the readonly version.
-        if (isReadonly(target)) {
+        if (target && target["__v_isReadonly" /* IS_READONLY */]) {
             return target;
         }
         return createReactiveObject(target, false, mutableHandlers, mutableCollectionHandlers, reactiveMap);
@@ -1146,9 +1130,6 @@
     function isReadonly(value) {
         return !!(value && value["__v_isReadonly" /* IS_READONLY */]);
     }
-    function isShallow$1(value) {
-        return !!(value && value["__v_isShallow" /* IS_SHALLOW */]);
-    }
     function isProxy(value) {
         return isReactive(value) || isReadonly(value);
     }
@@ -1207,22 +1188,22 @@
         return new RefImpl(rawValue, shallow);
     }
     class RefImpl {
-        constructor(value, __v_isShallow) {
-            this.__v_isShallow = __v_isShallow;
+        constructor(value, _shallow) {
+            this._shallow = _shallow;
             this.dep = undefined;
             this.__v_isRef = true;
-            this._rawValue = __v_isShallow ? value : toRaw(value);
-            this._value = __v_isShallow ? value : toReactive(value);
+            this._rawValue = _shallow ? value : toRaw(value);
+            this._value = _shallow ? value : toReactive(value);
         }
         get value() {
             trackRefValue(this);
             return this._value;
         }
         set value(newVal) {
-            newVal = this.__v_isShallow ? newVal : toRaw(newVal);
+            newVal = this._shallow ? newVal : toRaw(newVal);
             if (hasChanged(newVal, this._rawValue)) {
                 this._rawValue = newVal;
-                this._value = this.__v_isShallow ? newVal : toReactive(newVal);
+                this._value = this._shallow ? newVal : toReactive(newVal);
                 triggerRefValue(this, newVal);
             }
         }
@@ -1281,26 +1262,24 @@
     }
 
     class ComputedRefImpl {
-        constructor(getter, _setter, isReadonly, isSSR) {
+        constructor(getter, _setter, isReadonly) {
             this._setter = _setter;
             this.dep = undefined;
-            this.__v_isRef = true;
             this._dirty = true;
+            this.__v_isRef = true;
             this.effect = new ReactiveEffect(getter, () => {
                 if (!this._dirty) {
                     this._dirty = true;
                     triggerRefValue(this);
                 }
             });
-            this.effect.computed = this;
-            this.effect.active = this._cacheable = !isSSR;
             this["__v_isReadonly" /* IS_READONLY */] = isReadonly;
         }
         get value() {
             // the computed ref may get wrapped by other proxies e.g. readonly() #3376
             const self = toRaw(this);
             trackRefValue(self);
-            if (self._dirty || !self._cacheable) {
+            if (self._dirty) {
                 self._dirty = false;
                 self._value = self.effect.run();
             }
@@ -1310,7 +1289,7 @@
             this._setter(newValue);
         }
     }
-    function computed$1(getterOrOptions, debugOptions, isSSR = false) {
+    function computed(getterOrOptions, debugOptions) {
         let getter;
         let setter;
         const onlyGetter = isFunction(getterOrOptions);
@@ -1325,436 +1304,14 @@
             getter = getterOrOptions.get;
             setter = getterOrOptions.set;
         }
-        const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter, isSSR);
-        if (debugOptions && !isSSR) {
+        const cRef = new ComputedRefImpl(getter, setter, onlyGetter || !setter);
+        if (debugOptions) {
             cRef.effect.onTrack = debugOptions.onTrack;
             cRef.effect.onTrigger = debugOptions.onTrigger;
         }
         return cRef;
     }
     Promise.resolve();
-
-    const stack = [];
-    function pushWarningContext(vnode) {
-        stack.push(vnode);
-    }
-    function popWarningContext() {
-        stack.pop();
-    }
-    function warn$2(msg, ...args) {
-        // avoid props formatting or warn handler tracking deps that might be mutated
-        // during patch, leading to infinite recursion.
-        pauseTracking();
-        const instance = stack.length ? stack[stack.length - 1].component : null;
-        const appWarnHandler = instance && instance.appContext.config.warnHandler;
-        const trace = getComponentTrace();
-        if (appWarnHandler) {
-            callWithErrorHandling(appWarnHandler, instance, 11 /* APP_WARN_HANDLER */, [
-                msg + args.join(''),
-                instance && instance.proxy,
-                trace
-                    .map(({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`)
-                    .join('\n'),
-                trace
-            ]);
-        }
-        else {
-            const warnArgs = [`[Vue warn]: ${msg}`, ...args];
-            /* istanbul ignore if */
-            if (trace.length &&
-                // avoid spamming console during tests
-                !false) {
-                warnArgs.push(`\n`, ...formatTrace(trace));
-            }
-            console.warn(...warnArgs);
-        }
-        resetTracking();
-    }
-    function getComponentTrace() {
-        let currentVNode = stack[stack.length - 1];
-        if (!currentVNode) {
-            return [];
-        }
-        // we can't just use the stack because it will be incomplete during updates
-        // that did not start from the root. Re-construct the parent chain using
-        // instance parent pointers.
-        const normalizedStack = [];
-        while (currentVNode) {
-            const last = normalizedStack[0];
-            if (last && last.vnode === currentVNode) {
-                last.recurseCount++;
-            }
-            else {
-                normalizedStack.push({
-                    vnode: currentVNode,
-                    recurseCount: 0
-                });
-            }
-            const parentInstance = currentVNode.component && currentVNode.component.parent;
-            currentVNode = parentInstance && parentInstance.vnode;
-        }
-        return normalizedStack;
-    }
-    /* istanbul ignore next */
-    function formatTrace(trace) {
-        const logs = [];
-        trace.forEach((entry, i) => {
-            logs.push(...(i === 0 ? [] : [`\n`]), ...formatTraceEntry(entry));
-        });
-        return logs;
-    }
-    function formatTraceEntry({ vnode, recurseCount }) {
-        const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
-        const isRoot = vnode.component ? vnode.component.parent == null : false;
-        const open = ` at <${formatComponentName(vnode.component, vnode.type, isRoot)}`;
-        const close = `>` + postfix;
-        return vnode.props
-            ? [open, ...formatProps(vnode.props), close]
-            : [open + close];
-    }
-    /* istanbul ignore next */
-    function formatProps(props) {
-        const res = [];
-        const keys = Object.keys(props);
-        keys.slice(0, 3).forEach(key => {
-            res.push(...formatProp(key, props[key]));
-        });
-        if (keys.length > 3) {
-            res.push(` ...`);
-        }
-        return res;
-    }
-    /* istanbul ignore next */
-    function formatProp(key, value, raw) {
-        if (isString(value)) {
-            value = JSON.stringify(value);
-            return raw ? value : [`${key}=${value}`];
-        }
-        else if (typeof value === 'number' ||
-            typeof value === 'boolean' ||
-            value == null) {
-            return raw ? value : [`${key}=${value}`];
-        }
-        else if (isRef(value)) {
-            value = formatProp(key, toRaw(value.value), true);
-            return raw ? value : [`${key}=Ref<`, value, `>`];
-        }
-        else if (isFunction(value)) {
-            return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
-        }
-        else {
-            value = toRaw(value);
-            return raw ? value : [`${key}=`, value];
-        }
-    }
-
-    const ErrorTypeStrings = {
-        ["sp" /* SERVER_PREFETCH */]: 'serverPrefetch hook',
-        ["bc" /* BEFORE_CREATE */]: 'beforeCreate hook',
-        ["c" /* CREATED */]: 'created hook',
-        ["bm" /* BEFORE_MOUNT */]: 'beforeMount hook',
-        ["m" /* MOUNTED */]: 'mounted hook',
-        ["bu" /* BEFORE_UPDATE */]: 'beforeUpdate hook',
-        ["u" /* UPDATED */]: 'updated',
-        ["bum" /* BEFORE_UNMOUNT */]: 'beforeUnmount hook',
-        ["um" /* UNMOUNTED */]: 'unmounted hook',
-        ["a" /* ACTIVATED */]: 'activated hook',
-        ["da" /* DEACTIVATED */]: 'deactivated hook',
-        ["ec" /* ERROR_CAPTURED */]: 'errorCaptured hook',
-        ["rtc" /* RENDER_TRACKED */]: 'renderTracked hook',
-        ["rtg" /* RENDER_TRIGGERED */]: 'renderTriggered hook',
-        [0 /* SETUP_FUNCTION */]: 'setup function',
-        [1 /* RENDER_FUNCTION */]: 'render function',
-        [2 /* WATCH_GETTER */]: 'watcher getter',
-        [3 /* WATCH_CALLBACK */]: 'watcher callback',
-        [4 /* WATCH_CLEANUP */]: 'watcher cleanup function',
-        [5 /* NATIVE_EVENT_HANDLER */]: 'native event handler',
-        [6 /* COMPONENT_EVENT_HANDLER */]: 'component event handler',
-        [7 /* VNODE_HOOK */]: 'vnode hook',
-        [8 /* DIRECTIVE_HOOK */]: 'directive hook',
-        [9 /* TRANSITION_HOOK */]: 'transition hook',
-        [10 /* APP_ERROR_HANDLER */]: 'app errorHandler',
-        [11 /* APP_WARN_HANDLER */]: 'app warnHandler',
-        [12 /* FUNCTION_REF */]: 'ref function',
-        [13 /* ASYNC_COMPONENT_LOADER */]: 'async component loader',
-        [14 /* SCHEDULER */]: 'scheduler flush. This is likely a Vue internals bug. ' +
-            'Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/core'
-    };
-    function callWithErrorHandling(fn, instance, type, args) {
-        let res;
-        try {
-            res = args ? fn(...args) : fn();
-        }
-        catch (err) {
-            handleError(err, instance, type);
-        }
-        return res;
-    }
-    function callWithAsyncErrorHandling(fn, instance, type, args) {
-        if (isFunction(fn)) {
-            const res = callWithErrorHandling(fn, instance, type, args);
-            if (res && isPromise(res)) {
-                res.catch(err => {
-                    handleError(err, instance, type);
-                });
-            }
-            return res;
-        }
-        const values = [];
-        for (let i = 0; i < fn.length; i++) {
-            values.push(callWithAsyncErrorHandling(fn[i], instance, type, args));
-        }
-        return values;
-    }
-    function handleError(err, instance, type, throwInDev = true) {
-        const contextVNode = instance ? instance.vnode : null;
-        if (instance) {
-            let cur = instance.parent;
-            // the exposed instance is the render proxy to keep it consistent with 2.x
-            const exposedInstance = instance.proxy;
-            // in production the hook receives only the error code
-            const errorInfo = ErrorTypeStrings[type] ;
-            while (cur) {
-                const errorCapturedHooks = cur.ec;
-                if (errorCapturedHooks) {
-                    for (let i = 0; i < errorCapturedHooks.length; i++) {
-                        if (errorCapturedHooks[i](err, exposedInstance, errorInfo) === false) {
-                            return;
-                        }
-                    }
-                }
-                cur = cur.parent;
-            }
-            // app-level handling
-            const appErrorHandler = instance.appContext.config.errorHandler;
-            if (appErrorHandler) {
-                callWithErrorHandling(appErrorHandler, null, 10 /* APP_ERROR_HANDLER */, [err, exposedInstance, errorInfo]);
-                return;
-            }
-        }
-        logError(err, type, contextVNode, throwInDev);
-    }
-    function logError(err, type, contextVNode, throwInDev = true) {
-        {
-            const info = ErrorTypeStrings[type];
-            if (contextVNode) {
-                pushWarningContext(contextVNode);
-            }
-            warn$2(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
-            if (contextVNode) {
-                popWarningContext();
-            }
-            // crash in dev by default so it's more noticeable
-            if (throwInDev) {
-                throw err;
-            }
-            else {
-                console.error(err);
-            }
-        }
-    }
-
-    let isFlushing = false;
-    let isFlushPending = false;
-    const queue = [];
-    let flushIndex = 0;
-    const pendingPreFlushCbs = [];
-    let activePreFlushCbs = null;
-    let preFlushIndex = 0;
-    const pendingPostFlushCbs = [];
-    let activePostFlushCbs = null;
-    let postFlushIndex = 0;
-    const resolvedPromise = Promise.resolve();
-    let currentFlushPromise = null;
-    let currentPreFlushParentJob = null;
-    const RECURSION_LIMIT = 100;
-    function nextTick(fn) {
-        const p = currentFlushPromise || resolvedPromise;
-        return fn ? p.then(this ? fn.bind(this) : fn) : p;
-    }
-    // #2768
-    // Use binary-search to find a suitable position in the queue,
-    // so that the queue maintains the increasing order of job's id,
-    // which can prevent the job from being skipped and also can avoid repeated patching.
-    function findInsertionIndex(id) {
-        // the start index should be `flushIndex + 1`
-        let start = flushIndex + 1;
-        let end = queue.length;
-        while (start < end) {
-            const middle = (start + end) >>> 1;
-            const middleJobId = getId(queue[middle]);
-            middleJobId < id ? (start = middle + 1) : (end = middle);
-        }
-        return start;
-    }
-    function queueJob(job) {
-        // the dedupe search uses the startIndex argument of Array.includes()
-        // by default the search index includes the current job that is being run
-        // so it cannot recursively trigger itself again.
-        // if the job is a watch() callback, the search will start with a +1 index to
-        // allow it recursively trigger itself - it is the user's responsibility to
-        // ensure it doesn't end up in an infinite loop.
-        if ((!queue.length ||
-            !queue.includes(job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex)) &&
-            job !== currentPreFlushParentJob) {
-            if (job.id == null) {
-                queue.push(job);
-            }
-            else {
-                queue.splice(findInsertionIndex(job.id), 0, job);
-            }
-            queueFlush();
-        }
-    }
-    function queueFlush() {
-        if (!isFlushing && !isFlushPending) {
-            isFlushPending = true;
-            currentFlushPromise = resolvedPromise.then(flushJobs);
-        }
-    }
-    function invalidateJob(job) {
-        const i = queue.indexOf(job);
-        if (i > flushIndex) {
-            queue.splice(i, 1);
-        }
-    }
-    function queueCb(cb, activeQueue, pendingQueue, index) {
-        if (!isArray(cb)) {
-            if (!activeQueue ||
-                !activeQueue.includes(cb, cb.allowRecurse ? index + 1 : index)) {
-                pendingQueue.push(cb);
-            }
-        }
-        else {
-            // if cb is an array, it is a component lifecycle hook which can only be
-            // triggered by a job, which is already deduped in the main queue, so
-            // we can skip duplicate check here to improve perf
-            pendingQueue.push(...cb);
-        }
-        queueFlush();
-    }
-    function queuePreFlushCb(cb) {
-        queueCb(cb, activePreFlushCbs, pendingPreFlushCbs, preFlushIndex);
-    }
-    function queuePostFlushCb(cb) {
-        queueCb(cb, activePostFlushCbs, pendingPostFlushCbs, postFlushIndex);
-    }
-    function flushPreFlushCbs(seen, parentJob = null) {
-        if (pendingPreFlushCbs.length) {
-            currentPreFlushParentJob = parentJob;
-            activePreFlushCbs = [...new Set(pendingPreFlushCbs)];
-            pendingPreFlushCbs.length = 0;
-            {
-                seen = seen || new Map();
-            }
-            for (preFlushIndex = 0; preFlushIndex < activePreFlushCbs.length; preFlushIndex++) {
-                if (checkRecursiveUpdates(seen, activePreFlushCbs[preFlushIndex])) {
-                    continue;
-                }
-                activePreFlushCbs[preFlushIndex]();
-            }
-            activePreFlushCbs = null;
-            preFlushIndex = 0;
-            currentPreFlushParentJob = null;
-            // recursively flush until it drains
-            flushPreFlushCbs(seen, parentJob);
-        }
-    }
-    function flushPostFlushCbs(seen) {
-        if (pendingPostFlushCbs.length) {
-            const deduped = [...new Set(pendingPostFlushCbs)];
-            pendingPostFlushCbs.length = 0;
-            // #1947 already has active queue, nested flushPostFlushCbs call
-            if (activePostFlushCbs) {
-                activePostFlushCbs.push(...deduped);
-                return;
-            }
-            activePostFlushCbs = deduped;
-            {
-                seen = seen || new Map();
-            }
-            activePostFlushCbs.sort((a, b) => getId(a) - getId(b));
-            for (postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++) {
-                if (checkRecursiveUpdates(seen, activePostFlushCbs[postFlushIndex])) {
-                    continue;
-                }
-                activePostFlushCbs[postFlushIndex]();
-            }
-            activePostFlushCbs = null;
-            postFlushIndex = 0;
-        }
-    }
-    const getId = (job) => job.id == null ? Infinity : job.id;
-    function flushJobs(seen) {
-        isFlushPending = false;
-        isFlushing = true;
-        {
-            seen = seen || new Map();
-        }
-        flushPreFlushCbs(seen);
-        // Sort queue before flush.
-        // This ensures that:
-        // 1. Components are updated from parent to child. (because parent is always
-        //    created before the child so its render effect will have smaller
-        //    priority number)
-        // 2. If a component is unmounted during a parent component's update,
-        //    its update can be skipped.
-        queue.sort((a, b) => getId(a) - getId(b));
-        // conditional usage of checkRecursiveUpdate must be determined out of
-        // try ... catch block since Rollup by default de-optimizes treeshaking
-        // inside try-catch. This can leave all warning code unshaked. Although
-        // they would get eventually shaken by a minifier like terser, some minifiers
-        // would fail to do that (e.g. https://github.com/evanw/esbuild/issues/1610)
-        const check = (job) => checkRecursiveUpdates(seen, job)
-            ;
-        try {
-            for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
-                const job = queue[flushIndex];
-                if (job && job.active !== false) {
-                    if (("development" !== 'production') && check(job)) {
-                        continue;
-                    }
-                    // console.log(`running:`, job.id)
-                    callWithErrorHandling(job, null, 14 /* SCHEDULER */);
-                }
-            }
-        }
-        finally {
-            flushIndex = 0;
-            queue.length = 0;
-            flushPostFlushCbs(seen);
-            isFlushing = false;
-            currentFlushPromise = null;
-            // some postFlushCb queued jobs!
-            // keep flushing until it drains.
-            if (queue.length ||
-                pendingPreFlushCbs.length ||
-                pendingPostFlushCbs.length) {
-                flushJobs(seen);
-            }
-        }
-    }
-    function checkRecursiveUpdates(seen, fn) {
-        if (!seen.has(fn)) {
-            seen.set(fn, 1);
-        }
-        else {
-            const count = seen.get(fn);
-            if (count > RECURSION_LIMIT) {
-                const instance = fn.ownerInstance;
-                const componentName = instance && getComponentName(instance.type);
-                warn$2(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. ` +
-                    `This means you have a reactive effect that is mutating its own ` +
-                    `dependencies and thus recursively triggering itself. Possible sources ` +
-                    `include component template, render function, updated hook or ` +
-                    `watcher source function.`);
-                return true;
-            }
-            else {
-                seen.set(fn, count + 1);
-            }
-        }
-    }
 
     /* eslint-disable no-restricted-globals */
     let isHmrUpdating = false;
@@ -2506,7 +2063,7 @@
         if (instance) {
             // #2400
             // to support `app.use` plugins,
-            // fallback to appContext's `provides` if the instance is at root
+            // fallback to appContext's `provides` if the intance is at root
             const provides = instance.parent == null
                 ? instance.vnode.appContext && instance.vnode.appContext.provides
                 : instance.parent.provides;
@@ -2526,264 +2083,6 @@
         else {
             warn$2(`inject() can only be used inside setup() or functional components.`);
         }
-    }
-
-    // Simple effect.
-    function watchEffect(effect, options) {
-        return doWatch(effect, null, options);
-    }
-    // initial value for watchers to trigger on undefined initial values
-    const INITIAL_WATCHER_VALUE = {};
-    // implementation
-    function watch(source, cb, options) {
-        if (!isFunction(cb)) {
-            warn$2(`\`watch(fn, options?)\` signature has been moved to a separate API. ` +
-                `Use \`watchEffect(fn, options?)\` instead. \`watch\` now only ` +
-                `supports \`watch(source, cb, options?) signature.`);
-        }
-        return doWatch(source, cb, options);
-    }
-    function doWatch(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ) {
-        if (!cb) {
-            if (immediate !== undefined) {
-                warn$2(`watch() "immediate" option is only respected when using the ` +
-                    `watch(source, callback, options?) signature.`);
-            }
-            if (deep !== undefined) {
-                warn$2(`watch() "deep" option is only respected when using the ` +
-                    `watch(source, callback, options?) signature.`);
-            }
-        }
-        const warnInvalidSource = (s) => {
-            warn$2(`Invalid watch source: `, s, `A watch source can only be a getter/effect function, a ref, ` +
-                `a reactive object, or an array of these types.`);
-        };
-        const instance = currentInstance;
-        let getter;
-        let forceTrigger = false;
-        let isMultiSource = false;
-        if (isRef(source)) {
-            getter = () => source.value;
-            forceTrigger = isShallow$1(source);
-        }
-        else if (isReactive(source)) {
-            getter = () => source;
-            deep = true;
-        }
-        else if (isArray(source)) {
-            isMultiSource = true;
-            forceTrigger = source.some(isReactive);
-            getter = () => source.map(s => {
-                if (isRef(s)) {
-                    return s.value;
-                }
-                else if (isReactive(s)) {
-                    return traverse(s);
-                }
-                else if (isFunction(s)) {
-                    return callWithErrorHandling(s, instance, 2 /* WATCH_GETTER */);
-                }
-                else {
-                    warnInvalidSource(s);
-                }
-            });
-        }
-        else if (isFunction(source)) {
-            if (cb) {
-                // getter with cb
-                getter = () => callWithErrorHandling(source, instance, 2 /* WATCH_GETTER */);
-            }
-            else {
-                // no cb -> simple effect
-                getter = () => {
-                    if (instance && instance.isUnmounted) {
-                        return;
-                    }
-                    if (cleanup) {
-                        cleanup();
-                    }
-                    return callWithAsyncErrorHandling(source, instance, 3 /* WATCH_CALLBACK */, [onCleanup]);
-                };
-            }
-        }
-        else {
-            getter = NOOP;
-            warnInvalidSource(source);
-        }
-        if (cb && deep) {
-            const baseGetter = getter;
-            getter = () => traverse(baseGetter());
-        }
-        let cleanup;
-        let onCleanup = (fn) => {
-            cleanup = effect.onStop = () => {
-                callWithErrorHandling(fn, instance, 4 /* WATCH_CLEANUP */);
-            };
-        };
-        // in SSR there is no need to setup an actual effect, and it should be noop
-        // unless it's eager
-        if (isInSSRComponentSetup) {
-            // we will also not call the invalidate callback (+ runner is not set up)
-            onCleanup = NOOP;
-            if (!cb) {
-                getter();
-            }
-            else if (immediate) {
-                callWithAsyncErrorHandling(cb, instance, 3 /* WATCH_CALLBACK */, [
-                    getter(),
-                    isMultiSource ? [] : undefined,
-                    onCleanup
-                ]);
-            }
-            return NOOP;
-        }
-        let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE;
-        const job = () => {
-            if (!effect.active) {
-                return;
-            }
-            if (cb) {
-                // watch(source, cb)
-                const newValue = effect.run();
-                if (deep ||
-                    forceTrigger ||
-                    (isMultiSource
-                        ? newValue.some((v, i) => hasChanged(v, oldValue[i]))
-                        : hasChanged(newValue, oldValue)) ||
-                    (false  )) {
-                    // cleanup before running cb again
-                    if (cleanup) {
-                        cleanup();
-                    }
-                    callWithAsyncErrorHandling(cb, instance, 3 /* WATCH_CALLBACK */, [
-                        newValue,
-                        // pass undefined as the old value when it's changed for the first time
-                        oldValue === INITIAL_WATCHER_VALUE ? undefined : oldValue,
-                        onCleanup
-                    ]);
-                    oldValue = newValue;
-                }
-            }
-            else {
-                // watchEffect
-                effect.run();
-            }
-        };
-        // important: mark the job as a watcher callback so that scheduler knows
-        // it is allowed to self-trigger (#1727)
-        job.allowRecurse = !!cb;
-        let scheduler;
-        if (flush === 'sync') {
-            scheduler = job; // the scheduler function gets called directly
-        }
-        else if (flush === 'post') {
-            scheduler = () => queuePostRenderEffect(job, instance && instance.suspense);
-        }
-        else {
-            // default: 'pre'
-            scheduler = () => {
-                if (!instance || instance.isMounted) {
-                    queuePreFlushCb(job);
-                }
-                else {
-                    // with 'pre' option, the first call must happen before
-                    // the component is mounted so it is called synchronously.
-                    job();
-                }
-            };
-        }
-        const effect = new ReactiveEffect(getter, scheduler);
-        {
-            effect.onTrack = onTrack;
-            effect.onTrigger = onTrigger;
-        }
-        // initial run
-        if (cb) {
-            if (immediate) {
-                job();
-            }
-            else {
-                oldValue = effect.run();
-            }
-        }
-        else if (flush === 'post') {
-            queuePostRenderEffect(effect.run.bind(effect), instance && instance.suspense);
-        }
-        else {
-            effect.run();
-        }
-        return () => {
-            effect.stop();
-            if (instance && instance.scope) {
-                remove$1(instance.scope.effects, effect);
-            }
-        };
-    }
-    // this.$watch
-    function instanceWatch(source, value, options) {
-        const publicThis = this.proxy;
-        const getter = isString(source)
-            ? source.includes('.')
-                ? createPathGetter(publicThis, source)
-                : () => publicThis[source]
-            : source.bind(publicThis, publicThis);
-        let cb;
-        if (isFunction(value)) {
-            cb = value;
-        }
-        else {
-            cb = value.handler;
-            options = value;
-        }
-        const cur = currentInstance;
-        setCurrentInstance(this);
-        const res = doWatch(getter, cb.bind(publicThis), options);
-        if (cur) {
-            setCurrentInstance(cur);
-        }
-        else {
-            unsetCurrentInstance();
-        }
-        return res;
-    }
-    function createPathGetter(ctx, path) {
-        const segments = path.split('.');
-        return () => {
-            let cur = ctx;
-            for (let i = 0; i < segments.length && cur; i++) {
-                cur = cur[segments[i]];
-            }
-            return cur;
-        };
-    }
-    function traverse(value, seen) {
-        if (!isObject$1(value) || value["__v_skip" /* SKIP */]) {
-            return value;
-        }
-        seen = seen || new Set();
-        if (seen.has(value)) {
-            return value;
-        }
-        seen.add(value);
-        if (isRef(value)) {
-            traverse(value.value, seen);
-        }
-        else if (isArray(value)) {
-            for (let i = 0; i < value.length; i++) {
-                traverse(value[i], seen);
-            }
-        }
-        else if (isSet(value) || isMap(value)) {
-            value.forEach((v) => {
-                traverse(v, seen);
-            });
-        }
-        else if (isPlainObject(value)) {
-            for (const key in value) {
-                traverse(value[key], seen);
-            }
-        }
-        return value;
     }
 
     function useTransitionState() {
@@ -3738,9 +3037,7 @@
             // attrs point to the same object so it should already have been updated.
             if (attrs !== rawCurrentProps) {
                 for (const key in attrs) {
-                    if (!rawProps ||
-                        (!hasOwn(rawProps, key) &&
-                            (!false ))) {
+                    if (!rawProps || !hasOwn(rawProps, key)) {
                         delete attrs[key];
                         hasAttrsChanged = true;
                     }
@@ -4481,7 +3778,6 @@
         }
     }
 
-    /* eslint-disable no-restricted-globals */
     let supported;
     let perf;
     function startMeasure(instance, type) {
@@ -4509,6 +3805,7 @@
         if (supported !== undefined) {
             return supported;
         }
+        /* eslint-disable no-restricted-globals */
         if (typeof window !== 'undefined' && window.performance) {
             supported = true;
             perf = window.performance;
@@ -4516,6 +3813,7 @@
         else {
             supported = false;
         }
+        /* eslint-enable no-restricted-globals */
         return supported;
     }
 
@@ -4648,7 +3946,7 @@
             }
         };
         const mountStaticNode = (n2, container, anchor, isSVG) => {
-            [n2.el, n2.anchor] = hostInsertStaticContent(n2.children, container, anchor, isSVG, n2.el, n2.anchor);
+            [n2.el, n2.anchor] = hostInsertStaticContent(n2.children, container, anchor, isSVG);
         };
         /**
          * Dev / HMR only
@@ -6202,7 +5500,7 @@
             shapeFlag: vnode.shapeFlag,
             // if the vnode is cloned with extra props, we can no longer assume its
             // existing patch flag to be reliable and need to add the FULL_PROPS flag.
-            // note: preserve flag for fragments since they use the flag for children
+            // note: perserve flag for fragments since they use the flag for children
             // fast paths only.
             patchFlag: extraProps && vnode.type !== Fragment
                 ? patchFlag === -1 // hoisted node
@@ -6354,8 +5652,7 @@
                 else if (isOn(key)) {
                     const existing = ret[key];
                     const incoming = toMerge[key];
-                    if (incoming &&
-                        existing !== incoming &&
+                    if (existing !== incoming &&
                         !(isArray(existing) && existing.includes(incoming))) {
                         ret[key] = existing
                             ? [].concat(existing, incoming)
@@ -6942,7 +6239,7 @@
         // template / render function normalization
         // could be already set when returned from setup()
         if (!instance.render) {
-            // only do on-the-fly compile if not in SSR - SSR on-the-fly compilation
+            // only do on-the-fly compile if not in SSR - SSR on-the-fly compliation
             // is done by server-renderer
             if (!isSSR && compile && !Component.render) {
                 const template = Component.template;
@@ -7080,10 +6377,685 @@
         return isFunction(value) && '__vccOpts' in value;
     }
 
-    const computed = ((getterOrOptions, debugOptions) => {
-        // @ts-ignore
-        return computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
-    });
+    const stack = [];
+    function pushWarningContext(vnode) {
+        stack.push(vnode);
+    }
+    function popWarningContext() {
+        stack.pop();
+    }
+    function warn$2(msg, ...args) {
+        // avoid props formatting or warn handler tracking deps that might be mutated
+        // during patch, leading to infinite recursion.
+        pauseTracking();
+        const instance = stack.length ? stack[stack.length - 1].component : null;
+        const appWarnHandler = instance && instance.appContext.config.warnHandler;
+        const trace = getComponentTrace();
+        if (appWarnHandler) {
+            callWithErrorHandling(appWarnHandler, instance, 11 /* APP_WARN_HANDLER */, [
+                msg + args.join(''),
+                instance && instance.proxy,
+                trace
+                    .map(({ vnode }) => `at <${formatComponentName(instance, vnode.type)}>`)
+                    .join('\n'),
+                trace
+            ]);
+        }
+        else {
+            const warnArgs = [`[Vue warn]: ${msg}`, ...args];
+            /* istanbul ignore if */
+            if (trace.length &&
+                // avoid spamming console during tests
+                !false) {
+                warnArgs.push(`\n`, ...formatTrace(trace));
+            }
+            console.warn(...warnArgs);
+        }
+        resetTracking();
+    }
+    function getComponentTrace() {
+        let currentVNode = stack[stack.length - 1];
+        if (!currentVNode) {
+            return [];
+        }
+        // we can't just use the stack because it will be incomplete during updates
+        // that did not start from the root. Re-construct the parent chain using
+        // instance parent pointers.
+        const normalizedStack = [];
+        while (currentVNode) {
+            const last = normalizedStack[0];
+            if (last && last.vnode === currentVNode) {
+                last.recurseCount++;
+            }
+            else {
+                normalizedStack.push({
+                    vnode: currentVNode,
+                    recurseCount: 0
+                });
+            }
+            const parentInstance = currentVNode.component && currentVNode.component.parent;
+            currentVNode = parentInstance && parentInstance.vnode;
+        }
+        return normalizedStack;
+    }
+    /* istanbul ignore next */
+    function formatTrace(trace) {
+        const logs = [];
+        trace.forEach((entry, i) => {
+            logs.push(...(i === 0 ? [] : [`\n`]), ...formatTraceEntry(entry));
+        });
+        return logs;
+    }
+    function formatTraceEntry({ vnode, recurseCount }) {
+        const postfix = recurseCount > 0 ? `... (${recurseCount} recursive calls)` : ``;
+        const isRoot = vnode.component ? vnode.component.parent == null : false;
+        const open = ` at <${formatComponentName(vnode.component, vnode.type, isRoot)}`;
+        const close = `>` + postfix;
+        return vnode.props
+            ? [open, ...formatProps(vnode.props), close]
+            : [open + close];
+    }
+    /* istanbul ignore next */
+    function formatProps(props) {
+        const res = [];
+        const keys = Object.keys(props);
+        keys.slice(0, 3).forEach(key => {
+            res.push(...formatProp(key, props[key]));
+        });
+        if (keys.length > 3) {
+            res.push(` ...`);
+        }
+        return res;
+    }
+    /* istanbul ignore next */
+    function formatProp(key, value, raw) {
+        if (isString(value)) {
+            value = JSON.stringify(value);
+            return raw ? value : [`${key}=${value}`];
+        }
+        else if (typeof value === 'number' ||
+            typeof value === 'boolean' ||
+            value == null) {
+            return raw ? value : [`${key}=${value}`];
+        }
+        else if (isRef(value)) {
+            value = formatProp(key, toRaw(value.value), true);
+            return raw ? value : [`${key}=Ref<`, value, `>`];
+        }
+        else if (isFunction(value)) {
+            return [`${key}=fn${value.name ? `<${value.name}>` : ``}`];
+        }
+        else {
+            value = toRaw(value);
+            return raw ? value : [`${key}=`, value];
+        }
+    }
+
+    const ErrorTypeStrings = {
+        ["sp" /* SERVER_PREFETCH */]: 'serverPrefetch hook',
+        ["bc" /* BEFORE_CREATE */]: 'beforeCreate hook',
+        ["c" /* CREATED */]: 'created hook',
+        ["bm" /* BEFORE_MOUNT */]: 'beforeMount hook',
+        ["m" /* MOUNTED */]: 'mounted hook',
+        ["bu" /* BEFORE_UPDATE */]: 'beforeUpdate hook',
+        ["u" /* UPDATED */]: 'updated',
+        ["bum" /* BEFORE_UNMOUNT */]: 'beforeUnmount hook',
+        ["um" /* UNMOUNTED */]: 'unmounted hook',
+        ["a" /* ACTIVATED */]: 'activated hook',
+        ["da" /* DEACTIVATED */]: 'deactivated hook',
+        ["ec" /* ERROR_CAPTURED */]: 'errorCaptured hook',
+        ["rtc" /* RENDER_TRACKED */]: 'renderTracked hook',
+        ["rtg" /* RENDER_TRIGGERED */]: 'renderTriggered hook',
+        [0 /* SETUP_FUNCTION */]: 'setup function',
+        [1 /* RENDER_FUNCTION */]: 'render function',
+        [2 /* WATCH_GETTER */]: 'watcher getter',
+        [3 /* WATCH_CALLBACK */]: 'watcher callback',
+        [4 /* WATCH_CLEANUP */]: 'watcher cleanup function',
+        [5 /* NATIVE_EVENT_HANDLER */]: 'native event handler',
+        [6 /* COMPONENT_EVENT_HANDLER */]: 'component event handler',
+        [7 /* VNODE_HOOK */]: 'vnode hook',
+        [8 /* DIRECTIVE_HOOK */]: 'directive hook',
+        [9 /* TRANSITION_HOOK */]: 'transition hook',
+        [10 /* APP_ERROR_HANDLER */]: 'app errorHandler',
+        [11 /* APP_WARN_HANDLER */]: 'app warnHandler',
+        [12 /* FUNCTION_REF */]: 'ref function',
+        [13 /* ASYNC_COMPONENT_LOADER */]: 'async component loader',
+        [14 /* SCHEDULER */]: 'scheduler flush. This is likely a Vue internals bug. ' +
+            'Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/vue-next'
+    };
+    function callWithErrorHandling(fn, instance, type, args) {
+        let res;
+        try {
+            res = args ? fn(...args) : fn();
+        }
+        catch (err) {
+            handleError(err, instance, type);
+        }
+        return res;
+    }
+    function callWithAsyncErrorHandling(fn, instance, type, args) {
+        if (isFunction(fn)) {
+            const res = callWithErrorHandling(fn, instance, type, args);
+            if (res && isPromise(res)) {
+                res.catch(err => {
+                    handleError(err, instance, type);
+                });
+            }
+            return res;
+        }
+        const values = [];
+        for (let i = 0; i < fn.length; i++) {
+            values.push(callWithAsyncErrorHandling(fn[i], instance, type, args));
+        }
+        return values;
+    }
+    function handleError(err, instance, type, throwInDev = true) {
+        const contextVNode = instance ? instance.vnode : null;
+        if (instance) {
+            let cur = instance.parent;
+            // the exposed instance is the render proxy to keep it consistent with 2.x
+            const exposedInstance = instance.proxy;
+            // in production the hook receives only the error code
+            const errorInfo = ErrorTypeStrings[type] ;
+            while (cur) {
+                const errorCapturedHooks = cur.ec;
+                if (errorCapturedHooks) {
+                    for (let i = 0; i < errorCapturedHooks.length; i++) {
+                        if (errorCapturedHooks[i](err, exposedInstance, errorInfo) === false) {
+                            return;
+                        }
+                    }
+                }
+                cur = cur.parent;
+            }
+            // app-level handling
+            const appErrorHandler = instance.appContext.config.errorHandler;
+            if (appErrorHandler) {
+                callWithErrorHandling(appErrorHandler, null, 10 /* APP_ERROR_HANDLER */, [err, exposedInstance, errorInfo]);
+                return;
+            }
+        }
+        logError(err, type, contextVNode, throwInDev);
+    }
+    function logError(err, type, contextVNode, throwInDev = true) {
+        {
+            const info = ErrorTypeStrings[type];
+            if (contextVNode) {
+                pushWarningContext(contextVNode);
+            }
+            warn$2(`Unhandled error${info ? ` during execution of ${info}` : ``}`);
+            if (contextVNode) {
+                popWarningContext();
+            }
+            // crash in dev by default so it's more noticeable
+            if (throwInDev) {
+                throw err;
+            }
+            else {
+                console.error(err);
+            }
+        }
+    }
+
+    let isFlushing = false;
+    let isFlushPending = false;
+    const queue = [];
+    let flushIndex = 0;
+    const pendingPreFlushCbs = [];
+    let activePreFlushCbs = null;
+    let preFlushIndex = 0;
+    const pendingPostFlushCbs = [];
+    let activePostFlushCbs = null;
+    let postFlushIndex = 0;
+    const resolvedPromise = Promise.resolve();
+    let currentFlushPromise = null;
+    let currentPreFlushParentJob = null;
+    const RECURSION_LIMIT = 100;
+    function nextTick(fn) {
+        const p = currentFlushPromise || resolvedPromise;
+        return fn ? p.then(this ? fn.bind(this) : fn) : p;
+    }
+    // #2768
+    // Use binary-search to find a suitable position in the queue,
+    // so that the queue maintains the increasing order of job's id,
+    // which can prevent the job from being skipped and also can avoid repeated patching.
+    function findInsertionIndex(id) {
+        // the start index should be `flushIndex + 1`
+        let start = flushIndex + 1;
+        let end = queue.length;
+        while (start < end) {
+            const middle = (start + end) >>> 1;
+            const middleJobId = getId(queue[middle]);
+            middleJobId < id ? (start = middle + 1) : (end = middle);
+        }
+        return start;
+    }
+    function queueJob(job) {
+        // the dedupe search uses the startIndex argument of Array.includes()
+        // by default the search index includes the current job that is being run
+        // so it cannot recursively trigger itself again.
+        // if the job is a watch() callback, the search will start with a +1 index to
+        // allow it recursively trigger itself - it is the user's responsibility to
+        // ensure it doesn't end up in an infinite loop.
+        if ((!queue.length ||
+            !queue.includes(job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex)) &&
+            job !== currentPreFlushParentJob) {
+            if (job.id == null) {
+                queue.push(job);
+            }
+            else {
+                queue.splice(findInsertionIndex(job.id), 0, job);
+            }
+            queueFlush();
+        }
+    }
+    function queueFlush() {
+        if (!isFlushing && !isFlushPending) {
+            isFlushPending = true;
+            currentFlushPromise = resolvedPromise.then(flushJobs);
+        }
+    }
+    function invalidateJob(job) {
+        const i = queue.indexOf(job);
+        if (i > flushIndex) {
+            queue.splice(i, 1);
+        }
+    }
+    function queueCb(cb, activeQueue, pendingQueue, index) {
+        if (!isArray(cb)) {
+            if (!activeQueue ||
+                !activeQueue.includes(cb, cb.allowRecurse ? index + 1 : index)) {
+                pendingQueue.push(cb);
+            }
+        }
+        else {
+            // if cb is an array, it is a component lifecycle hook which can only be
+            // triggered by a job, which is already deduped in the main queue, so
+            // we can skip duplicate check here to improve perf
+            pendingQueue.push(...cb);
+        }
+        queueFlush();
+    }
+    function queuePreFlushCb(cb) {
+        queueCb(cb, activePreFlushCbs, pendingPreFlushCbs, preFlushIndex);
+    }
+    function queuePostFlushCb(cb) {
+        queueCb(cb, activePostFlushCbs, pendingPostFlushCbs, postFlushIndex);
+    }
+    function flushPreFlushCbs(seen, parentJob = null) {
+        if (pendingPreFlushCbs.length) {
+            currentPreFlushParentJob = parentJob;
+            activePreFlushCbs = [...new Set(pendingPreFlushCbs)];
+            pendingPreFlushCbs.length = 0;
+            {
+                seen = seen || new Map();
+            }
+            for (preFlushIndex = 0; preFlushIndex < activePreFlushCbs.length; preFlushIndex++) {
+                if (checkRecursiveUpdates(seen, activePreFlushCbs[preFlushIndex])) {
+                    continue;
+                }
+                activePreFlushCbs[preFlushIndex]();
+            }
+            activePreFlushCbs = null;
+            preFlushIndex = 0;
+            currentPreFlushParentJob = null;
+            // recursively flush until it drains
+            flushPreFlushCbs(seen, parentJob);
+        }
+    }
+    function flushPostFlushCbs(seen) {
+        if (pendingPostFlushCbs.length) {
+            const deduped = [...new Set(pendingPostFlushCbs)];
+            pendingPostFlushCbs.length = 0;
+            // #1947 already has active queue, nested flushPostFlushCbs call
+            if (activePostFlushCbs) {
+                activePostFlushCbs.push(...deduped);
+                return;
+            }
+            activePostFlushCbs = deduped;
+            {
+                seen = seen || new Map();
+            }
+            activePostFlushCbs.sort((a, b) => getId(a) - getId(b));
+            for (postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++) {
+                if (checkRecursiveUpdates(seen, activePostFlushCbs[postFlushIndex])) {
+                    continue;
+                }
+                activePostFlushCbs[postFlushIndex]();
+            }
+            activePostFlushCbs = null;
+            postFlushIndex = 0;
+        }
+    }
+    const getId = (job) => job.id == null ? Infinity : job.id;
+    function flushJobs(seen) {
+        isFlushPending = false;
+        isFlushing = true;
+        {
+            seen = seen || new Map();
+        }
+        flushPreFlushCbs(seen);
+        // Sort queue before flush.
+        // This ensures that:
+        // 1. Components are updated from parent to child. (because parent is always
+        //    created before the child so its render effect will have smaller
+        //    priority number)
+        // 2. If a component is unmounted during a parent component's update,
+        //    its update can be skipped.
+        queue.sort((a, b) => getId(a) - getId(b));
+        // conditional usage of checkRecursiveUpdate must be determined out of
+        // try ... catch block since Rollup by default de-optimizes treeshaking
+        // inside try-catch. This can leave all warning code unshaked. Although
+        // they would get eventually shaken by a minifier like terser, some minifiers
+        // would fail to do that (e.g. https://github.com/evanw/esbuild/issues/1610)
+        const check = (job) => checkRecursiveUpdates(seen, job)
+            ;
+        try {
+            for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+                const job = queue[flushIndex];
+                if (job && job.active !== false) {
+                    if (("development" !== 'production') && check(job)) {
+                        continue;
+                    }
+                    // console.log(`running:`, job.id)
+                    callWithErrorHandling(job, null, 14 /* SCHEDULER */);
+                }
+            }
+        }
+        finally {
+            flushIndex = 0;
+            queue.length = 0;
+            flushPostFlushCbs(seen);
+            isFlushing = false;
+            currentFlushPromise = null;
+            // some postFlushCb queued jobs!
+            // keep flushing until it drains.
+            if (queue.length ||
+                pendingPreFlushCbs.length ||
+                pendingPostFlushCbs.length) {
+                flushJobs(seen);
+            }
+        }
+    }
+    function checkRecursiveUpdates(seen, fn) {
+        if (!seen.has(fn)) {
+            seen.set(fn, 1);
+        }
+        else {
+            const count = seen.get(fn);
+            if (count > RECURSION_LIMIT) {
+                const instance = fn.ownerInstance;
+                const componentName = instance && getComponentName(instance.type);
+                warn$2(`Maximum recursive updates exceeded${componentName ? ` in component <${componentName}>` : ``}. ` +
+                    `This means you have a reactive effect that is mutating its own ` +
+                    `dependencies and thus recursively triggering itself. Possible sources ` +
+                    `include component template, render function, updated hook or ` +
+                    `watcher source function.`);
+                return true;
+            }
+            else {
+                seen.set(fn, count + 1);
+            }
+        }
+    }
+
+    // Simple effect.
+    function watchEffect(effect, options) {
+        return doWatch(effect, null, options);
+    }
+    // initial value for watchers to trigger on undefined initial values
+    const INITIAL_WATCHER_VALUE = {};
+    // implementation
+    function watch(source, cb, options) {
+        if (!isFunction(cb)) {
+            warn$2(`\`watch(fn, options?)\` signature has been moved to a separate API. ` +
+                `Use \`watchEffect(fn, options?)\` instead. \`watch\` now only ` +
+                `supports \`watch(source, cb, options?) signature.`);
+        }
+        return doWatch(source, cb, options);
+    }
+    function doWatch(source, cb, { immediate, deep, flush, onTrack, onTrigger } = EMPTY_OBJ) {
+        if (!cb) {
+            if (immediate !== undefined) {
+                warn$2(`watch() "immediate" option is only respected when using the ` +
+                    `watch(source, callback, options?) signature.`);
+            }
+            if (deep !== undefined) {
+                warn$2(`watch() "deep" option is only respected when using the ` +
+                    `watch(source, callback, options?) signature.`);
+            }
+        }
+        const warnInvalidSource = (s) => {
+            warn$2(`Invalid watch source: `, s, `A watch source can only be a getter/effect function, a ref, ` +
+                `a reactive object, or an array of these types.`);
+        };
+        const instance = currentInstance;
+        let getter;
+        let forceTrigger = false;
+        let isMultiSource = false;
+        if (isRef(source)) {
+            getter = () => source.value;
+            forceTrigger = !!source._shallow;
+        }
+        else if (isReactive(source)) {
+            getter = () => source;
+            deep = true;
+        }
+        else if (isArray(source)) {
+            isMultiSource = true;
+            forceTrigger = source.some(isReactive);
+            getter = () => source.map(s => {
+                if (isRef(s)) {
+                    return s.value;
+                }
+                else if (isReactive(s)) {
+                    return traverse(s);
+                }
+                else if (isFunction(s)) {
+                    return callWithErrorHandling(s, instance, 2 /* WATCH_GETTER */);
+                }
+                else {
+                    warnInvalidSource(s);
+                }
+            });
+        }
+        else if (isFunction(source)) {
+            if (cb) {
+                // getter with cb
+                getter = () => callWithErrorHandling(source, instance, 2 /* WATCH_GETTER */);
+            }
+            else {
+                // no cb -> simple effect
+                getter = () => {
+                    if (instance && instance.isUnmounted) {
+                        return;
+                    }
+                    if (cleanup) {
+                        cleanup();
+                    }
+                    return callWithAsyncErrorHandling(source, instance, 3 /* WATCH_CALLBACK */, [onInvalidate]);
+                };
+            }
+        }
+        else {
+            getter = NOOP;
+            warnInvalidSource(source);
+        }
+        if (cb && deep) {
+            const baseGetter = getter;
+            getter = () => traverse(baseGetter());
+        }
+        let cleanup;
+        let onInvalidate = (fn) => {
+            cleanup = effect.onStop = () => {
+                callWithErrorHandling(fn, instance, 4 /* WATCH_CLEANUP */);
+            };
+        };
+        // in SSR there is no need to setup an actual effect, and it should be noop
+        // unless it's eager
+        if (isInSSRComponentSetup) {
+            // we will also not call the invalidate callback (+ runner is not set up)
+            onInvalidate = NOOP;
+            if (!cb) {
+                getter();
+            }
+            else if (immediate) {
+                callWithAsyncErrorHandling(cb, instance, 3 /* WATCH_CALLBACK */, [
+                    getter(),
+                    isMultiSource ? [] : undefined,
+                    onInvalidate
+                ]);
+            }
+            return NOOP;
+        }
+        let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE;
+        const job = () => {
+            if (!effect.active) {
+                return;
+            }
+            if (cb) {
+                // watch(source, cb)
+                const newValue = effect.run();
+                if (deep ||
+                    forceTrigger ||
+                    (isMultiSource
+                        ? newValue.some((v, i) => hasChanged(v, oldValue[i]))
+                        : hasChanged(newValue, oldValue)) ||
+                    (false  )) {
+                    // cleanup before running cb again
+                    if (cleanup) {
+                        cleanup();
+                    }
+                    callWithAsyncErrorHandling(cb, instance, 3 /* WATCH_CALLBACK */, [
+                        newValue,
+                        // pass undefined as the old value when it's changed for the first time
+                        oldValue === INITIAL_WATCHER_VALUE ? undefined : oldValue,
+                        onInvalidate
+                    ]);
+                    oldValue = newValue;
+                }
+            }
+            else {
+                // watchEffect
+                effect.run();
+            }
+        };
+        // important: mark the job as a watcher callback so that scheduler knows
+        // it is allowed to self-trigger (#1727)
+        job.allowRecurse = !!cb;
+        let scheduler;
+        if (flush === 'sync') {
+            scheduler = job; // the scheduler function gets called directly
+        }
+        else if (flush === 'post') {
+            scheduler = () => queuePostRenderEffect(job, instance && instance.suspense);
+        }
+        else {
+            // default: 'pre'
+            scheduler = () => {
+                if (!instance || instance.isMounted) {
+                    queuePreFlushCb(job);
+                }
+                else {
+                    // with 'pre' option, the first call must happen before
+                    // the component is mounted so it is called synchronously.
+                    job();
+                }
+            };
+        }
+        const effect = new ReactiveEffect(getter, scheduler);
+        {
+            effect.onTrack = onTrack;
+            effect.onTrigger = onTrigger;
+        }
+        // initial run
+        if (cb) {
+            if (immediate) {
+                job();
+            }
+            else {
+                oldValue = effect.run();
+            }
+        }
+        else if (flush === 'post') {
+            queuePostRenderEffect(effect.run.bind(effect), instance && instance.suspense);
+        }
+        else {
+            effect.run();
+        }
+        return () => {
+            effect.stop();
+            if (instance && instance.scope) {
+                remove$1(instance.scope.effects, effect);
+            }
+        };
+    }
+    // this.$watch
+    function instanceWatch(source, value, options) {
+        const publicThis = this.proxy;
+        const getter = isString(source)
+            ? source.includes('.')
+                ? createPathGetter(publicThis, source)
+                : () => publicThis[source]
+            : source.bind(publicThis, publicThis);
+        let cb;
+        if (isFunction(value)) {
+            cb = value;
+        }
+        else {
+            cb = value.handler;
+            options = value;
+        }
+        const cur = currentInstance;
+        setCurrentInstance(this);
+        const res = doWatch(getter, cb.bind(publicThis), options);
+        if (cur) {
+            setCurrentInstance(cur);
+        }
+        else {
+            unsetCurrentInstance();
+        }
+        return res;
+    }
+    function createPathGetter(ctx, path) {
+        const segments = path.split('.');
+        return () => {
+            let cur = ctx;
+            for (let i = 0; i < segments.length && cur; i++) {
+                cur = cur[segments[i]];
+            }
+            return cur;
+        };
+    }
+    function traverse(value, seen) {
+        if (!isObject$1(value) || value["__v_skip" /* SKIP */]) {
+            return value;
+        }
+        seen = seen || new Set();
+        if (seen.has(value)) {
+            return value;
+        }
+        seen.add(value);
+        if (isRef(value)) {
+            traverse(value.value, seen);
+        }
+        else if (isArray(value)) {
+            for (let i = 0; i < value.length; i++) {
+                traverse(value[i], seen);
+            }
+        }
+        else if (isSet(value) || isMap(value)) {
+            value.forEach((v) => {
+                traverse(v, seen);
+            });
+        }
+        else if (isPlainObject(value)) {
+            for (const key in value) {
+                traverse(value[key], seen);
+            }
+        }
+        return value;
+    }
 
     // Actual implementation
     function h$1(type, propsOrChildren, children) {
@@ -7111,10 +7083,6 @@
             }
             return createVNode(type, propsOrChildren, children);
         }
-    }
-
-    function isShallow(value) {
-        return !!(value && value["__v_isShallow" /* IS_SHALLOW */]);
     }
 
     function initCustomFormatter() {
@@ -7151,7 +7119,7 @@
                     return [
                         'div',
                         {},
-                        ['span', vueStyle, isShallow(obj) ? 'ShallowReactive' : 'Reactive'],
+                        ['span', vueStyle, 'Reactive'],
                         '<',
                         formatValue(obj),
                         `>${isReadonly(obj) ? ` (readonly)` : ``}`
@@ -7161,7 +7129,7 @@
                     return [
                         'div',
                         {},
-                        ['span', vueStyle, isShallow(obj) ? 'ShallowReadonly' : 'Readonly'],
+                        ['span', vueStyle, 'Readonly'],
                         '<',
                         formatValue(obj),
                         '>'
@@ -7290,7 +7258,7 @@
             }
         }
         function genRefFlag(v) {
-            if (isShallow(v)) {
+            if (v._shallow) {
                 return `ShallowRef`;
             }
             if (v.effect) {
@@ -7307,11 +7275,11 @@
     }
 
     // Core API ------------------------------------------------------------------
-    const version = "3.2.29";
+    const version = "3.2.26";
 
     const svgNS = 'http://www.w3.org/2000/svg';
     const doc = (typeof document !== 'undefined' ? document : null);
-    const templateContainer = doc && doc.createElement('template');
+    const staticTemplateCache = new Map();
     const nodeOps = {
         insert: (child, parent, anchor) => {
             parent.insertBefore(child, anchor || null);
@@ -7365,24 +7333,14 @@
         // Reason: innerHTML.
         // Static content here can only come from compiled templates.
         // As long as the user only uses trusted templates, this is safe.
-        insertStaticContent(content, parent, anchor, isSVG, start, end) {
+        insertStaticContent(content, parent, anchor, isSVG) {
             // <parent> before | first ... last | anchor </parent>
             const before = anchor ? anchor.previousSibling : parent.lastChild;
-            // #5308 can only take cached path if:
-            // - has a single root node
-            // - nextSibling info is still available
-            if (start && (start === end || start.nextSibling)) {
-                // cached
-                while (true) {
-                    parent.insertBefore(start.cloneNode(true), anchor);
-                    if (start === end || !(start = start.nextSibling))
-                        break;
-                }
-            }
-            else {
-                // fresh insert
-                templateContainer.innerHTML = isSVG ? `<svg>${content}</svg>` : content;
-                const template = templateContainer.content;
+            let template = staticTemplateCache.get(content);
+            if (!template) {
+                const t = doc.createElement('template');
+                t.innerHTML = isSVG ? `<svg>${content}</svg>` : content;
+                template = t.content;
                 if (isSVG) {
                     // remove outer svg wrapper
                     const wrapper = template.firstChild;
@@ -7391,8 +7349,9 @@
                     }
                     template.removeChild(wrapper);
                 }
-                parent.insertBefore(template, anchor);
+                staticTemplateCache.set(content, template);
             }
+            parent.insertBefore(template.cloneNode(true), anchor);
             return [
                 // first
                 before ? before.nextSibling : parent.firstChild,
@@ -7684,7 +7643,7 @@
                 originalStop.call(e);
                 e._stopped = true;
             };
-            return value.map(fn => (e) => !e._stopped && fn && fn(e));
+            return value.map(fn => (e) => !e._stopped && fn(e));
         }
         else {
             return value;
@@ -12455,21 +12414,13 @@
           adaptive = _ref2.adaptive,
           roundOffsets = _ref2.roundOffsets,
           isFixed = _ref2.isFixed;
-      var _offsets$x = offsets.x,
-          x = _offsets$x === void 0 ? 0 : _offsets$x,
-          _offsets$y = offsets.y,
-          y = _offsets$y === void 0 ? 0 : _offsets$y;
 
-      var _ref3 = typeof roundOffsets === 'function' ? roundOffsets({
-        x: x,
-        y: y
-      }) : {
-        x: x,
-        y: y
-      };
+      var _ref3 = roundOffsets === true ? roundOffsetsByDPR(offsets) : typeof roundOffsets === 'function' ? roundOffsets(offsets) : offsets,
+          _ref3$x = _ref3.x,
+          x = _ref3$x === void 0 ? 0 : _ref3$x,
+          _ref3$y = _ref3.y,
+          y = _ref3$y === void 0 ? 0 : _ref3$y;
 
-      x = _ref3.x;
-      y = _ref3.y;
       var hasX = offsets.hasOwnProperty('x');
       var hasY = offsets.hasOwnProperty('y');
       var sideX = left;
@@ -12514,17 +12465,6 @@
         position: position
       }, adaptive && unsetSides);
 
-      var _ref4 = roundOffsets === true ? roundOffsetsByDPR({
-        x: x,
-        y: y
-      }) : {
-        x: x,
-        y: y
-      };
-
-      x = _ref4.x;
-      y = _ref4.y;
-
       if (gpuAcceleration) {
         var _Object$assign;
 
@@ -12534,9 +12474,9 @@
       return Object.assign({}, commonStyles, (_Object$assign2 = {}, _Object$assign2[sideY] = hasY ? y + "px" : '', _Object$assign2[sideX] = hasX ? x + "px" : '', _Object$assign2.transform = '', _Object$assign2));
     }
 
-    function computeStyles(_ref5) {
-      var state = _ref5.state,
-          options = _ref5.options;
+    function computeStyles(_ref4) {
+      var state = _ref4.state,
+          options = _ref4.options;
       var _options$gpuAccelerat = options.gpuAcceleration,
           gpuAcceleration = _options$gpuAccelerat === void 0 ? true : _options$gpuAccelerat,
           _options$adaptive = options.adaptive,
@@ -12835,7 +12775,7 @@
 
 
       return clippingParents.filter(function (clippingParent) {
-        return isElement$1(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body';
+        return isElement$1(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body' && (canEscapeClipping ? getComputedStyle$1(clippingParent).position !== 'static' : true);
       });
     } // Gets the maximum area that the element is visible in due to any number of
     // clipping parents
@@ -20400,2699 +20340,6 @@
     script$a.render = render$a;
     script$a.__file = "src/views/HKIbook.vue";
 
-    /**
-     * marked - a markdown parser
-     * Copyright (c) 2011-2022, Christopher Jeffrey. (MIT Licensed)
-     * https://github.com/markedjs/marked
-     */
-
-    /**
-     * DO NOT EDIT THIS FILE
-     * The code in this file is generated from files in ./src/
-     */
-
-    function getDefaults() {
-      return {
-        baseUrl: null,
-        breaks: false,
-        extensions: null,
-        gfm: true,
-        headerIds: true,
-        headerPrefix: '',
-        highlight: null,
-        langPrefix: 'language-',
-        mangle: true,
-        pedantic: false,
-        renderer: null,
-        sanitize: false,
-        sanitizer: null,
-        silent: false,
-        smartLists: false,
-        smartypants: false,
-        tokenizer: null,
-        walkTokens: null,
-        xhtml: false
-      };
-    }
-
-    let defaults = getDefaults();
-
-    function changeDefaults(newDefaults) {
-      defaults = newDefaults;
-    }
-
-    /**
-     * Helpers
-     */
-    const escapeTest = /[&<>"']/;
-    const escapeReplace = /[&<>"']/g;
-    const escapeTestNoEncode = /[<>"']|&(?!#?\w+;)/;
-    const escapeReplaceNoEncode = /[<>"']|&(?!#?\w+;)/g;
-    const escapeReplacements = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    };
-    const getEscapeReplacement = (ch) => escapeReplacements[ch];
-    function escape(html, encode) {
-      if (encode) {
-        if (escapeTest.test(html)) {
-          return html.replace(escapeReplace, getEscapeReplacement);
-        }
-      } else {
-        if (escapeTestNoEncode.test(html)) {
-          return html.replace(escapeReplaceNoEncode, getEscapeReplacement);
-        }
-      }
-
-      return html;
-    }
-
-    const unescapeTest = /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig;
-
-    function unescape(html) {
-      // explicitly match decimal, hex, and named HTML entities
-      return html.replace(unescapeTest, (_, n) => {
-        n = n.toLowerCase();
-        if (n === 'colon') return ':';
-        if (n.charAt(0) === '#') {
-          return n.charAt(1) === 'x'
-            ? String.fromCharCode(parseInt(n.substring(2), 16))
-            : String.fromCharCode(+n.substring(1));
-        }
-        return '';
-      });
-    }
-
-    const caret = /(^|[^\[])\^/g;
-    function edit(regex, opt) {
-      regex = regex.source || regex;
-      opt = opt || '';
-      const obj = {
-        replace: (name, val) => {
-          val = val.source || val;
-          val = val.replace(caret, '$1');
-          regex = regex.replace(name, val);
-          return obj;
-        },
-        getRegex: () => {
-          return new RegExp(regex, opt);
-        }
-      };
-      return obj;
-    }
-
-    const nonWordAndColonTest = /[^\w:]/g;
-    const originIndependentUrl = /^$|^[a-z][a-z0-9+.-]*:|^[?#]/i;
-    function cleanUrl(sanitize, base, href) {
-      if (sanitize) {
-        let prot;
-        try {
-          prot = decodeURIComponent(unescape(href))
-            .replace(nonWordAndColonTest, '')
-            .toLowerCase();
-        } catch (e) {
-          return null;
-        }
-        if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0 || prot.indexOf('data:') === 0) {
-          return null;
-        }
-      }
-      if (base && !originIndependentUrl.test(href)) {
-        href = resolveUrl(base, href);
-      }
-      try {
-        href = encodeURI(href).replace(/%25/g, '%');
-      } catch (e) {
-        return null;
-      }
-      return href;
-    }
-
-    const baseUrls = {};
-    const justDomain = /^[^:]+:\/*[^/]*$/;
-    const protocol = /^([^:]+:)[\s\S]*$/;
-    const domain = /^([^:]+:\/*[^/]*)[\s\S]*$/;
-
-    function resolveUrl(base, href) {
-      if (!baseUrls[' ' + base]) {
-        // we can ignore everything in base after the last slash of its path component,
-        // but we might need to add _that_
-        // https://tools.ietf.org/html/rfc3986#section-3
-        if (justDomain.test(base)) {
-          baseUrls[' ' + base] = base + '/';
-        } else {
-          baseUrls[' ' + base] = rtrim(base, '/', true);
-        }
-      }
-      base = baseUrls[' ' + base];
-      const relativeBase = base.indexOf(':') === -1;
-
-      if (href.substring(0, 2) === '//') {
-        if (relativeBase) {
-          return href;
-        }
-        return base.replace(protocol, '$1') + href;
-      } else if (href.charAt(0) === '/') {
-        if (relativeBase) {
-          return href;
-        }
-        return base.replace(domain, '$1') + href;
-      } else {
-        return base + href;
-      }
-    }
-
-    const noopTest = { exec: function noopTest() {} };
-
-    function merge(obj) {
-      let i = 1,
-        target,
-        key;
-
-      for (; i < arguments.length; i++) {
-        target = arguments[i];
-        for (key in target) {
-          if (Object.prototype.hasOwnProperty.call(target, key)) {
-            obj[key] = target[key];
-          }
-        }
-      }
-
-      return obj;
-    }
-
-    function splitCells(tableRow, count) {
-      // ensure that every cell-delimiting pipe has a space
-      // before it to distinguish it from an escaped pipe
-      const row = tableRow.replace(/\|/g, (match, offset, str) => {
-          let escaped = false,
-            curr = offset;
-          while (--curr >= 0 && str[curr] === '\\') escaped = !escaped;
-          if (escaped) {
-            // odd number of slashes means | is escaped
-            // so we leave it alone
-            return '|';
-          } else {
-            // add space before unescaped |
-            return ' |';
-          }
-        }),
-        cells = row.split(/ \|/);
-      let i = 0;
-
-      // First/last cell in a row cannot be empty if it has no leading/trailing pipe
-      if (!cells[0].trim()) { cells.shift(); }
-      if (!cells[cells.length - 1].trim()) { cells.pop(); }
-
-      if (cells.length > count) {
-        cells.splice(count);
-      } else {
-        while (cells.length < count) cells.push('');
-      }
-
-      for (; i < cells.length; i++) {
-        // leading or trailing whitespace is ignored per the gfm spec
-        cells[i] = cells[i].trim().replace(/\\\|/g, '|');
-      }
-      return cells;
-    }
-
-    // Remove trailing 'c's. Equivalent to str.replace(/c*$/, '').
-    // /c*$/ is vulnerable to REDOS.
-    // invert: Remove suffix of non-c chars instead. Default falsey.
-    function rtrim(str, c, invert) {
-      const l = str.length;
-      if (l === 0) {
-        return '';
-      }
-
-      // Length of suffix matching the invert condition.
-      let suffLen = 0;
-
-      // Step left until we fail to match the invert condition.
-      while (suffLen < l) {
-        const currChar = str.charAt(l - suffLen - 1);
-        if (currChar === c && !invert) {
-          suffLen++;
-        } else if (currChar !== c && invert) {
-          suffLen++;
-        } else {
-          break;
-        }
-      }
-
-      return str.substr(0, l - suffLen);
-    }
-
-    function findClosingBracket(str, b) {
-      if (str.indexOf(b[1]) === -1) {
-        return -1;
-      }
-      const l = str.length;
-      let level = 0,
-        i = 0;
-      for (; i < l; i++) {
-        if (str[i] === '\\') {
-          i++;
-        } else if (str[i] === b[0]) {
-          level++;
-        } else if (str[i] === b[1]) {
-          level--;
-          if (level < 0) {
-            return i;
-          }
-        }
-      }
-      return -1;
-    }
-
-    function checkSanitizeDeprecation(opt) {
-      if (opt && opt.sanitize && !opt.silent) {
-        console.warn('marked(): sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options');
-      }
-    }
-
-    // copied from https://stackoverflow.com/a/5450113/806777
-    function repeatString(pattern, count) {
-      if (count < 1) {
-        return '';
-      }
-      let result = '';
-      while (count > 1) {
-        if (count & 1) {
-          result += pattern;
-        }
-        count >>= 1;
-        pattern += pattern;
-      }
-      return result + pattern;
-    }
-
-    function outputLink(cap, link, raw, lexer) {
-      const href = link.href;
-      const title = link.title ? escape(link.title) : null;
-      const text = cap[1].replace(/\\([\[\]])/g, '$1');
-
-      if (cap[0].charAt(0) !== '!') {
-        lexer.state.inLink = true;
-        const token = {
-          type: 'link',
-          raw,
-          href,
-          title,
-          text,
-          tokens: lexer.inlineTokens(text, [])
-        };
-        lexer.state.inLink = false;
-        return token;
-      } else {
-        return {
-          type: 'image',
-          raw,
-          href,
-          title,
-          text: escape(text)
-        };
-      }
-    }
-
-    function indentCodeCompensation(raw, text) {
-      const matchIndentToCode = raw.match(/^(\s+)(?:```)/);
-
-      if (matchIndentToCode === null) {
-        return text;
-      }
-
-      const indentToCode = matchIndentToCode[1];
-
-      return text
-        .split('\n')
-        .map(node => {
-          const matchIndentInNode = node.match(/^\s+/);
-          if (matchIndentInNode === null) {
-            return node;
-          }
-
-          const [indentInNode] = matchIndentInNode;
-
-          if (indentInNode.length >= indentToCode.length) {
-            return node.slice(indentToCode.length);
-          }
-
-          return node;
-        })
-        .join('\n');
-    }
-
-    /**
-     * Tokenizer
-     */
-    class Tokenizer {
-      constructor(options) {
-        this.options = options || defaults;
-      }
-
-      space(src) {
-        const cap = this.rules.block.newline.exec(src);
-        if (cap && cap[0].length > 0) {
-          return {
-            type: 'space',
-            raw: cap[0]
-          };
-        }
-      }
-
-      code(src) {
-        const cap = this.rules.block.code.exec(src);
-        if (cap) {
-          const text = cap[0].replace(/^ {1,4}/gm, '');
-          return {
-            type: 'code',
-            raw: cap[0],
-            codeBlockStyle: 'indented',
-            text: !this.options.pedantic
-              ? rtrim(text, '\n')
-              : text
-          };
-        }
-      }
-
-      fences(src) {
-        const cap = this.rules.block.fences.exec(src);
-        if (cap) {
-          const raw = cap[0];
-          const text = indentCodeCompensation(raw, cap[3] || '');
-
-          return {
-            type: 'code',
-            raw,
-            lang: cap[2] ? cap[2].trim() : cap[2],
-            text
-          };
-        }
-      }
-
-      heading(src) {
-        const cap = this.rules.block.heading.exec(src);
-        if (cap) {
-          let text = cap[2].trim();
-
-          // remove trailing #s
-          if (/#$/.test(text)) {
-            const trimmed = rtrim(text, '#');
-            if (this.options.pedantic) {
-              text = trimmed.trim();
-            } else if (!trimmed || / $/.test(trimmed)) {
-              // CommonMark requires space before trailing #s
-              text = trimmed.trim();
-            }
-          }
-
-          const token = {
-            type: 'heading',
-            raw: cap[0],
-            depth: cap[1].length,
-            text: text,
-            tokens: []
-          };
-          this.lexer.inline(token.text, token.tokens);
-          return token;
-        }
-      }
-
-      hr(src) {
-        const cap = this.rules.block.hr.exec(src);
-        if (cap) {
-          return {
-            type: 'hr',
-            raw: cap[0]
-          };
-        }
-      }
-
-      blockquote(src) {
-        const cap = this.rules.block.blockquote.exec(src);
-        if (cap) {
-          const text = cap[0].replace(/^ *> ?/gm, '');
-
-          return {
-            type: 'blockquote',
-            raw: cap[0],
-            tokens: this.lexer.blockTokens(text, []),
-            text
-          };
-        }
-      }
-
-      list(src) {
-        let cap = this.rules.block.list.exec(src);
-        if (cap) {
-          let raw, istask, ischecked, indent, i, blankLine, endsWithBlankLine,
-            line, nextLine, rawLine, itemContents, endEarly;
-
-          let bull = cap[1].trim();
-          const isordered = bull.length > 1;
-
-          const list = {
-            type: 'list',
-            raw: '',
-            ordered: isordered,
-            start: isordered ? +bull.slice(0, -1) : '',
-            loose: false,
-            items: []
-          };
-
-          bull = isordered ? `\\d{1,9}\\${bull.slice(-1)}` : `\\${bull}`;
-
-          if (this.options.pedantic) {
-            bull = isordered ? bull : '[*+-]';
-          }
-
-          // Get next list item
-          const itemRegex = new RegExp(`^( {0,3}${bull})((?: [^\\n]*)?(?:\\n|$))`);
-
-          // Check if current bullet point can start a new List Item
-          while (src) {
-            endEarly = false;
-            if (!(cap = itemRegex.exec(src))) {
-              break;
-            }
-
-            if (this.rules.block.hr.test(src)) { // End list if bullet was actually HR (possibly move into itemRegex?)
-              break;
-            }
-
-            raw = cap[0];
-            src = src.substring(raw.length);
-
-            line = cap[2].split('\n', 1)[0];
-            nextLine = src.split('\n', 1)[0];
-
-            if (this.options.pedantic) {
-              indent = 2;
-              itemContents = line.trimLeft();
-            } else {
-              indent = cap[2].search(/[^ ]/); // Find first non-space char
-              indent = indent > 4 ? 1 : indent; // Treat indented code blocks (> 4 spaces) as having only 1 indent
-              itemContents = line.slice(indent);
-              indent += cap[1].length;
-            }
-
-            blankLine = false;
-
-            if (!line && /^ *$/.test(nextLine)) { // Items begin with at most one blank line
-              raw += nextLine + '\n';
-              src = src.substring(nextLine.length + 1);
-              endEarly = true;
-            }
-
-            if (!endEarly) {
-              const nextBulletRegex = new RegExp(`^ {0,${Math.min(3, indent - 1)}}(?:[*+-]|\\d{1,9}[.)])`);
-
-              // Check if following lines should be included in List Item
-              while (src) {
-                rawLine = src.split('\n', 1)[0];
-                line = rawLine;
-
-                // Re-align to follow commonmark nesting rules
-                if (this.options.pedantic) {
-                  line = line.replace(/^ {1,4}(?=( {4})*[^ ])/g, '  ');
-                }
-
-                // End list item if found start of new bullet
-                if (nextBulletRegex.test(line)) {
-                  break;
-                }
-
-                if (line.search(/[^ ]/) >= indent || !line.trim()) { // Dedent if possible
-                  itemContents += '\n' + line.slice(indent);
-                } else if (!blankLine) { // Until blank line, item doesn't need indentation
-                  itemContents += '\n' + line;
-                } else { // Otherwise, improper indentation ends this item
-                  break;
-                }
-
-                if (!blankLine && !line.trim()) { // Check if current line is blank
-                  blankLine = true;
-                }
-
-                raw += rawLine + '\n';
-                src = src.substring(rawLine.length + 1);
-              }
-            }
-
-            if (!list.loose) {
-              // If the previous item ended with a blank line, the list is loose
-              if (endsWithBlankLine) {
-                list.loose = true;
-              } else if (/\n *\n *$/.test(raw)) {
-                endsWithBlankLine = true;
-              }
-            }
-
-            // Check for task list items
-            if (this.options.gfm) {
-              istask = /^\[[ xX]\] /.exec(itemContents);
-              if (istask) {
-                ischecked = istask[0] !== '[ ] ';
-                itemContents = itemContents.replace(/^\[[ xX]\] +/, '');
-              }
-            }
-
-            list.items.push({
-              type: 'list_item',
-              raw: raw,
-              task: !!istask,
-              checked: ischecked,
-              loose: false,
-              text: itemContents
-            });
-
-            list.raw += raw;
-          }
-
-          // Do not consume newlines at end of final item. Alternatively, make itemRegex *start* with any newlines to simplify/speed up endsWithBlankLine logic
-          list.items[list.items.length - 1].raw = raw.trimRight();
-          list.items[list.items.length - 1].text = itemContents.trimRight();
-          list.raw = list.raw.trimRight();
-
-          const l = list.items.length;
-
-          // Item child tokens handled here at end because we needed to have the final item to trim it first
-          for (i = 0; i < l; i++) {
-            this.lexer.state.top = false;
-            list.items[i].tokens = this.lexer.blockTokens(list.items[i].text, []);
-            const spacers = list.items[i].tokens.filter(t => t.type === 'space');
-            const hasMultipleLineBreaks = spacers.every(t => {
-              const chars = t.raw.split('');
-              let lineBreaks = 0;
-              for (const char of chars) {
-                if (char === '\n') {
-                  lineBreaks += 1;
-                }
-                if (lineBreaks > 1) {
-                  return true;
-                }
-              }
-
-              return false;
-            });
-
-            if (!list.loose && spacers.length && hasMultipleLineBreaks) {
-              // Having a single line break doesn't mean a list is loose. A single line break is terminating the last list item
-              list.loose = true;
-              list.items[i].loose = true;
-            }
-          }
-
-          return list;
-        }
-      }
-
-      html(src) {
-        const cap = this.rules.block.html.exec(src);
-        if (cap) {
-          const token = {
-            type: 'html',
-            raw: cap[0],
-            pre: !this.options.sanitizer
-              && (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
-            text: cap[0]
-          };
-          if (this.options.sanitize) {
-            token.type = 'paragraph';
-            token.text = this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0]);
-            token.tokens = [];
-            this.lexer.inline(token.text, token.tokens);
-          }
-          return token;
-        }
-      }
-
-      def(src) {
-        const cap = this.rules.block.def.exec(src);
-        if (cap) {
-          if (cap[3]) cap[3] = cap[3].substring(1, cap[3].length - 1);
-          const tag = cap[1].toLowerCase().replace(/\s+/g, ' ');
-          return {
-            type: 'def',
-            tag,
-            raw: cap[0],
-            href: cap[2],
-            title: cap[3]
-          };
-        }
-      }
-
-      table(src) {
-        const cap = this.rules.block.table.exec(src);
-        if (cap) {
-          const item = {
-            type: 'table',
-            header: splitCells(cap[1]).map(c => { return { text: c }; }),
-            align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-            rows: cap[3] ? cap[3].replace(/\n[ \t]*$/, '').split('\n') : []
-          };
-
-          if (item.header.length === item.align.length) {
-            item.raw = cap[0];
-
-            let l = item.align.length;
-            let i, j, k, row;
-            for (i = 0; i < l; i++) {
-              if (/^ *-+: *$/.test(item.align[i])) {
-                item.align[i] = 'right';
-              } else if (/^ *:-+: *$/.test(item.align[i])) {
-                item.align[i] = 'center';
-              } else if (/^ *:-+ *$/.test(item.align[i])) {
-                item.align[i] = 'left';
-              } else {
-                item.align[i] = null;
-              }
-            }
-
-            l = item.rows.length;
-            for (i = 0; i < l; i++) {
-              item.rows[i] = splitCells(item.rows[i], item.header.length).map(c => { return { text: c }; });
-            }
-
-            // parse child tokens inside headers and cells
-
-            // header child tokens
-            l = item.header.length;
-            for (j = 0; j < l; j++) {
-              item.header[j].tokens = [];
-              this.lexer.inlineTokens(item.header[j].text, item.header[j].tokens);
-            }
-
-            // cell child tokens
-            l = item.rows.length;
-            for (j = 0; j < l; j++) {
-              row = item.rows[j];
-              for (k = 0; k < row.length; k++) {
-                row[k].tokens = [];
-                this.lexer.inlineTokens(row[k].text, row[k].tokens);
-              }
-            }
-
-            return item;
-          }
-        }
-      }
-
-      lheading(src) {
-        const cap = this.rules.block.lheading.exec(src);
-        if (cap) {
-          const token = {
-            type: 'heading',
-            raw: cap[0],
-            depth: cap[2].charAt(0) === '=' ? 1 : 2,
-            text: cap[1],
-            tokens: []
-          };
-          this.lexer.inline(token.text, token.tokens);
-          return token;
-        }
-      }
-
-      paragraph(src) {
-        const cap = this.rules.block.paragraph.exec(src);
-        if (cap) {
-          const token = {
-            type: 'paragraph',
-            raw: cap[0],
-            text: cap[1].charAt(cap[1].length - 1) === '\n'
-              ? cap[1].slice(0, -1)
-              : cap[1],
-            tokens: []
-          };
-          this.lexer.inline(token.text, token.tokens);
-          return token;
-        }
-      }
-
-      text(src) {
-        const cap = this.rules.block.text.exec(src);
-        if (cap) {
-          const token = {
-            type: 'text',
-            raw: cap[0],
-            text: cap[0],
-            tokens: []
-          };
-          this.lexer.inline(token.text, token.tokens);
-          return token;
-        }
-      }
-
-      escape(src) {
-        const cap = this.rules.inline.escape.exec(src);
-        if (cap) {
-          return {
-            type: 'escape',
-            raw: cap[0],
-            text: escape(cap[1])
-          };
-        }
-      }
-
-      tag(src) {
-        const cap = this.rules.inline.tag.exec(src);
-        if (cap) {
-          if (!this.lexer.state.inLink && /^<a /i.test(cap[0])) {
-            this.lexer.state.inLink = true;
-          } else if (this.lexer.state.inLink && /^<\/a>/i.test(cap[0])) {
-            this.lexer.state.inLink = false;
-          }
-          if (!this.lexer.state.inRawBlock && /^<(pre|code|kbd|script)(\s|>)/i.test(cap[0])) {
-            this.lexer.state.inRawBlock = true;
-          } else if (this.lexer.state.inRawBlock && /^<\/(pre|code|kbd|script)(\s|>)/i.test(cap[0])) {
-            this.lexer.state.inRawBlock = false;
-          }
-
-          return {
-            type: this.options.sanitize
-              ? 'text'
-              : 'html',
-            raw: cap[0],
-            inLink: this.lexer.state.inLink,
-            inRawBlock: this.lexer.state.inRawBlock,
-            text: this.options.sanitize
-              ? (this.options.sanitizer
-                ? this.options.sanitizer(cap[0])
-                : escape(cap[0]))
-              : cap[0]
-          };
-        }
-      }
-
-      link(src) {
-        const cap = this.rules.inline.link.exec(src);
-        if (cap) {
-          const trimmedUrl = cap[2].trim();
-          if (!this.options.pedantic && /^</.test(trimmedUrl)) {
-            // commonmark requires matching angle brackets
-            if (!(/>$/.test(trimmedUrl))) {
-              return;
-            }
-
-            // ending angle bracket cannot be escaped
-            const rtrimSlash = rtrim(trimmedUrl.slice(0, -1), '\\');
-            if ((trimmedUrl.length - rtrimSlash.length) % 2 === 0) {
-              return;
-            }
-          } else {
-            // find closing parenthesis
-            const lastParenIndex = findClosingBracket(cap[2], '()');
-            if (lastParenIndex > -1) {
-              const start = cap[0].indexOf('!') === 0 ? 5 : 4;
-              const linkLen = start + cap[1].length + lastParenIndex;
-              cap[2] = cap[2].substring(0, lastParenIndex);
-              cap[0] = cap[0].substring(0, linkLen).trim();
-              cap[3] = '';
-            }
-          }
-          let href = cap[2];
-          let title = '';
-          if (this.options.pedantic) {
-            // split pedantic href and title
-            const link = /^([^'"]*[^\s])\s+(['"])(.*)\2/.exec(href);
-
-            if (link) {
-              href = link[1];
-              title = link[3];
-            }
-          } else {
-            title = cap[3] ? cap[3].slice(1, -1) : '';
-          }
-
-          href = href.trim();
-          if (/^</.test(href)) {
-            if (this.options.pedantic && !(/>$/.test(trimmedUrl))) {
-              // pedantic allows starting angle bracket without ending angle bracket
-              href = href.slice(1);
-            } else {
-              href = href.slice(1, -1);
-            }
-          }
-          return outputLink(cap, {
-            href: href ? href.replace(this.rules.inline._escapes, '$1') : href,
-            title: title ? title.replace(this.rules.inline._escapes, '$1') : title
-          }, cap[0], this.lexer);
-        }
-      }
-
-      reflink(src, links) {
-        let cap;
-        if ((cap = this.rules.inline.reflink.exec(src))
-            || (cap = this.rules.inline.nolink.exec(src))) {
-          let link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
-          link = links[link.toLowerCase()];
-          if (!link || !link.href) {
-            const text = cap[0].charAt(0);
-            return {
-              type: 'text',
-              raw: text,
-              text
-            };
-          }
-          return outputLink(cap, link, cap[0], this.lexer);
-        }
-      }
-
-      emStrong(src, maskedSrc, prevChar = '') {
-        let match = this.rules.inline.emStrong.lDelim.exec(src);
-        if (!match) return;
-
-        // _ can't be between two alphanumerics. \p{L}\p{N} includes non-english alphabet/numbers as well
-        if (match[3] && prevChar.match(/[\p{L}\p{N}]/u)) return;
-
-        const nextChar = match[1] || match[2] || '';
-
-        if (!nextChar || (nextChar && (prevChar === '' || this.rules.inline.punctuation.exec(prevChar)))) {
-          const lLength = match[0].length - 1;
-          let rDelim, rLength, delimTotal = lLength, midDelimTotal = 0;
-
-          const endReg = match[0][0] === '*' ? this.rules.inline.emStrong.rDelimAst : this.rules.inline.emStrong.rDelimUnd;
-          endReg.lastIndex = 0;
-
-          // Clip maskedSrc to same section of string as src (move to lexer?)
-          maskedSrc = maskedSrc.slice(-1 * src.length + lLength);
-
-          while ((match = endReg.exec(maskedSrc)) != null) {
-            rDelim = match[1] || match[2] || match[3] || match[4] || match[5] || match[6];
-
-            if (!rDelim) continue; // skip single * in __abc*abc__
-
-            rLength = rDelim.length;
-
-            if (match[3] || match[4]) { // found another Left Delim
-              delimTotal += rLength;
-              continue;
-            } else if (match[5] || match[6]) { // either Left or Right Delim
-              if (lLength % 3 && !((lLength + rLength) % 3)) {
-                midDelimTotal += rLength;
-                continue; // CommonMark Emphasis Rules 9-10
-              }
-            }
-
-            delimTotal -= rLength;
-
-            if (delimTotal > 0) continue; // Haven't found enough closing delimiters
-
-            // Remove extra characters. *a*** -> *a*
-            rLength = Math.min(rLength, rLength + delimTotal + midDelimTotal);
-
-            // Create `em` if smallest delimiter has odd char count. *a***
-            if (Math.min(lLength, rLength) % 2) {
-              const text = src.slice(1, lLength + match.index + rLength);
-              return {
-                type: 'em',
-                raw: src.slice(0, lLength + match.index + rLength + 1),
-                text,
-                tokens: this.lexer.inlineTokens(text, [])
-              };
-            }
-
-            // Create 'strong' if smallest delimiter has even char count. **a***
-            const text = src.slice(2, lLength + match.index + rLength - 1);
-            return {
-              type: 'strong',
-              raw: src.slice(0, lLength + match.index + rLength + 1),
-              text,
-              tokens: this.lexer.inlineTokens(text, [])
-            };
-          }
-        }
-      }
-
-      codespan(src) {
-        const cap = this.rules.inline.code.exec(src);
-        if (cap) {
-          let text = cap[2].replace(/\n/g, ' ');
-          const hasNonSpaceChars = /[^ ]/.test(text);
-          const hasSpaceCharsOnBothEnds = /^ /.test(text) && / $/.test(text);
-          if (hasNonSpaceChars && hasSpaceCharsOnBothEnds) {
-            text = text.substring(1, text.length - 1);
-          }
-          text = escape(text, true);
-          return {
-            type: 'codespan',
-            raw: cap[0],
-            text
-          };
-        }
-      }
-
-      br(src) {
-        const cap = this.rules.inline.br.exec(src);
-        if (cap) {
-          return {
-            type: 'br',
-            raw: cap[0]
-          };
-        }
-      }
-
-      del(src) {
-        const cap = this.rules.inline.del.exec(src);
-        if (cap) {
-          return {
-            type: 'del',
-            raw: cap[0],
-            text: cap[2],
-            tokens: this.lexer.inlineTokens(cap[2], [])
-          };
-        }
-      }
-
-      autolink(src, mangle) {
-        const cap = this.rules.inline.autolink.exec(src);
-        if (cap) {
-          let text, href;
-          if (cap[2] === '@') {
-            text = escape(this.options.mangle ? mangle(cap[1]) : cap[1]);
-            href = 'mailto:' + text;
-          } else {
-            text = escape(cap[1]);
-            href = text;
-          }
-
-          return {
-            type: 'link',
-            raw: cap[0],
-            text,
-            href,
-            tokens: [
-              {
-                type: 'text',
-                raw: text,
-                text
-              }
-            ]
-          };
-        }
-      }
-
-      url(src, mangle) {
-        let cap;
-        if (cap = this.rules.inline.url.exec(src)) {
-          let text, href;
-          if (cap[2] === '@') {
-            text = escape(this.options.mangle ? mangle(cap[0]) : cap[0]);
-            href = 'mailto:' + text;
-          } else {
-            // do extended autolink path validation
-            let prevCapZero;
-            do {
-              prevCapZero = cap[0];
-              cap[0] = this.rules.inline._backpedal.exec(cap[0])[0];
-            } while (prevCapZero !== cap[0]);
-            text = escape(cap[0]);
-            if (cap[1] === 'www.') {
-              href = 'http://' + text;
-            } else {
-              href = text;
-            }
-          }
-          return {
-            type: 'link',
-            raw: cap[0],
-            text,
-            href,
-            tokens: [
-              {
-                type: 'text',
-                raw: text,
-                text
-              }
-            ]
-          };
-        }
-      }
-
-      inlineText(src, smartypants) {
-        const cap = this.rules.inline.text.exec(src);
-        if (cap) {
-          let text;
-          if (this.lexer.state.inRawBlock) {
-            text = this.options.sanitize ? (this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0])) : cap[0];
-          } else {
-            text = escape(this.options.smartypants ? smartypants(cap[0]) : cap[0]);
-          }
-          return {
-            type: 'text',
-            raw: cap[0],
-            text
-          };
-        }
-      }
-    }
-
-    /**
-     * Block-Level Grammar
-     */
-    const block = {
-      newline: /^(?: *(?:\n|$))+/,
-      code: /^( {4}[^\n]+(?:\n(?: *(?:\n|$))*)?)+/,
-      fences: /^ {0,3}(`{3,}(?=[^`\n]*\n)|~{3,})([^\n]*)\n(?:|([\s\S]*?)\n)(?: {0,3}\1[~`]* *(?=\n|$)|$)/,
-      hr: /^ {0,3}((?:- *){3,}|(?:_ *){3,}|(?:\* *){3,})(?:\n+|$)/,
-      heading: /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/,
-      blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/,
-      list: /^( {0,3}bull)( [^\n]+?)?(?:\n|$)/,
-      html: '^ {0,3}(?:' // optional indentation
-        + '<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)' // (1)
-        + '|comment[^\\n]*(\\n+|$)' // (2)
-        + '|<\\?[\\s\\S]*?(?:\\?>\\n*|$)' // (3)
-        + '|<![A-Z][\\s\\S]*?(?:>\\n*|$)' // (4)
-        + '|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)' // (5)
-        + '|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n *)+\\n|$)' // (6)
-        + '|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n *)+\\n|$)' // (7) open tag
-        + '|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n *)+\\n|$)' // (7) closing tag
-        + ')',
-      def: /^ {0,3}\[(label)\]: *(?:\n *)?<?([^\s>]+)>?(?:(?: +(?:\n *)?| *\n *)(title))? *(?:\n+|$)/,
-      table: noopTest,
-      lheading: /^([^\n]+)\n {0,3}(=+|-+) *(?:\n+|$)/,
-      // regex template, placeholders will be replaced according to different paragraph
-      // interruption rules of commonmark and the original markdown spec:
-      _paragraph: /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/,
-      text: /^[^\n]+/
-    };
-
-    block._label = /(?!\s*\])(?:\\.|[^\[\]\\])+/;
-    block._title = /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/;
-    block.def = edit(block.def)
-      .replace('label', block._label)
-      .replace('title', block._title)
-      .getRegex();
-
-    block.bullet = /(?:[*+-]|\d{1,9}[.)])/;
-    block.listItemStart = edit(/^( *)(bull) */)
-      .replace('bull', block.bullet)
-      .getRegex();
-
-    block.list = edit(block.list)
-      .replace(/bull/g, block.bullet)
-      .replace('hr', '\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))')
-      .replace('def', '\\n+(?=' + block.def.source + ')')
-      .getRegex();
-
-    block._tag = 'address|article|aside|base|basefont|blockquote|body|caption'
-      + '|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption'
-      + '|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe'
-      + '|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option'
-      + '|p|param|section|source|summary|table|tbody|td|tfoot|th|thead|title|tr'
-      + '|track|ul';
-    block._comment = /<!--(?!-?>)[\s\S]*?(?:-->|$)/;
-    block.html = edit(block.html, 'i')
-      .replace('comment', block._comment)
-      .replace('tag', block._tag)
-      .replace('attribute', / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/)
-      .getRegex();
-
-    block.paragraph = edit(block._paragraph)
-      .replace('hr', block.hr)
-      .replace('heading', ' {0,3}#{1,6} ')
-      .replace('|lheading', '') // setex headings don't interrupt commonmark paragraphs
-      .replace('|table', '')
-      .replace('blockquote', ' {0,3}>')
-      .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
-      .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
-      .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)')
-      .replace('tag', block._tag) // pars can be interrupted by type (6) html blocks
-      .getRegex();
-
-    block.blockquote = edit(block.blockquote)
-      .replace('paragraph', block.paragraph)
-      .getRegex();
-
-    /**
-     * Normal Block Grammar
-     */
-
-    block.normal = merge({}, block);
-
-    /**
-     * GFM Block Grammar
-     */
-
-    block.gfm = merge({}, block.normal, {
-      table: '^ *([^\\n ].*\\|.*)\\n' // Header
-        + ' {0,3}(?:\\| *)?(:?-+:? *(?:\\| *:?-+:? *)*)(?:\\| *)?' // Align
-        + '(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)' // Cells
-    });
-
-    block.gfm.table = edit(block.gfm.table)
-      .replace('hr', block.hr)
-      .replace('heading', ' {0,3}#{1,6} ')
-      .replace('blockquote', ' {0,3}>')
-      .replace('code', ' {4}[^\\n]')
-      .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
-      .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
-      .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)')
-      .replace('tag', block._tag) // tables can be interrupted by type (6) html blocks
-      .getRegex();
-
-    block.gfm.paragraph = edit(block._paragraph)
-      .replace('hr', block.hr)
-      .replace('heading', ' {0,3}#{1,6} ')
-      .replace('|lheading', '') // setex headings don't interrupt commonmark paragraphs
-      .replace('table', block.gfm.table) // interrupt paragraphs with table
-      .replace('blockquote', ' {0,3}>')
-      .replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
-      .replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
-      .replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)')
-      .replace('tag', block._tag) // pars can be interrupted by type (6) html blocks
-      .getRegex();
-    /**
-     * Pedantic grammar (original John Gruber's loose markdown specification)
-     */
-
-    block.pedantic = merge({}, block.normal, {
-      html: edit(
-        '^ *(?:comment *(?:\\n|\\s*$)'
-        + '|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)' // closed tag
-        + '|<tag(?:"[^"]*"|\'[^\']*\'|\\s[^\'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))')
-        .replace('comment', block._comment)
-        .replace(/tag/g, '(?!(?:'
-          + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub'
-          + '|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)'
-          + '\\b)\\w+(?!:|[^\\w\\s@]*@)\\b')
-        .getRegex(),
-      def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/,
-      heading: /^(#{1,6})(.*)(?:\n+|$)/,
-      fences: noopTest, // fences not supported
-      paragraph: edit(block.normal._paragraph)
-        .replace('hr', block.hr)
-        .replace('heading', ' *#{1,6} *[^\n]')
-        .replace('lheading', block.lheading)
-        .replace('blockquote', ' {0,3}>')
-        .replace('|fences', '')
-        .replace('|list', '')
-        .replace('|html', '')
-        .getRegex()
-    });
-
-    /**
-     * Inline-Level Grammar
-     */
-    const inline = {
-      escape: /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/,
-      autolink: /^<(scheme:[^\s\x00-\x1f<>]*|email)>/,
-      url: noopTest,
-      tag: '^comment'
-        + '|^</[a-zA-Z][\\w:-]*\\s*>' // self-closing tag
-        + '|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>' // open tag
-        + '|^<\\?[\\s\\S]*?\\?>' // processing instruction, e.g. <?php ?>
-        + '|^<![a-zA-Z]+\\s[\\s\\S]*?>' // declaration, e.g. <!DOCTYPE html>
-        + '|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>', // CDATA section
-      link: /^!?\[(label)\]\(\s*(href)(?:\s+(title))?\s*\)/,
-      reflink: /^!?\[(label)\]\[(ref)\]/,
-      nolink: /^!?\[(ref)\](?:\[\])?/,
-      reflinkSearch: 'reflink|nolink(?!\\()',
-      emStrong: {
-        lDelim: /^(?:\*+(?:([punct_])|[^\s*]))|^_+(?:([punct*])|([^\s_]))/,
-        //        (1) and (2) can only be a Right Delimiter. (3) and (4) can only be Left.  (5) and (6) can be either Left or Right.
-        //        () Skip orphan delim inside strong    (1) #***                (2) a***#, a***                   (3) #***a, ***a                 (4) ***#              (5) #***#                 (6) a***a
-        rDelimAst: /^[^_*]*?\_\_[^_*]*?\*[^_*]*?(?=\_\_)|[punct_](\*+)(?=[\s]|$)|[^punct*_\s](\*+)(?=[punct_\s]|$)|[punct_\s](\*+)(?=[^punct*_\s])|[\s](\*+)(?=[punct_])|[punct_](\*+)(?=[punct_])|[^punct*_\s](\*+)(?=[^punct*_\s])/,
-        rDelimUnd: /^[^_*]*?\*\*[^_*]*?\_[^_*]*?(?=\*\*)|[punct*](\_+)(?=[\s]|$)|[^punct*_\s](\_+)(?=[punct*\s]|$)|[punct*\s](\_+)(?=[^punct*_\s])|[\s](\_+)(?=[punct*])|[punct*](\_+)(?=[punct*])/ // ^- Not allowed for _
-      },
-      code: /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/,
-      br: /^( {2,}|\\)\n(?!\s*$)/,
-      del: noopTest,
-      text: /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/,
-      punctuation: /^([\spunctuation])/
-    };
-
-    // list of punctuation marks from CommonMark spec
-    // without * and _ to handle the different emphasis markers * and _
-    inline._punctuation = '!"#$%&\'()+\\-.,/:;<=>?@\\[\\]`^{|}~';
-    inline.punctuation = edit(inline.punctuation).replace(/punctuation/g, inline._punctuation).getRegex();
-
-    // sequences em should skip over [title](link), `code`, <html>
-    inline.blockSkip = /\[[^\]]*?\]\([^\)]*?\)|`[^`]*?`|<[^>]*?>/g;
-    inline.escapedEmSt = /\\\*|\\_/g;
-
-    inline._comment = edit(block._comment).replace('(?:-->|$)', '-->').getRegex();
-
-    inline.emStrong.lDelim = edit(inline.emStrong.lDelim)
-      .replace(/punct/g, inline._punctuation)
-      .getRegex();
-
-    inline.emStrong.rDelimAst = edit(inline.emStrong.rDelimAst, 'g')
-      .replace(/punct/g, inline._punctuation)
-      .getRegex();
-
-    inline.emStrong.rDelimUnd = edit(inline.emStrong.rDelimUnd, 'g')
-      .replace(/punct/g, inline._punctuation)
-      .getRegex();
-
-    inline._escapes = /\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/g;
-
-    inline._scheme = /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/;
-    inline._email = /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/;
-    inline.autolink = edit(inline.autolink)
-      .replace('scheme', inline._scheme)
-      .replace('email', inline._email)
-      .getRegex();
-
-    inline._attribute = /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/;
-
-    inline.tag = edit(inline.tag)
-      .replace('comment', inline._comment)
-      .replace('attribute', inline._attribute)
-      .getRegex();
-
-    inline._label = /(?:\[(?:\\.|[^\[\]\\])*\]|\\.|`[^`]*`|[^\[\]\\`])*?/;
-    inline._href = /<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/;
-    inline._title = /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/;
-
-    inline.link = edit(inline.link)
-      .replace('label', inline._label)
-      .replace('href', inline._href)
-      .replace('title', inline._title)
-      .getRegex();
-
-    inline.reflink = edit(inline.reflink)
-      .replace('label', inline._label)
-      .replace('ref', block._label)
-      .getRegex();
-
-    inline.nolink = edit(inline.nolink)
-      .replace('ref', block._label)
-      .getRegex();
-
-    inline.reflinkSearch = edit(inline.reflinkSearch, 'g')
-      .replace('reflink', inline.reflink)
-      .replace('nolink', inline.nolink)
-      .getRegex();
-
-    /**
-     * Normal Inline Grammar
-     */
-
-    inline.normal = merge({}, inline);
-
-    /**
-     * Pedantic Inline Grammar
-     */
-
-    inline.pedantic = merge({}, inline.normal, {
-      strong: {
-        start: /^__|\*\*/,
-        middle: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
-        endAst: /\*\*(?!\*)/g,
-        endUnd: /__(?!_)/g
-      },
-      em: {
-        start: /^_|\*/,
-        middle: /^()\*(?=\S)([\s\S]*?\S)\*(?!\*)|^_(?=\S)([\s\S]*?\S)_(?!_)/,
-        endAst: /\*(?!\*)/g,
-        endUnd: /_(?!_)/g
-      },
-      link: edit(/^!?\[(label)\]\((.*?)\)/)
-        .replace('label', inline._label)
-        .getRegex(),
-      reflink: edit(/^!?\[(label)\]\s*\[([^\]]*)\]/)
-        .replace('label', inline._label)
-        .getRegex()
-    });
-
-    /**
-     * GFM Inline Grammar
-     */
-
-    inline.gfm = merge({}, inline.normal, {
-      escape: edit(inline.escape).replace('])', '~|])').getRegex(),
-      _extended_email: /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/,
-      url: /^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/,
-      _backpedal: /(?:[^?!.,:;*_~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_~)]+(?!$))+/,
-      del: /^(~~?)(?=[^\s~])([\s\S]*?[^\s~])\1(?=[^~]|$)/,
-      text: /^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|https?:\/\/|ftp:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/
-    });
-
-    inline.gfm.url = edit(inline.gfm.url, 'i')
-      .replace('email', inline.gfm._extended_email)
-      .getRegex();
-    /**
-     * GFM + Line Breaks Inline Grammar
-     */
-
-    inline.breaks = merge({}, inline.gfm, {
-      br: edit(inline.br).replace('{2,}', '*').getRegex(),
-      text: edit(inline.gfm.text)
-        .replace('\\b_', '\\b_| {2,}\\n')
-        .replace(/\{2,\}/g, '*')
-        .getRegex()
-    });
-
-    /**
-     * smartypants text replacement
-     */
-    function smartypants(text) {
-      return text
-        // em-dashes
-        .replace(/---/g, '\u2014')
-        // en-dashes
-        .replace(/--/g, '\u2013')
-        // opening singles
-        .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')
-        // closing singles & apostrophes
-        .replace(/'/g, '\u2019')
-        // opening doubles
-        .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c')
-        // closing doubles
-        .replace(/"/g, '\u201d')
-        // ellipses
-        .replace(/\.{3}/g, '\u2026');
-    }
-
-    /**
-     * mangle email addresses
-     */
-    function mangle(text) {
-      let out = '',
-        i,
-        ch;
-
-      const l = text.length;
-      for (i = 0; i < l; i++) {
-        ch = text.charCodeAt(i);
-        if (Math.random() > 0.5) {
-          ch = 'x' + ch.toString(16);
-        }
-        out += '&#' + ch + ';';
-      }
-
-      return out;
-    }
-
-    /**
-     * Block Lexer
-     */
-    class Lexer {
-      constructor(options) {
-        this.tokens = [];
-        this.tokens.links = Object.create(null);
-        this.options = options || defaults;
-        this.options.tokenizer = this.options.tokenizer || new Tokenizer();
-        this.tokenizer = this.options.tokenizer;
-        this.tokenizer.options = this.options;
-        this.tokenizer.lexer = this;
-        this.inlineQueue = [];
-        this.state = {
-          inLink: false,
-          inRawBlock: false,
-          top: true
-        };
-
-        const rules = {
-          block: block.normal,
-          inline: inline.normal
-        };
-
-        if (this.options.pedantic) {
-          rules.block = block.pedantic;
-          rules.inline = inline.pedantic;
-        } else if (this.options.gfm) {
-          rules.block = block.gfm;
-          if (this.options.breaks) {
-            rules.inline = inline.breaks;
-          } else {
-            rules.inline = inline.gfm;
-          }
-        }
-        this.tokenizer.rules = rules;
-      }
-
-      /**
-       * Expose Rules
-       */
-      static get rules() {
-        return {
-          block,
-          inline
-        };
-      }
-
-      /**
-       * Static Lex Method
-       */
-      static lex(src, options) {
-        const lexer = new Lexer(options);
-        return lexer.lex(src);
-      }
-
-      /**
-       * Static Lex Inline Method
-       */
-      static lexInline(src, options) {
-        const lexer = new Lexer(options);
-        return lexer.inlineTokens(src);
-      }
-
-      /**
-       * Preprocessing
-       */
-      lex(src) {
-        src = src
-          .replace(/\r\n|\r/g, '\n')
-          .replace(/\t/g, '    ');
-
-        this.blockTokens(src, this.tokens);
-
-        let next;
-        while (next = this.inlineQueue.shift()) {
-          this.inlineTokens(next.src, next.tokens);
-        }
-
-        return this.tokens;
-      }
-
-      /**
-       * Lexing
-       */
-      blockTokens(src, tokens = []) {
-        if (this.options.pedantic) {
-          src = src.replace(/^ +$/gm, '');
-        }
-        let token, lastToken, cutSrc, lastParagraphClipped;
-
-        while (src) {
-          if (this.options.extensions
-            && this.options.extensions.block
-            && this.options.extensions.block.some((extTokenizer) => {
-              if (token = extTokenizer.call({ lexer: this }, src, tokens)) {
-                src = src.substring(token.raw.length);
-                tokens.push(token);
-                return true;
-              }
-              return false;
-            })) {
-            continue;
-          }
-
-          // newline
-          if (token = this.tokenizer.space(src)) {
-            src = src.substring(token.raw.length);
-            if (token.raw.length === 1 && tokens.length > 0) {
-              // if there's a single \n as a spacer, it's terminating the last line,
-              // so move it there so that we don't get unecessary paragraph tags
-              tokens[tokens.length - 1].raw += '\n';
-            } else {
-              tokens.push(token);
-            }
-            continue;
-          }
-
-          // code
-          if (token = this.tokenizer.code(src)) {
-            src = src.substring(token.raw.length);
-            lastToken = tokens[tokens.length - 1];
-            // An indented code block cannot interrupt a paragraph.
-            if (lastToken && (lastToken.type === 'paragraph' || lastToken.type === 'text')) {
-              lastToken.raw += '\n' + token.raw;
-              lastToken.text += '\n' + token.text;
-              this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-            } else {
-              tokens.push(token);
-            }
-            continue;
-          }
-
-          // fences
-          if (token = this.tokenizer.fences(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // heading
-          if (token = this.tokenizer.heading(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // hr
-          if (token = this.tokenizer.hr(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // blockquote
-          if (token = this.tokenizer.blockquote(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // list
-          if (token = this.tokenizer.list(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // html
-          if (token = this.tokenizer.html(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // def
-          if (token = this.tokenizer.def(src)) {
-            src = src.substring(token.raw.length);
-            lastToken = tokens[tokens.length - 1];
-            if (lastToken && (lastToken.type === 'paragraph' || lastToken.type === 'text')) {
-              lastToken.raw += '\n' + token.raw;
-              lastToken.text += '\n' + token.raw;
-              this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-            } else if (!this.tokens.links[token.tag]) {
-              this.tokens.links[token.tag] = {
-                href: token.href,
-                title: token.title
-              };
-            }
-            continue;
-          }
-
-          // table (gfm)
-          if (token = this.tokenizer.table(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // lheading
-          if (token = this.tokenizer.lheading(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // top-level paragraph
-          // prevent paragraph consuming extensions by clipping 'src' to extension start
-          cutSrc = src;
-          if (this.options.extensions && this.options.extensions.startBlock) {
-            let startIndex = Infinity;
-            const tempSrc = src.slice(1);
-            let tempStart;
-            this.options.extensions.startBlock.forEach(function(getStartIndex) {
-              tempStart = getStartIndex.call({ lexer: this }, tempSrc);
-              if (typeof tempStart === 'number' && tempStart >= 0) { startIndex = Math.min(startIndex, tempStart); }
-            });
-            if (startIndex < Infinity && startIndex >= 0) {
-              cutSrc = src.substring(0, startIndex + 1);
-            }
-          }
-          if (this.state.top && (token = this.tokenizer.paragraph(cutSrc))) {
-            lastToken = tokens[tokens.length - 1];
-            if (lastParagraphClipped && lastToken.type === 'paragraph') {
-              lastToken.raw += '\n' + token.raw;
-              lastToken.text += '\n' + token.text;
-              this.inlineQueue.pop();
-              this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-            } else {
-              tokens.push(token);
-            }
-            lastParagraphClipped = (cutSrc.length !== src.length);
-            src = src.substring(token.raw.length);
-            continue;
-          }
-
-          // text
-          if (token = this.tokenizer.text(src)) {
-            src = src.substring(token.raw.length);
-            lastToken = tokens[tokens.length - 1];
-            if (lastToken && lastToken.type === 'text') {
-              lastToken.raw += '\n' + token.raw;
-              lastToken.text += '\n' + token.text;
-              this.inlineQueue.pop();
-              this.inlineQueue[this.inlineQueue.length - 1].src = lastToken.text;
-            } else {
-              tokens.push(token);
-            }
-            continue;
-          }
-
-          if (src) {
-            const errMsg = 'Infinite loop on byte: ' + src.charCodeAt(0);
-            if (this.options.silent) {
-              console.error(errMsg);
-              break;
-            } else {
-              throw new Error(errMsg);
-            }
-          }
-        }
-
-        this.state.top = true;
-        return tokens;
-      }
-
-      inline(src, tokens) {
-        this.inlineQueue.push({ src, tokens });
-      }
-
-      /**
-       * Lexing/Compiling
-       */
-      inlineTokens(src, tokens = []) {
-        let token, lastToken, cutSrc;
-
-        // String with links masked to avoid interference with em and strong
-        let maskedSrc = src;
-        let match;
-        let keepPrevChar, prevChar;
-
-        // Mask out reflinks
-        if (this.tokens.links) {
-          const links = Object.keys(this.tokens.links);
-          if (links.length > 0) {
-            while ((match = this.tokenizer.rules.inline.reflinkSearch.exec(maskedSrc)) != null) {
-              if (links.includes(match[0].slice(match[0].lastIndexOf('[') + 1, -1))) {
-                maskedSrc = maskedSrc.slice(0, match.index) + '[' + repeatString('a', match[0].length - 2) + ']' + maskedSrc.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex);
-              }
-            }
-          }
-        }
-        // Mask out other blocks
-        while ((match = this.tokenizer.rules.inline.blockSkip.exec(maskedSrc)) != null) {
-          maskedSrc = maskedSrc.slice(0, match.index) + '[' + repeatString('a', match[0].length - 2) + ']' + maskedSrc.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);
-        }
-
-        // Mask out escaped em & strong delimiters
-        while ((match = this.tokenizer.rules.inline.escapedEmSt.exec(maskedSrc)) != null) {
-          maskedSrc = maskedSrc.slice(0, match.index) + '++' + maskedSrc.slice(this.tokenizer.rules.inline.escapedEmSt.lastIndex);
-        }
-
-        while (src) {
-          if (!keepPrevChar) {
-            prevChar = '';
-          }
-          keepPrevChar = false;
-
-          // extensions
-          if (this.options.extensions
-            && this.options.extensions.inline
-            && this.options.extensions.inline.some((extTokenizer) => {
-              if (token = extTokenizer.call({ lexer: this }, src, tokens)) {
-                src = src.substring(token.raw.length);
-                tokens.push(token);
-                return true;
-              }
-              return false;
-            })) {
-            continue;
-          }
-
-          // escape
-          if (token = this.tokenizer.escape(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // tag
-          if (token = this.tokenizer.tag(src)) {
-            src = src.substring(token.raw.length);
-            lastToken = tokens[tokens.length - 1];
-            if (lastToken && token.type === 'text' && lastToken.type === 'text') {
-              lastToken.raw += token.raw;
-              lastToken.text += token.text;
-            } else {
-              tokens.push(token);
-            }
-            continue;
-          }
-
-          // link
-          if (token = this.tokenizer.link(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // reflink, nolink
-          if (token = this.tokenizer.reflink(src, this.tokens.links)) {
-            src = src.substring(token.raw.length);
-            lastToken = tokens[tokens.length - 1];
-            if (lastToken && token.type === 'text' && lastToken.type === 'text') {
-              lastToken.raw += token.raw;
-              lastToken.text += token.text;
-            } else {
-              tokens.push(token);
-            }
-            continue;
-          }
-
-          // em & strong
-          if (token = this.tokenizer.emStrong(src, maskedSrc, prevChar)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // code
-          if (token = this.tokenizer.codespan(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // br
-          if (token = this.tokenizer.br(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // del (gfm)
-          if (token = this.tokenizer.del(src)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // autolink
-          if (token = this.tokenizer.autolink(src, mangle)) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // url (gfm)
-          if (!this.state.inLink && (token = this.tokenizer.url(src, mangle))) {
-            src = src.substring(token.raw.length);
-            tokens.push(token);
-            continue;
-          }
-
-          // text
-          // prevent inlineText consuming extensions by clipping 'src' to extension start
-          cutSrc = src;
-          if (this.options.extensions && this.options.extensions.startInline) {
-            let startIndex = Infinity;
-            const tempSrc = src.slice(1);
-            let tempStart;
-            this.options.extensions.startInline.forEach(function(getStartIndex) {
-              tempStart = getStartIndex.call({ lexer: this }, tempSrc);
-              if (typeof tempStart === 'number' && tempStart >= 0) { startIndex = Math.min(startIndex, tempStart); }
-            });
-            if (startIndex < Infinity && startIndex >= 0) {
-              cutSrc = src.substring(0, startIndex + 1);
-            }
-          }
-          if (token = this.tokenizer.inlineText(cutSrc, smartypants)) {
-            src = src.substring(token.raw.length);
-            if (token.raw.slice(-1) !== '_') { // Track prevChar before string of ____ started
-              prevChar = token.raw.slice(-1);
-            }
-            keepPrevChar = true;
-            lastToken = tokens[tokens.length - 1];
-            if (lastToken && lastToken.type === 'text') {
-              lastToken.raw += token.raw;
-              lastToken.text += token.text;
-            } else {
-              tokens.push(token);
-            }
-            continue;
-          }
-
-          if (src) {
-            const errMsg = 'Infinite loop on byte: ' + src.charCodeAt(0);
-            if (this.options.silent) {
-              console.error(errMsg);
-              break;
-            } else {
-              throw new Error(errMsg);
-            }
-          }
-        }
-
-        return tokens;
-      }
-    }
-
-    /**
-     * Renderer
-     */
-    class Renderer {
-      constructor(options) {
-        this.options = options || defaults;
-      }
-
-      code(code, infostring, escaped) {
-        const lang = (infostring || '').match(/\S*/)[0];
-        if (this.options.highlight) {
-          const out = this.options.highlight(code, lang);
-          if (out != null && out !== code) {
-            escaped = true;
-            code = out;
-          }
-        }
-
-        code = code.replace(/\n$/, '') + '\n';
-
-        if (!lang) {
-          return '<pre><code>'
-            + (escaped ? code : escape(code, true))
-            + '</code></pre>\n';
-        }
-
-        return '<pre><code class="'
-          + this.options.langPrefix
-          + escape(lang, true)
-          + '">'
-          + (escaped ? code : escape(code, true))
-          + '</code></pre>\n';
-      }
-
-      blockquote(quote) {
-        return '<blockquote>\n' + quote + '</blockquote>\n';
-      }
-
-      html(html) {
-        return html;
-      }
-
-      heading(text, level, raw, slugger) {
-        if (this.options.headerIds) {
-          return '<h'
-            + level
-            + ' id="'
-            + this.options.headerPrefix
-            + slugger.slug(raw)
-            + '">'
-            + text
-            + '</h'
-            + level
-            + '>\n';
-        }
-        // ignore IDs
-        return '<h' + level + '>' + text + '</h' + level + '>\n';
-      }
-
-      hr() {
-        return this.options.xhtml ? '<hr/>\n' : '<hr>\n';
-      }
-
-      list(body, ordered, start) {
-        const type = ordered ? 'ol' : 'ul',
-          startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
-        return '<' + type + startatt + '>\n' + body + '</' + type + '>\n';
-      }
-
-      listitem(text) {
-        return '<li>' + text + '</li>\n';
-      }
-
-      checkbox(checked) {
-        return '<input '
-          + (checked ? 'checked="" ' : '')
-          + 'disabled="" type="checkbox"'
-          + (this.options.xhtml ? ' /' : '')
-          + '> ';
-      }
-
-      paragraph(text) {
-        return '<p>' + text + '</p>\n';
-      }
-
-      table(header, body) {
-        if (body) body = '<tbody>' + body + '</tbody>';
-
-        return '<table>\n'
-          + '<thead>\n'
-          + header
-          + '</thead>\n'
-          + body
-          + '</table>\n';
-      }
-
-      tablerow(content) {
-        return '<tr>\n' + content + '</tr>\n';
-      }
-
-      tablecell(content, flags) {
-        const type = flags.header ? 'th' : 'td';
-        const tag = flags.align
-          ? '<' + type + ' align="' + flags.align + '">'
-          : '<' + type + '>';
-        return tag + content + '</' + type + '>\n';
-      }
-
-      // span level renderer
-      strong(text) {
-        return '<strong>' + text + '</strong>';
-      }
-
-      em(text) {
-        return '<em>' + text + '</em>';
-      }
-
-      codespan(text) {
-        return '<code>' + text + '</code>';
-      }
-
-      br() {
-        return this.options.xhtml ? '<br/>' : '<br>';
-      }
-
-      del(text) {
-        return '<del>' + text + '</del>';
-      }
-
-      link(href, title, text) {
-        href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
-        if (href === null) {
-          return text;
-        }
-        let out = '<a href="' + escape(href) + '"';
-        if (title) {
-          out += ' title="' + title + '"';
-        }
-        out += '>' + text + '</a>';
-        return out;
-      }
-
-      image(href, title, text) {
-        href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
-        if (href === null) {
-          return text;
-        }
-
-        let out = '<img src="' + href + '" alt="' + text + '"';
-        if (title) {
-          out += ' title="' + title + '"';
-        }
-        out += this.options.xhtml ? '/>' : '>';
-        return out;
-      }
-
-      text(text) {
-        return text;
-      }
-    }
-
-    /**
-     * TextRenderer
-     * returns only the textual part of the token
-     */
-    class TextRenderer {
-      // no need for block level renderers
-      strong(text) {
-        return text;
-      }
-
-      em(text) {
-        return text;
-      }
-
-      codespan(text) {
-        return text;
-      }
-
-      del(text) {
-        return text;
-      }
-
-      html(text) {
-        return text;
-      }
-
-      text(text) {
-        return text;
-      }
-
-      link(href, title, text) {
-        return '' + text;
-      }
-
-      image(href, title, text) {
-        return '' + text;
-      }
-
-      br() {
-        return '';
-      }
-    }
-
-    /**
-     * Slugger generates header id
-     */
-    class Slugger {
-      constructor() {
-        this.seen = {};
-      }
-
-      serialize(value) {
-        return value
-          .toLowerCase()
-          .trim()
-          // remove html tags
-          .replace(/<[!\/a-z].*?>/ig, '')
-          // remove unwanted chars
-          .replace(/[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~]/g, '')
-          .replace(/\s/g, '-');
-      }
-
-      /**
-       * Finds the next safe (unique) slug to use
-       */
-      getNextSafeSlug(originalSlug, isDryRun) {
-        let slug = originalSlug;
-        let occurenceAccumulator = 0;
-        if (this.seen.hasOwnProperty(slug)) {
-          occurenceAccumulator = this.seen[originalSlug];
-          do {
-            occurenceAccumulator++;
-            slug = originalSlug + '-' + occurenceAccumulator;
-          } while (this.seen.hasOwnProperty(slug));
-        }
-        if (!isDryRun) {
-          this.seen[originalSlug] = occurenceAccumulator;
-          this.seen[slug] = 0;
-        }
-        return slug;
-      }
-
-      /**
-       * Convert string to unique id
-       * @param {object} options
-       * @param {boolean} options.dryrun Generates the next unique slug without updating the internal accumulator.
-       */
-      slug(value, options = {}) {
-        const slug = this.serialize(value);
-        return this.getNextSafeSlug(slug, options.dryrun);
-      }
-    }
-
-    /**
-     * Parsing & Compiling
-     */
-    class Parser {
-      constructor(options) {
-        this.options = options || defaults;
-        this.options.renderer = this.options.renderer || new Renderer();
-        this.renderer = this.options.renderer;
-        this.renderer.options = this.options;
-        this.textRenderer = new TextRenderer();
-        this.slugger = new Slugger();
-      }
-
-      /**
-       * Static Parse Method
-       */
-      static parse(tokens, options) {
-        const parser = new Parser(options);
-        return parser.parse(tokens);
-      }
-
-      /**
-       * Static Parse Inline Method
-       */
-      static parseInline(tokens, options) {
-        const parser = new Parser(options);
-        return parser.parseInline(tokens);
-      }
-
-      /**
-       * Parse Loop
-       */
-      parse(tokens, top = true) {
-        let out = '',
-          i,
-          j,
-          k,
-          l2,
-          l3,
-          row,
-          cell,
-          header,
-          body,
-          token,
-          ordered,
-          start,
-          loose,
-          itemBody,
-          item,
-          checked,
-          task,
-          checkbox,
-          ret;
-
-        const l = tokens.length;
-        for (i = 0; i < l; i++) {
-          token = tokens[i];
-
-          // Run any renderer extensions
-          if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
-            ret = this.options.extensions.renderers[token.type].call({ parser: this }, token);
-            if (ret !== false || !['space', 'hr', 'heading', 'code', 'table', 'blockquote', 'list', 'html', 'paragraph', 'text'].includes(token.type)) {
-              out += ret || '';
-              continue;
-            }
-          }
-
-          switch (token.type) {
-            case 'space': {
-              continue;
-            }
-            case 'hr': {
-              out += this.renderer.hr();
-              continue;
-            }
-            case 'heading': {
-              out += this.renderer.heading(
-                this.parseInline(token.tokens),
-                token.depth,
-                unescape(this.parseInline(token.tokens, this.textRenderer)),
-                this.slugger);
-              continue;
-            }
-            case 'code': {
-              out += this.renderer.code(token.text,
-                token.lang,
-                token.escaped);
-              continue;
-            }
-            case 'table': {
-              header = '';
-
-              // header
-              cell = '';
-              l2 = token.header.length;
-              for (j = 0; j < l2; j++) {
-                cell += this.renderer.tablecell(
-                  this.parseInline(token.header[j].tokens),
-                  { header: true, align: token.align[j] }
-                );
-              }
-              header += this.renderer.tablerow(cell);
-
-              body = '';
-              l2 = token.rows.length;
-              for (j = 0; j < l2; j++) {
-                row = token.rows[j];
-
-                cell = '';
-                l3 = row.length;
-                for (k = 0; k < l3; k++) {
-                  cell += this.renderer.tablecell(
-                    this.parseInline(row[k].tokens),
-                    { header: false, align: token.align[k] }
-                  );
-                }
-
-                body += this.renderer.tablerow(cell);
-              }
-              out += this.renderer.table(header, body);
-              continue;
-            }
-            case 'blockquote': {
-              body = this.parse(token.tokens);
-              out += this.renderer.blockquote(body);
-              continue;
-            }
-            case 'list': {
-              ordered = token.ordered;
-              start = token.start;
-              loose = token.loose;
-              l2 = token.items.length;
-
-              body = '';
-              for (j = 0; j < l2; j++) {
-                item = token.items[j];
-                checked = item.checked;
-                task = item.task;
-
-                itemBody = '';
-                if (item.task) {
-                  checkbox = this.renderer.checkbox(checked);
-                  if (loose) {
-                    if (item.tokens.length > 0 && item.tokens[0].type === 'paragraph') {
-                      item.tokens[0].text = checkbox + ' ' + item.tokens[0].text;
-                      if (item.tokens[0].tokens && item.tokens[0].tokens.length > 0 && item.tokens[0].tokens[0].type === 'text') {
-                        item.tokens[0].tokens[0].text = checkbox + ' ' + item.tokens[0].tokens[0].text;
-                      }
-                    } else {
-                      item.tokens.unshift({
-                        type: 'text',
-                        text: checkbox
-                      });
-                    }
-                  } else {
-                    itemBody += checkbox;
-                  }
-                }
-
-                itemBody += this.parse(item.tokens, loose);
-                body += this.renderer.listitem(itemBody, task, checked);
-              }
-
-              out += this.renderer.list(body, ordered, start);
-              continue;
-            }
-            case 'html': {
-              // TODO parse inline content if parameter markdown=1
-              out += this.renderer.html(token.text);
-              continue;
-            }
-            case 'paragraph': {
-              out += this.renderer.paragraph(this.parseInline(token.tokens));
-              continue;
-            }
-            case 'text': {
-              body = token.tokens ? this.parseInline(token.tokens) : token.text;
-              while (i + 1 < l && tokens[i + 1].type === 'text') {
-                token = tokens[++i];
-                body += '\n' + (token.tokens ? this.parseInline(token.tokens) : token.text);
-              }
-              out += top ? this.renderer.paragraph(body) : body;
-              continue;
-            }
-
-            default: {
-              const errMsg = 'Token with "' + token.type + '" type was not found.';
-              if (this.options.silent) {
-                console.error(errMsg);
-                return;
-              } else {
-                throw new Error(errMsg);
-              }
-            }
-          }
-        }
-
-        return out;
-      }
-
-      /**
-       * Parse Inline Tokens
-       */
-      parseInline(tokens, renderer) {
-        renderer = renderer || this.renderer;
-        let out = '',
-          i,
-          token,
-          ret;
-
-        const l = tokens.length;
-        for (i = 0; i < l; i++) {
-          token = tokens[i];
-
-          // Run any renderer extensions
-          if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
-            ret = this.options.extensions.renderers[token.type].call({ parser: this }, token);
-            if (ret !== false || !['escape', 'html', 'link', 'image', 'strong', 'em', 'codespan', 'br', 'del', 'text'].includes(token.type)) {
-              out += ret || '';
-              continue;
-            }
-          }
-
-          switch (token.type) {
-            case 'escape': {
-              out += renderer.text(token.text);
-              break;
-            }
-            case 'html': {
-              out += renderer.html(token.text);
-              break;
-            }
-            case 'link': {
-              out += renderer.link(token.href, token.title, this.parseInline(token.tokens, renderer));
-              break;
-            }
-            case 'image': {
-              out += renderer.image(token.href, token.title, token.text);
-              break;
-            }
-            case 'strong': {
-              out += renderer.strong(this.parseInline(token.tokens, renderer));
-              break;
-            }
-            case 'em': {
-              out += renderer.em(this.parseInline(token.tokens, renderer));
-              break;
-            }
-            case 'codespan': {
-              out += renderer.codespan(token.text);
-              break;
-            }
-            case 'br': {
-              out += renderer.br();
-              break;
-            }
-            case 'del': {
-              out += renderer.del(this.parseInline(token.tokens, renderer));
-              break;
-            }
-            case 'text': {
-              out += renderer.text(token.text);
-              break;
-            }
-            default: {
-              const errMsg = 'Token with "' + token.type + '" type was not found.';
-              if (this.options.silent) {
-                console.error(errMsg);
-                return;
-              } else {
-                throw new Error(errMsg);
-              }
-            }
-          }
-        }
-        return out;
-      }
-    }
-
-    /**
-     * Marked
-     */
-    function marked(src, opt, callback) {
-      // throw error in case of non string input
-      if (typeof src === 'undefined' || src === null) {
-        throw new Error('marked(): input parameter is undefined or null');
-      }
-      if (typeof src !== 'string') {
-        throw new Error('marked(): input parameter is of type '
-          + Object.prototype.toString.call(src) + ', string expected');
-      }
-
-      if (typeof opt === 'function') {
-        callback = opt;
-        opt = null;
-      }
-
-      opt = merge({}, marked.defaults, opt || {});
-      checkSanitizeDeprecation(opt);
-
-      if (callback) {
-        const highlight = opt.highlight;
-        let tokens;
-
-        try {
-          tokens = Lexer.lex(src, opt);
-        } catch (e) {
-          return callback(e);
-        }
-
-        const done = function(err) {
-          let out;
-
-          if (!err) {
-            try {
-              if (opt.walkTokens) {
-                marked.walkTokens(tokens, opt.walkTokens);
-              }
-              out = Parser.parse(tokens, opt);
-            } catch (e) {
-              err = e;
-            }
-          }
-
-          opt.highlight = highlight;
-
-          return err
-            ? callback(err)
-            : callback(null, out);
-        };
-
-        if (!highlight || highlight.length < 3) {
-          return done();
-        }
-
-        delete opt.highlight;
-
-        if (!tokens.length) return done();
-
-        let pending = 0;
-        marked.walkTokens(tokens, function(token) {
-          if (token.type === 'code') {
-            pending++;
-            setTimeout(() => {
-              highlight(token.text, token.lang, function(err, code) {
-                if (err) {
-                  return done(err);
-                }
-                if (code != null && code !== token.text) {
-                  token.text = code;
-                  token.escaped = true;
-                }
-
-                pending--;
-                if (pending === 0) {
-                  done();
-                }
-              });
-            }, 0);
-          }
-        });
-
-        if (pending === 0) {
-          done();
-        }
-
-        return;
-      }
-
-      try {
-        const tokens = Lexer.lex(src, opt);
-        if (opt.walkTokens) {
-          marked.walkTokens(tokens, opt.walkTokens);
-        }
-        return Parser.parse(tokens, opt);
-      } catch (e) {
-        e.message += '\nPlease report this to https://github.com/markedjs/marked.';
-        if (opt.silent) {
-          return '<p>An error occurred:</p><pre>'
-            + escape(e.message + '', true)
-            + '</pre>';
-        }
-        throw e;
-      }
-    }
-
-    /**
-     * Options
-     */
-
-    marked.options =
-    marked.setOptions = function(opt) {
-      merge(marked.defaults, opt);
-      changeDefaults(marked.defaults);
-      return marked;
-    };
-
-    marked.getDefaults = getDefaults;
-
-    marked.defaults = defaults;
-
-    /**
-     * Use Extension
-     */
-
-    marked.use = function(...args) {
-      const opts = merge({}, ...args);
-      const extensions = marked.defaults.extensions || { renderers: {}, childTokens: {} };
-      let hasExtensions;
-
-      args.forEach((pack) => {
-        // ==-- Parse "addon" extensions --== //
-        if (pack.extensions) {
-          hasExtensions = true;
-          pack.extensions.forEach((ext) => {
-            if (!ext.name) {
-              throw new Error('extension name required');
-            }
-            if (ext.renderer) { // Renderer extensions
-              const prevRenderer = extensions.renderers ? extensions.renderers[ext.name] : null;
-              if (prevRenderer) {
-                // Replace extension with func to run new extension but fall back if false
-                extensions.renderers[ext.name] = function(...args) {
-                  let ret = ext.renderer.apply(this, args);
-                  if (ret === false) {
-                    ret = prevRenderer.apply(this, args);
-                  }
-                  return ret;
-                };
-              } else {
-                extensions.renderers[ext.name] = ext.renderer;
-              }
-            }
-            if (ext.tokenizer) { // Tokenizer Extensions
-              if (!ext.level || (ext.level !== 'block' && ext.level !== 'inline')) {
-                throw new Error("extension level must be 'block' or 'inline'");
-              }
-              if (extensions[ext.level]) {
-                extensions[ext.level].unshift(ext.tokenizer);
-              } else {
-                extensions[ext.level] = [ext.tokenizer];
-              }
-              if (ext.start) { // Function to check for start of token
-                if (ext.level === 'block') {
-                  if (extensions.startBlock) {
-                    extensions.startBlock.push(ext.start);
-                  } else {
-                    extensions.startBlock = [ext.start];
-                  }
-                } else if (ext.level === 'inline') {
-                  if (extensions.startInline) {
-                    extensions.startInline.push(ext.start);
-                  } else {
-                    extensions.startInline = [ext.start];
-                  }
-                }
-              }
-            }
-            if (ext.childTokens) { // Child tokens to be visited by walkTokens
-              extensions.childTokens[ext.name] = ext.childTokens;
-            }
-          });
-        }
-
-        // ==-- Parse "overwrite" extensions --== //
-        if (pack.renderer) {
-          const renderer = marked.defaults.renderer || new Renderer();
-          for (const prop in pack.renderer) {
-            const prevRenderer = renderer[prop];
-            // Replace renderer with func to run extension, but fall back if false
-            renderer[prop] = (...args) => {
-              let ret = pack.renderer[prop].apply(renderer, args);
-              if (ret === false) {
-                ret = prevRenderer.apply(renderer, args);
-              }
-              return ret;
-            };
-          }
-          opts.renderer = renderer;
-        }
-        if (pack.tokenizer) {
-          const tokenizer = marked.defaults.tokenizer || new Tokenizer();
-          for (const prop in pack.tokenizer) {
-            const prevTokenizer = tokenizer[prop];
-            // Replace tokenizer with func to run extension, but fall back if false
-            tokenizer[prop] = (...args) => {
-              let ret = pack.tokenizer[prop].apply(tokenizer, args);
-              if (ret === false) {
-                ret = prevTokenizer.apply(tokenizer, args);
-              }
-              return ret;
-            };
-          }
-          opts.tokenizer = tokenizer;
-        }
-
-        // ==-- Parse WalkTokens extensions --== //
-        if (pack.walkTokens) {
-          const walkTokens = marked.defaults.walkTokens;
-          opts.walkTokens = function(token) {
-            pack.walkTokens.call(this, token);
-            if (walkTokens) {
-              walkTokens.call(this, token);
-            }
-          };
-        }
-
-        if (hasExtensions) {
-          opts.extensions = extensions;
-        }
-
-        marked.setOptions(opts);
-      });
-    };
-
-    /**
-     * Run callback for every token
-     */
-
-    marked.walkTokens = function(tokens, callback) {
-      for (const token of tokens) {
-        callback.call(marked, token);
-        switch (token.type) {
-          case 'table': {
-            for (const cell of token.header) {
-              marked.walkTokens(cell.tokens, callback);
-            }
-            for (const row of token.rows) {
-              for (const cell of row) {
-                marked.walkTokens(cell.tokens, callback);
-              }
-            }
-            break;
-          }
-          case 'list': {
-            marked.walkTokens(token.items, callback);
-            break;
-          }
-          default: {
-            if (marked.defaults.extensions && marked.defaults.extensions.childTokens && marked.defaults.extensions.childTokens[token.type]) { // Walk any extensions
-              marked.defaults.extensions.childTokens[token.type].forEach(function(childTokens) {
-                marked.walkTokens(token[childTokens], callback);
-              });
-            } else if (token.tokens) {
-              marked.walkTokens(token.tokens, callback);
-            }
-          }
-        }
-      }
-    };
-
-    /**
-     * Parse Inline
-     */
-    marked.parseInline = function(src, opt) {
-      // throw error in case of non string input
-      if (typeof src === 'undefined' || src === null) {
-        throw new Error('marked.parseInline(): input parameter is undefined or null');
-      }
-      if (typeof src !== 'string') {
-        throw new Error('marked.parseInline(): input parameter is of type '
-          + Object.prototype.toString.call(src) + ', string expected');
-      }
-
-      opt = merge({}, marked.defaults, opt || {});
-      checkSanitizeDeprecation(opt);
-
-      try {
-        const tokens = Lexer.lexInline(src, opt);
-        if (opt.walkTokens) {
-          marked.walkTokens(tokens, opt.walkTokens);
-        }
-        return Parser.parseInline(tokens, opt);
-      } catch (e) {
-        e.message += '\nPlease report this to https://github.com/markedjs/marked.';
-        if (opt.silent) {
-          return '<p>An error occurred:</p><pre>'
-            + escape(e.message + '', true)
-            + '</pre>';
-        }
-        throw e;
-      }
-    };
-
-    /**
-     * Expose
-     */
-    marked.Parser = Parser;
-    marked.parser = Parser.parse;
-    marked.Renderer = Renderer;
-    marked.TextRenderer = TextRenderer;
-    marked.Lexer = Lexer;
-    marked.lexer = Lexer.lex;
-    marked.Tokenizer = Tokenizer;
-    marked.Slugger = Slugger;
-    marked.parse = marked;
-    Parser.parse;
-    Lexer.lex;
-
     var script$9 = {
     	name: 'TagTool',
     	props: {
@@ -23315,7 +20562,7 @@
 
     		const compiledMarkdown = computed(() => {
     			if (form.body) {
-    				return marked(form.body, { sanitize: true })
+    				return marked.marked(form.body, { sanitize: true })
     			}
     		});
 
@@ -24224,8 +21471,8 @@
     script.__file = "src/App.vue";
 
     /**
-      * vee-validate v4.5.8
-      * (c) 2022 Abdelrahman Awad
+      * vee-validate v4.5.7
+      * (c) 2021 Abdelrahman Awad
       * @license MIT
       */
 
@@ -26242,8 +23489,6 @@
                     insertFieldAtPath(field, newPath);
                     // re-validate if either path had errors before
                     if (errors.value[oldPath] || errors.value[newPath]) {
-                        // clear up both paths errors
-                        setFieldError(oldPath, undefined);
                         validateField(newPath);
                     }
                     // clean up the old path if no other field is sharing that name
@@ -26810,7 +24055,7 @@
         function swap(indexA, indexB) {
             const pathName = unref(arrayPath);
             const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
-            if (!Array.isArray(pathValue) || !(indexA in pathValue) || !(indexB in pathValue)) {
+            if (!Array.isArray(pathValue) || !pathValue[indexA] || !pathValue[indexB]) {
                 return;
             }
             const newValue = [...pathValue];
@@ -27073,5 +24318,5 @@
     router$1.isReady()
     	.then(() => app.mount('#hki2050'));
 
-})();
+})(marked);
 //# sourceMappingURL=main.js.map
