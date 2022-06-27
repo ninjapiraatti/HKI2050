@@ -17,7 +17,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build_test_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           ARGS: "-rltgoDzvO"
-          SOURCE: "target/release/poc-golang-vue2"
+          SOURCE: "target/x86_64-unknown-linux-gnu/release/poc-golang-vue2"
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_USER: ${{ secrets.SSH_USERNAME }}
           #TARGET: ${{ secrets.REMOTE_TARGET }}
