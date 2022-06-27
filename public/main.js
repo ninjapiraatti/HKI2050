@@ -23375,8 +23375,7 @@
     const _hoisted_8$2 = {
       key: 0,
       value: null,
-      disabled: "",
-      selected: true
+      disabled: ""
     };
     const _hoisted_9$1 = ["value"];
     const _hoisted_10$1 = { class: "mt-label" };
@@ -23479,7 +23478,7 @@
                             return (openBlock(), createElementBlock("option", {
                               key: character.id,
                               value: character.id
-                            }, toDisplayString(character.id), 9 /* TEXT, PROPS */, _hoisted_9$1))
+                            }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_9$1))
                           }), 128 /* KEYED_FRAGMENT */))
                         ]),
                         _: 2 /* DYNAMIC */

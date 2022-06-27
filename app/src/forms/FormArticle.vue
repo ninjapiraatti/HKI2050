@@ -65,9 +65,9 @@
 					id="character_id"
 					aria-label="Pick author character"
 				>
-					<option v-if='!form.character_id' :value="null" disabled :selected='true'>Pick author character</option>
+					<option v-if='!form.character_id' :value="null" disabled>Pick author character</option>
 					<option v-for="character in characters" :key="character.id" :value="character.id">
-						{{ character.id }}
+						{{ character.name }}
 					</option>
 				</VField>
 				<ErrorMessage name='author' class='invalid-feedback shake' />
