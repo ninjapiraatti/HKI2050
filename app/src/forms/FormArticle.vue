@@ -2,6 +2,7 @@
 	<div class="card shadow" :class='colorScheme.card'>
 		<div class='card-header'>
 			<h1 class="h3 mb-0">{{ form.title }}</h1>
+			{{ form }}
 		</div>
 		<VForm v-if='showFormBool == true' @submit='onSubmit' v-slot='{ errors }' class='vstack gap-2'>
 			<div>
@@ -64,9 +65,9 @@
 					id="character_id"
 					aria-label="Pick author character"
 				>
-					<option :value="null" disabled selected>Pick author character</option>
-					<option v-for="character in characters" :key="character" :value="character.id">
-						{{ character.name }}
+					<option v-if='!form.character_id' :value="null" disabled :selected='true'>Pick author character</option>
+					<option v-for="character in characters" :key="character.id" :value="character.id">
+						{{ character.id }}
 					</option>
 				</VField>
 				<ErrorMessage name='author' class='invalid-feedback shake' />
@@ -90,31 +91,6 @@ import TagTool from '@components/TagTool.vue'
 export default {
 	name: 'FormArticle',
 	props: {
-		/*
-		id: {
-			type: String,
-			default: undefined,
-		},
-		character_id: {
-			type: String,
-			required: true,
-		},
-		user_id: {
-			type: String,
-			required: true,
-		},
-		title: {
-			type: String,
-			default: undefined,
-		},
-		ingress: {
-			type: String,
-			default: undefined,
-		},
-		body: {
-			type: String,
-			default: undefined,
-		},*/
 		article: {
 			type: Object,
 			default: undefined,
@@ -164,14 +140,15 @@ export default {
 			console.log("Fetching user articles")
 			articles.value = await api.users.articles.get({ user_id: store.state.loggeduser.id })
 			if (articles.value.length) {
-				console.log("returning true", articles.value)
 				showFormBool.value = true
 				return true
-			} else {
-				console.log("returning false", articles.value)
-				showFormBool.value = false
-				return false
 			}
+			if (!route.params.id) {
+				showFormBool.value = true
+				return true
+			}
+			showFormBool.value = false
+			return false
 		})
 
 		const submitLabel = computed(() => {

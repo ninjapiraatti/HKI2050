@@ -23263,31 +23263,6 @@
     var script$8 = {
     	name: 'FormArticle',
     	props: {
-    		/*
-    		id: {
-    			type: String,
-    			default: undefined,
-    		},
-    		character_id: {
-    			type: String,
-    			required: true,
-    		},
-    		user_id: {
-    			type: String,
-    			required: true,
-    		},
-    		title: {
-    			type: String,
-    			default: undefined,
-    		},
-    		ingress: {
-    			type: String,
-    			default: undefined,
-    		},
-    		body: {
-    			type: String,
-    			default: undefined,
-    		},*/
     		article: {
     			type: Object,
     			default: undefined,
@@ -23299,7 +23274,7 @@
     	setup(props, {emit}) {
     		const store = inject('store');
     		const api = inject('api');
-    		useRoute();
+    		const route = useRoute();
     		const colorScheme = inject('colorScheme');
     		let sending = false;
     		let form = reactive({
@@ -23332,14 +23307,15 @@
     			console.log("Fetching user articles");
     			articles.value = await api.users.articles.get({ user_id: store.state.loggeduser.id });
     			if (articles.value.length) {
-    				console.log("returning true", articles.value);
     				showFormBool.value = true;
     				return true
-    			} else {
-    				console.log("returning false", articles.value);
-    				showFormBool.value = false;
-    				return false
     			}
+    			if (!route.params.id) {
+    				showFormBool.value = true;
+    				return true
+    			}
+    			showFormBool.value = false;
+    			return false
     		});
 
     		const submitLabel = computed(() => {
@@ -23396,11 +23372,12 @@
       for: "author",
       class: "form-label"
     }, "Author", -1 /* HOISTED */);
-    const _hoisted_8$2 = /*#__PURE__*/createBaseVNode("option", {
+    const _hoisted_8$2 = {
+      key: 0,
       value: null,
       disabled: "",
-      selected: ""
-    }, "Pick author character", -1 /* HOISTED */);
+      selected: true
+    };
     const _hoisted_9$1 = ["value"];
     const _hoisted_10$1 = { class: "mt-label" };
     const _hoisted_11$1 = ["disabled"];
@@ -23416,7 +23393,8 @@
         class: normalizeClass(["card shadow", $setup.colorScheme.card])
       }, [
         createBaseVNode("div", _hoisted_1$7, [
-          createBaseVNode("h1", _hoisted_2$4, toDisplayString($setup.form.title), 1 /* TEXT */)
+          createBaseVNode("h1", _hoisted_2$4, toDisplayString($setup.form.title), 1 /* TEXT */),
+          createTextVNode(" " + toDisplayString($setup.form), 1 /* TEXT */)
         ]),
         ($setup.showFormBool == true)
           ? (openBlock(), createBlock(_component_VForm, {
@@ -23494,12 +23472,14 @@
                         "aria-label": "Pick author character"
                       }, {
                         default: withCtx(() => [
-                          _hoisted_8$2,
+                          (!$setup.form.character_id)
+                            ? (openBlock(), createElementBlock("option", _hoisted_8$2, "Pick author character"))
+                            : createCommentVNode("v-if", true),
                           (openBlock(true), createElementBlock(Fragment, null, renderList($setup.characters, (character) => {
                             return (openBlock(), createElementBlock("option", {
-                              key: character,
+                              key: character.id,
                               value: character.id
-                            }, toDisplayString(character.name), 9 /* TEXT, PROPS */, _hoisted_9$1))
+                            }, toDisplayString(character.id), 9 /* TEXT, PROPS */, _hoisted_9$1))
                           }), 128 /* KEYED_FRAGMENT */))
                         ]),
                         _: 2 /* DYNAMIC */
@@ -23559,6 +23539,7 @@
     		});
 
     		const articleProp = computed(() => {
+    			console.log(articleObject.value);
     			return articleObject.value
     		});
 

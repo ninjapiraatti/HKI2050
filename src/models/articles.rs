@@ -9,8 +9,8 @@ pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 #[table_name = "articles"]
 pub struct Article {
 	pub id: uuid::Uuid,
-  pub user_id: uuid::Uuid,
   pub character_id: uuid::Uuid,
+  pub user_id: uuid::Uuid,
 	pub title: String,
   pub ingress: String,
   pub body: String,

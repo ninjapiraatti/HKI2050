@@ -38,6 +38,7 @@ export default {
 		})
 
 		const articleProp = computed(() => {
+			console.log(articleObject.value)
 			return articleObject.value
 		})
 
