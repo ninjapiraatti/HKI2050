@@ -4,6 +4,7 @@ import { api } from '@root/api.js'
 const state = reactive({
 	loggeduser: JSON.parse(localStorage.getItem('user')),
 	colorScheme: getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim(),
+	tags: [],
 })
 
 const methods = {

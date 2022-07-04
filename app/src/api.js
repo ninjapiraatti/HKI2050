@@ -235,6 +235,19 @@ export const api = {
 
 		delete: remove('/api/tags/{id}'),
 	},
+
+	content_tags: {
+		get: async (data = {}) => {
+			return await getArray('/api/content_tags')(data)
+		},
+
+		save: save({
+			create: '/api/content_tags',
+			update: '/api/content_tags/{id}',
+		}),
+
+		delete: remove('/api/content_tags/{id}'),
+	},
 }
 
 export default {

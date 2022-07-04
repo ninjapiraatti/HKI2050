@@ -88,6 +88,7 @@ import { marked } from 'marked'
 import { useRoute } from 'vue-router'
 import { flashMessage } from '@smartweb/vue-flash-message';
 import TagTool from '@components/TagTool.vue'
+import { isNoUnitNumericStyleProp } from '@vue/shared';
 export default {
 	name: 'FormArticle',
 	props: {
@@ -102,6 +103,7 @@ export default {
 	setup(props, {emit}) {
 		const store = inject('store')
 		const api = inject('api')
+		const utils = inject('utils')
 		const route = useRoute()
 		const colorScheme = inject('colorScheme')
 		let sending = false
@@ -112,13 +114,16 @@ export default {
 			ingress: props.article.ingress || '',
 			body: props.article.body || '',
 			user_id: store.state.loggeduser.id, // This won't do in long run
+			tags: props.article.tags || [],
 		})
 		let characters = ref([])
 		let articles = ref([])
+		let allTags = []
 		let showFormBool = ref(false)
 
 		async function onSubmit() {
 			sending = true
+			utils.saveTags(form.tags)
 			let article = await api.users.articles.save(form)
 			if (article) {
 				flashMessage.show({
@@ -127,13 +132,12 @@ export default {
 					time: 500,
 				})
 			}
-
 			sending = false
 		}
 
-		async function updateTags(tags) {
-			console.log(tags)
-			//form.tags = tags
+		async function updateTags(e) {
+			console.log('tags: ' + e.value)
+			form.tags = e.value
 		}
 
 		const showForm = computed(async() => {
@@ -167,7 +171,8 @@ export default {
 
 		onMounted(async () => {
 			getCharacters()
-			showForm.value
+			allTags = await api.tags.get()
+			console.log(showForm.value) // What is this? 
 		})
 
 		return {
@@ -182,6 +187,8 @@ export default {
 			compiledMarkdown,
 			showForm,
 			showFormBool,
+			updateTags,
+			allTags,
 		}
 	},
 }

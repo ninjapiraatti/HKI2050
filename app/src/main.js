@@ -6,6 +6,7 @@ import api from '@root/api.js'
 import router from '@root/router.js'
 import colorScheme from '@root/plugins/vue-color-scheme'
 import modal from '@root/plugins/vue-modal'
+import utils from '@root/plugins/hkiUtils'
 import FlashMessage from '@smartweb/vue-flash-message'
 import App from '@root/App.vue'
 import 'bootstrap'
@@ -18,6 +19,7 @@ const app = createApp(App)
 	.use(api, {storeApi: store, routerApi: router})
 	.use(FlashMessage)
 	.use(modal)
+	.use(utils, {storeApi: store})
 	//app.provide('colorScheme', colorScheme)
 	.use(colorScheme, { scheme: toRef(store.state, 'colorScheme') })
 	//.use(colorScheme)

@@ -72,6 +72,7 @@ export default {
 
 		async function onTagChange(e) {
 			chosenTags.value.push(e.target.value)
+			console.log("emitting")
 			emit('tagsUpdated', chosenTags)
 		}
 
@@ -81,6 +82,7 @@ export default {
 				console.log(chosenTags.value)
 				if (!chosenTags.value.includes(tagTitle)) {
 					chosenTags.value.push(tagTitle)
+					emit('tagsUpdated', chosenTags)
 				}
 				tagInput.value = ''
 				return []
