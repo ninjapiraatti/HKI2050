@@ -93,6 +93,8 @@ table! {
 
 joinable!(articles -> characters (character_id));
 joinable!(characters -> users (user_id));
+joinable!(contenttags -> articles (content_id));
+joinable!(contenttags -> tags (tag_id));
 joinable!(invitations -> reset_requests (reset_request_id));
 joinable!(sessions -> users (user_id));
 

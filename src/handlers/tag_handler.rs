@@ -12,6 +12,14 @@ pub struct TagData {
 	pub title: String,
 }
 
+#[derive(Deserialize, Debug)]
+pub struct ContentTagData {
+	pub tag_id: uuid::Uuid,
+	pub content_id: uuid::Uuid,
+	pub user_id: uuid::Uuid,
+	pub title: String,
+}
+
 pub async fn get_tags(
 	pool: web::Data<Pool>,
 ) -> Result<HttpResponse, ServiceError> {
@@ -27,13 +35,31 @@ pub async fn get_tags(
 	}
 }
 
+pub async fn get_content_tags(
+	id: web::Path<String>,
+	pool: web::Data<Pool>,
+) -> Result<HttpResponse, ServiceError> {
+	trace!("Getting content tags");
+
+	let content_id = uuid::Uuid::parse_str(&id.into_inner())?;
+
+	let res = web::block(move || tags_storage::query_content_tags(content_id, &pool)).await;
+	match res {
+		Ok(tag) => Ok(HttpResponse::Ok().json(&tag)),
+		Err(err) => match err {
+			BlockingError::Error(service_error) => Err(service_error.into()),
+			BlockingError::Canceled => Err(ServiceError::InternalServerError),
+		},
+	}
+}
+
 pub async fn add_tag(
 	tag_data: web::Json<TagData>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,
 ) -> Result<HttpResponse, ServiceError> {
 	trace!(
-		"Adding an tag: tag_data = {:#?} logged_user = {:#?}",
+		"Adding a tag: tag_data = {:#?} logged_user = {:#?}",
 		&tag_data,
 		&logged_user
 	);
@@ -45,6 +71,43 @@ pub async fn add_tag(
 	let res = web::block(move || {
 		tags_storage::create_tag(
 			tag_data.title.clone(),
+			logged_user.email,
+			&pool,
+		)
+	})
+	.await;
+	match res {
+		Ok(tag) => Ok(HttpResponse::Ok().json(&tag)),
+		Err(err) => match err {
+			BlockingError::Error(service_error) => Err(service_error.into()),
+			BlockingError::Canceled => Err(ServiceError::InternalServerError),
+		},
+	}
+}
+
+pub async fn add_content_tag(
+	id: web::Path<String>,
+	tag_data: web::Json<ContentTagData>,
+	pool: web::Data<Pool>,
+	logged_user: LoggedUser,
+) -> Result<HttpResponse, ServiceError> {
+	trace!(
+		"Adding a content tag to article: content id = {:#?} tag_data = {:#?} logged_user = {:#?}",
+		&id,
+		&tag_data,
+		&logged_user
+	);
+
+	if logged_user.isadmin == false && logged_user.id != tag_data.user_id {
+		return Err(ServiceError::AdminRequired);
+	};
+
+	let content_id = uuid::Uuid::parse_str(&id.into_inner())?;
+
+	let res = web::block(move || {
+		tags_storage::create_content_tag(
+			tag_data.tag_id,
+			tag_data.content_id,
 			logged_user.email,
 			&pool,
 		)
@@ -89,6 +152,31 @@ pub async fn get_articles_by_tag(
 */
 
 pub async fn delete_tag(
+	id: web::Path<String>,
+	pool: web::Data<Pool>,
+	logged_user: LoggedUser,
+) -> Result<HttpResponse, ServiceError> {
+	trace!(
+		"Delete a tag: logged_user = {:#?}",
+		&logged_user
+	);
+
+	let tag_id = uuid::Uuid::parse_str(&id.into_inner())?;
+	if logged_user.isadmin == false {
+		return Err(ServiceError::AdminRequired);
+	}
+
+	let res = web::block(move || tags_storage::delete_tag(tag_id, &pool)).await;
+	match res {
+		Ok(tag) => Ok(HttpResponse::Ok().json(&tag)),
+		Err(err) => match err {
+			BlockingError::Error(service_error) => Err(service_error.into()),
+			BlockingError::Canceled => Err(ServiceError::InternalServerError),
+		},
+	}
+}
+
+pub async fn delete_content_tag(
 	id: web::Path<String>,
 	pool: web::Data<Pool>,
 	logged_user: LoggedUser,

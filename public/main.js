@@ -24059,12 +24059,12 @@
         let existingTags = extractExistingTags(tags, store.state.tags);
         let newTags = tags.filter( i => !existingTags.includes( i ) );
         console.log(newTags);
-        console.log(existingTags);
+        console.log(api);
       }
     };
 
     var utils$1 = {
-    	install: (app, {storeApi }) => {
+    	install: (app, {storeApi}) => {
         store = storeApi;
     		app.provide('utils', utils);
     	},

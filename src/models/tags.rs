@@ -14,6 +14,8 @@ pub struct Tag {
   pub updated_by: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
+#[table_name = "contenttags"]
 pub struct ContentTag {
   pub id: uuid::Uuid,
   pub tag_id: uuid::Uuid,
