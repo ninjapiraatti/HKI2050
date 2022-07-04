@@ -50,6 +50,22 @@ const methods = {
 			localStorage.removeItem('user')
 		}
 	},
+
+	async initState() {
+		console.log("getting tags")
+		let data = []
+		try {
+			console.log("gonna await now")
+			const tagObjects = await Promise.all([api.tags.get()])
+			data = tagObjects.map( i => i.title )
+			console.log(tagObjects)
+			console.log(data)
+			state.tags = tagObjects[0]
+		} catch (error) {
+			console.warn(`Fetching tags failed: ${error.message}`)
+			return []
+		}		
+	}
 }
 
 export default {

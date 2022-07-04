@@ -8582,6 +8582,22 @@
     			localStorage.removeItem('user');
     		}
     	},
+
+    	async initState() {
+    		console.log("getting tags");
+    		let data = [];
+    		try {
+    			console.log("gonna await now");
+    			const tagObjects = await Promise.all([api.tags.get()]);
+    			data = tagObjects.map( i => i.title );
+    			console.log(tagObjects);
+    			console.log(data);
+    			state.tags = tagObjects[0];
+    		} catch (error) {
+    			console.warn(`Fetching tags failed: ${error.message}`);
+    			return []
+    		}		
+    	}
     };
 
     var store$1 = {
@@ -23483,7 +23499,7 @@
                       })
                     ]))
                   : createCommentVNode("v-if", true),
-                createVNode(_component_TagTool, { onTagsUpdated: _ctx.updateTags }, null, 8 /* PROPS */, ["onTagsUpdated"]),
+                createVNode(_component_TagTool, { onTagsUpdated: $setup.updateTags }, null, 8 /* PROPS */, ["onTagsUpdated"]),
                 createBaseVNode("div", _hoisted_10$1, [
                   createBaseVNode("button", {
                     type: "submit",
@@ -24035,15 +24051,15 @@
 
     function extractExistingTags(inputTags, allTags) {
       let filteredTags = allTags.filter( i => inputTags.includes( i.title ) );
-      console.log(filteredTags);
+      return filteredTags.map( i => i.title )
     }
 
     const utils = {
       saveTags: function(tags) {
-        console.log(store);
         let existingTags = extractExistingTags(tags, store.state.tags);
         let newTags = tags.filter( i => !existingTags.includes( i ) );
         console.log(newTags);
+        console.log(existingTags);
       }
     };
 
@@ -24223,7 +24239,7 @@
     		provide('store', store$1);
 
     		onMounted(() => {
-    			//console.log(store)
+    			store$1.methods.initState();
     		});
 
     		return {

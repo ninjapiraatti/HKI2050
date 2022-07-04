@@ -22,7 +22,7 @@ export default {
 		provide('store', store)
 
 		onMounted(() => {
-			//console.log(store)
+			store.methods.initState()
 		})
 
 		return {
