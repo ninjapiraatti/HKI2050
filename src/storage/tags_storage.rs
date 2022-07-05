@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use diesel::result::Error::NotFound;
 use diesel::PgConnection;
 
-use crate::models::tags::{Tag, ContentTag};
+use crate::models::tags::{Tag, ContentTag, RichContentTag};
 use crate::models::users::Pool;
 use diesel::result::Error;
 
@@ -22,12 +22,13 @@ pub fn query_tags(
 pub fn query_content_tags(
 	q_content_id: uuid::Uuid,
 	pool: &web::Data<Pool>,
-) -> Result<Vec<ContentTag>, Error> {
-	use crate::schema::contenttags::dsl::{contenttags};
+) -> Result<Vec<RichContentTag>, Error> {
+	use crate::schema::rich_contenttags::dsl::{content_id, rich_contenttags};
 	let conn: &PgConnection = &pool.get().unwrap();
 
-	let tags_res = contenttags
-		.load::<ContentTag>(conn)?;
+	let tags_res = rich_contenttags
+		.filter(content_id.eq(&q_content_id))
+		.load::<RichContentTag>(conn)?;
 
 	Ok(tags_res)
 }

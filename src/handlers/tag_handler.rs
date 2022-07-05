@@ -14,10 +14,8 @@ pub struct TagData {
 
 #[derive(Deserialize, Debug)]
 pub struct ContentTagData {
-	pub tag_id: uuid::Uuid,
-	pub content_id: uuid::Uuid,
 	pub user_id: uuid::Uuid,
-	pub title: String,
+	pub tag_id: uuid::Uuid,
 }
 
 pub async fn get_tags(
@@ -107,7 +105,7 @@ pub async fn add_content_tag(
 	let res = web::block(move || {
 		tags_storage::create_content_tag(
 			tag_data.tag_id,
-			tag_data.content_id,
+			content_id,
 			logged_user.email,
 			&pool,
 		)

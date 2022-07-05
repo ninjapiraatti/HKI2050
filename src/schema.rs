@@ -91,6 +91,16 @@ table! {
     }
 }
 
+table! {
+    rich_contenttags (idx) {
+        idx -> Int4,
+        contenttag_id -> Uuid,
+        tag_id -> Uuid,
+        content_id -> Uuid,
+        tag_title -> Varchar,
+    }
+}
+
 joinable!(articles -> characters (character_id));
 joinable!(characters -> users (user_id));
 joinable!(contenttags -> articles (content_id));
