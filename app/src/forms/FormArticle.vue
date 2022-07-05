@@ -123,9 +123,11 @@ export default {
 
 		async function onSubmit() {
 			sending = true
-			utils.saveTags(form.tags)
 			let article = await api.users.articles.save(form)
 			if (article) {
+				console.log(article.id)
+				utils.saveTags(form.tags, store.state.loggeduser.id, article.id)
+				store.methods.initState()
 				flashMessage.show({
 					type: 'success',
 					title: 'Article saved.',

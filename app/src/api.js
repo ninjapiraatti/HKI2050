@@ -238,15 +238,14 @@ export const api = {
 
 	content_tags: {
 		get: async (data = {}) => {
-			return await getArray('/api/content_tags')(data)
+			return await getArray('/api/content-tags/{id}')(data) // {id} here is content id, not tag id
 		},
 
 		save: save({
-			create: '/api/content_tags',
-			update: '/api/content_tags/{id}',
+			create: '/api/content-tags/{id}', // {id} here is content id, not tag id
 		}),
 
-		delete: remove('/api/content_tags/{id}'),
+		delete: remove('/api/content-tags/{id}'),
 	},
 }
 

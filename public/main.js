@@ -8512,15 +8512,14 @@
 
     	content_tags: {
     		get: async (data = {}) => {
-    			return await getArray('/api/content_tags')(data)
+    			return await getArray('/api/content-tags/{id}')(data) // {id} here is content id, not tag id
     		},
 
     		save: save({
-    			create: '/api/content_tags',
-    			update: '/api/content_tags/{id}',
+    			create: '/api/content-tags/{id}', // {id} here is content id, not tag id
     		}),
 
-    		delete: remove('/api/content_tags/{id}'),
+    		delete: remove('/api/content-tags/{id}'),
     	},
     };
 
@@ -23293,9 +23292,11 @@
 
     		async function onSubmit() {
     			sending = true;
-    			utils.saveTags(form.tags);
     			let article = await api.users.articles.save(form);
     			if (article) {
+    				console.log(article.id);
+    				utils.saveTags(form.tags, store.state.loggeduser.id, article.id);
+    				store.methods.initState();
     				m.show({
     					type: 'success',
     					title: 'Article saved.',
@@ -24051,15 +24052,48 @@
 
     function extractExistingTags(inputTags, allTags) {
       let filteredTags = allTags.filter( i => inputTags.includes( i.title ) );
-      return filteredTags.map( i => i.title )
+      return filteredTags
+    }
+
+    function extractNewTags(inputTags, allTags) {
+      let allTagTitles = allTags.map( i => i.title );
+      console.log(allTagTitles);
+      let filteredTags = inputTags.filter( i => !allTagTitles.includes( i ) );
+      return filteredTags
     }
 
     const utils = {
-      saveTags: function(tags) {
+      saveTags: async function(tags, userId, contentId) {
         let existingTags = extractExistingTags(tags, store.state.tags);
-        let newTags = tags.filter( i => !existingTags.includes( i ) );
-        console.log(newTags);
-        console.log(api);
+        let newTags = extractNewTags(tags, store.state.tags);
+        // console.log(newTags)
+        // console.log(existingTags)    
+
+        newTags.forEach( async tag => {
+          const dataNewTag = {
+            user_id: userId,
+            title: tag,
+          };
+          let newTagRes = await api.tags.save(dataNewTag);
+          const dataContentTag = {
+            id: contentId,
+            user_id: userId,
+            tag_id: newTagRes.id,
+          };
+          let newContentTagRes = await api.content_tags.save(dataContentTag);
+          if (!newContentTagRes.success) {
+            console.log(newContentTagRes);
+          }
+        });
+
+        existingTags.forEach( async tag => {
+          const data = {
+            id: contentId,
+            user_id: userId,
+            tag_id: tag.id,
+          };
+          await api.content_tags.save(data);
+        });
       }
     };
 
