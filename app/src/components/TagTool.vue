@@ -48,26 +48,24 @@ export default {
 			default: function() {
 				return [];
 			}
-		}
+		},
 	},
 	setup(props, {emit}) {
 		const api = inject('api')
 		const colorScheme = inject('colorScheme')
 		let sending = false
 		let tagInput = ref('')
-
-		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
-		let tags = ref([ ...props.contentTags])
-		let chosenTags = ref([])
+		let tags = ref([])
+		let chosenTags = ref([ ...props.contentTags])
 
 		onMounted(async () => {
 			getTags()
+			console.log('tags in tagtool:' + tags.value)
 		})
 
 		async function getTags() {
-			tags = await api.tags.get()
-			// console.log(tags.value)
-			// tags.value = tagObjects.map(tag => tag.title)
+			const tagObjects = await api.tags.get()
+			tags.value = tagObjects
 		}
 
 		async function onTagChange(e) {
@@ -88,7 +86,7 @@ export default {
 				return []
 			}
 			if (tagInput.value.length > 1) {
-				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
+				return tags.value.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
 			}
 			return []
 		})

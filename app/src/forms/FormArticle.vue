@@ -72,7 +72,7 @@
 				</VField>
 				<ErrorMessage name='author' class='invalid-feedback shake' />
 			</div>
-			<TagTool @tagsUpdated='updateTags'></TagTool>
+			<TagTool :contentTags='form.tags' @tagsUpdated='updateTags'></TagTool>
 			<div class='mt-label'>
 				<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
 			</div>
@@ -175,6 +175,7 @@ export default {
 			getCharacters()
 			allTags = await api.tags.get()
 			console.log(showForm.value) // What is this? 
+			console.log('content tags and title:' + form.tags + form.title)			
 		})
 
 		return {

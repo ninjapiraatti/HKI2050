@@ -23130,25 +23130,23 @@
     			default: function() {
     				return [];
     			}
-    		}
+    		},
     	},
     	setup(props, {emit}) {
     		const api = inject('api');
     		inject('colorScheme');
     		let tagInput = ref('');
-
-    		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
-    		let tags = ref([ ...props.contentTags]);
-    		let chosenTags = ref([]);
+    		let tags = ref([]);
+    		let chosenTags = ref([ ...props.contentTags]);
 
     		onMounted(async () => {
     			getTags();
+    			console.log('tags in tagtool:' + tags.value);
     		});
 
     		async function getTags() {
-    			tags = await api.tags.get();
-    			// console.log(tags.value)
-    			// tags.value = tagObjects.map(tag => tag.title)
+    			const tagObjects = await api.tags.get();
+    			tags.value = tagObjects;
     		}
 
     		async function onTagChange(e) {
@@ -23169,7 +23167,7 @@
     				return []
     			}
     			if (tagInput.value.length > 1) {
-    				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
+    				return tags.value.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
     			}
     			return []
     		});
@@ -23344,6 +23342,7 @@
     			getCharacters();
     			allTags = await api.tags.get();
     			console.log(showForm.value); // What is this? 
+    			console.log('content tags and title:' + form.tags + form.title);			
     		});
 
     		return {
@@ -23500,7 +23499,10 @@
                       })
                     ]))
                   : createCommentVNode("v-if", true),
-                createVNode(_component_TagTool, { onTagsUpdated: $setup.updateTags }, null, 8 /* PROPS */, ["onTagsUpdated"]),
+                createVNode(_component_TagTool, {
+                  contentTags: $setup.form.tags,
+                  onTagsUpdated: $setup.updateTags
+                }, null, 8 /* PROPS */, ["contentTags", "onTagsUpdated"]),
                 createBaseVNode("div", _hoisted_10$1, [
                   createBaseVNode("button", {
                     type: "submit",
@@ -23531,7 +23533,9 @@
     		async function getArticle() {
     			console.log(route.params.id);
     			let article = await api.articles.get({id: route.params.id});
+    			let tags = await api.content_tags.get({id: route.params.id});
     			if (article) {
+    				article[0].tags = tags;
     				articleObject.value = article[0];
     			}
     		}
