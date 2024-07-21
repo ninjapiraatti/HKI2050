@@ -20,7 +20,9 @@ export default {
 		async function getArticle() {
 			console.log(route.params.id)
 			let article = await api.articles.get({id: route.params.id})
+			let tags = await api.content_tags.get({id: route.params.id})
 			if (article) {
+				article[0].tags = tags
 				articleObject.value = article[0]
 			}
 		}

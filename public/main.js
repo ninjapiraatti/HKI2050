@@ -23163,26 +23163,31 @@
     			default: function() {
     				return [];
     			}
-    		}
+    		},
     	},
     	setup(props, {emit}) {
     		const api = inject('api');
     		inject('colorScheme');
     		let tagInput = ref('');
+<<<<<<< HEAD
 
     		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
     		let tags = ref([]);
     		let chosenTags = ref([ ...props.contentTags]);
     		console.log(chosenTags.value);
+=======
+    		let tags = ref([]);
+    		let chosenTags = ref([ ...props.contentTags]);
+>>>>>>> a068e0f9e4235065b2c833f4969ed2d110a203e4
 
     		onMounted(async () => {
     			getTags();
+    			console.log('tags in tagtool:' + tags.value);
     		});
 
     		async function getTags() {
-    			tags = await api.tags.get();
-    			// console.log(tags.value)
-    			// tags.value = tagObjects.map(tag => tag.title)
+    			const tagObjects = await api.tags.get();
+    			tags.value = tagObjects;
     		}
 
     		async function onTagChange(e) {
@@ -23203,7 +23208,7 @@
     				return []
     			}
     			if (tagInput.value.length > 1) {
-    				return tags.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
+    				return tags.value.filter(tag => tag.title.toLowerCase().startsWith(tagInput.value.toLowerCase()) && !chosenTags.value.includes(tag.title))
     			}
     			return []
     		});
@@ -23386,9 +23391,14 @@
 
     		onMounted(async () => {
     			allTags = await api.tags.get();
+<<<<<<< HEAD
     			getCharacters();
     			getContentTags();
     			console.log(showForm.value); // What is this?
+=======
+    			console.log(showForm.value); // What is this? 
+    			console.log('content tags and title:' + form.tags + form.title);			
+>>>>>>> a068e0f9e4235065b2c833f4969ed2d110a203e4
     		});
 
     		return {
