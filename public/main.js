@@ -23169,16 +23169,11 @@
     		const api = inject('api');
     		inject('colorScheme');
     		let tagInput = ref('');
-<<<<<<< HEAD
 
     		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
     		let tags = ref([]);
     		let chosenTags = ref([ ...props.contentTags]);
     		console.log(chosenTags.value);
-=======
-    		let tags = ref([]);
-    		let chosenTags = ref([ ...props.contentTags]);
->>>>>>> a068e0f9e4235065b2c833f4969ed2d110a203e4
 
     		onMounted(async () => {
     			getTags();
@@ -23391,14 +23386,9 @@
 
     		onMounted(async () => {
     			allTags = await api.tags.get();
-<<<<<<< HEAD
     			getCharacters();
     			getContentTags();
     			console.log(showForm.value); // What is this?
-=======
-    			console.log(showForm.value); // What is this? 
-    			console.log('content tags and title:' + form.tags + form.title);			
->>>>>>> a068e0f9e4235065b2c833f4969ed2d110a203e4
     		});
 
     		return {
@@ -23592,7 +23582,9 @@
     		async function getArticle() {
     			console.log(route.params.id);
     			let article = await api.articles.get({id: route.params.id});
+    			let tags = await api.content_tags.get({id: route.params.id});
     			if (article) {
+    				article[0].tags = tags;
     				articleObject.value = article[0];
     			}
     		}
