@@ -72,7 +72,7 @@
 				</VField>
 				<ErrorMessage name='author' class='invalid-feedback shake' />
 			</div>
-			<TagTool @tagsUpdated='updateTags'></TagTool>
+			<TagTool :contentTags='thisMakesNoSense' @tagsUpdated='updateTags'></TagTool>
 			<div class='mt-label'>
 				<button type='submit' :disabled='sending' class='btn btn-primary gradient float-end'>{{ submitLabel }}</button>
 			</div>
@@ -114,11 +114,11 @@ export default {
 			ingress: props.article.ingress || '',
 			body: props.article.body || '',
 			user_id: store.state.loggeduser.id, // This won't do in long run
-			tags: props.article.tags || [],
 		})
 		let characters = ref([])
 		let articles = ref([])
 		let allTags = []
+		let contentTags = ref([])
 		let showFormBool = ref(false)
 
 		async function onSubmit() {
@@ -133,6 +133,7 @@ export default {
 					title: 'Article saved.',
 					time: 500,
 				})
+				getContentTags()
 			}
 			sending = false
 		}
@@ -171,10 +172,20 @@ export default {
 			characters.value = await api.users.characters.get({ user_id: store.state.loggeduser.id })
 		}
 
+		const thisMakesNoSense = computed(() => {
+			return contentTags
+		})
+
+		async function getContentTags() {
+			let tagObjects = await api.content_tags.get(route.params.id)
+			contentTags = tagObjects.map(tag => tag.tag_title)
+		}
+
 		onMounted(async () => {
-			getCharacters()
 			allTags = await api.tags.get()
-			console.log(showForm.value) // What is this? 
+			getCharacters()
+			getContentTags()
+			console.log(showForm.value) // What is this?
 		})
 
 		return {
@@ -191,6 +202,9 @@ export default {
 			showFormBool,
 			updateTags,
 			allTags,
+			contentTags,
+			getContentTags,
+			thisMakesNoSense,
 		}
 	},
 }

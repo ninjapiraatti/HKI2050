@@ -57,8 +57,9 @@ export default {
 		let tagInput = ref('')
 
 		//let form = ref({ ...props, user_id: store.state.loggeduser.id })
-		let tags = ref([ ...props.contentTags])
-		let chosenTags = ref([])
+		let tags = ref([])
+		let chosenTags = ref([ ...props.contentTags])
+		console.log(chosenTags.value)
 
 		onMounted(async () => {
 			getTags()
